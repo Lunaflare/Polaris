@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2013/10/10 11:05:45.000.767,=C:\Users\Alex\Documents\RAD Studio\Projects\Project1PCH1.h</Transaction>
+    <Transaction>2013/10/10 11:05:47.000.570,=C:\Users\Alex\Documents\RAD Studio\Projects\Unit1.cpp</Transaction>
+    <Transaction>2013/10/10 11:26:20.000.974,C:\Users\Alex\Documents\RAD Studio\Projects\Unit1.fmx=C:\Users\Alex\Lunaflare\prototype.fmx</Transaction>
+    <Transaction>2013/10/10 11:26:20.000.974,C:\Users\Alex\Documents\RAD Studio\Projects\Unit1.h=C:\Users\Alex\Lunaflare\prototype.h</Transaction>
+    <Transaction>2013/10/10 11:26:20.000.974,C:\Users\Alex\Documents\RAD Studio\Projects\Unit1.cpp=C:\Users\Alex\Lunaflare\prototype.cpp</Transaction>
+    <Transaction>2013/10/10 11:27:17.000.380,C:\Users\Alex\Documents\RAD Studio\Projects\Project1PCH1.h=C:\Users\Alex\Lunaflare\prototype_all.h</Transaction>
+    <Transaction>2013/10/10 11:27:31.000.487,C:\Users\Alex\Documents\RAD Studio\Projects\Project1.cbproj=C:\Users\Alex\Lunaflare\prototype_one.cbproj</Transaction>
+  </Transactions>
+</BorlandProject>
