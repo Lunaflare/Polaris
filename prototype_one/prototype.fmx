@@ -49,7 +49,6 @@ object Form1: TForm1
     Position.Y = 136.000000000000000000
     Width = 193.000000000000000000
     Height = 25.000000000000000000
-    OnClick = usernameEditClick
   end
   object passwordEdit: TEdit
     DisableFocusEffect = False
@@ -59,7 +58,6 @@ object Form1: TForm1
     Position.Y = 200.000000000000000000
     Width = 193.000000000000000000
     Height = 25.000000000000000000
-    OnClick = passwordEditClick
   end
   object loginSubmitButton: TButton
     DisableFocusEffect = False
