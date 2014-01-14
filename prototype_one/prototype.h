@@ -20,6 +20,8 @@ __published:	// IDE-managed Components
 	TEdit *passwordEdit;
 	TButton *loginSubmitButton;
 	TButton *loginregisterButton;
+	void __fastcall usernameEditClick(TObject *Sender);
+	void __fastcall passwordEditClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);

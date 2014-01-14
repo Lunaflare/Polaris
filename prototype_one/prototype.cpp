@@ -19,3 +19,15 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 
 
 
+void __fastcall TForm1::usernameEditClick(TObject *Sender)
+{
+	usernameEdit->Text = "I love cats";	//important
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::passwordEditClick(TObject *Sender)
+{
+	passwordEdit->Text = "and certain dogs";	//also important
+}
+//---------------------------------------------------------------------------
+
