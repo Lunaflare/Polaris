@@ -15,3 +15,18 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
+{
+	SQLQuery1->SQL->Text="select * from user_info where username='"+usernameEdit->Text+"' and password=md5('"+passwordEdit->Text+"');";
+	SQLQuery1->Open();
+	SQLQuery1->First();
+
+	if(!SQLQuery1->Eof)
+	{
+		usernameText->Text = "Success!";
+	}
+	else
+		usernameText->Text = "Failure";
+}
+//---------------------------------------------------------------------------
+

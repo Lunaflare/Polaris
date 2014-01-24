@@ -10,6 +10,10 @@
 #include <FMX.Types.hpp>
 #include <FMX.Objects.hpp>
 #include <FMX.ExtCtrls.hpp>
+#include <Data.DB.hpp>
+#include <Data.DBXMySQL.hpp>
+#include <Data.SqlExpr.hpp>
+#include <Data.FMTBcd.hpp>
 //---------------------------------------------------------------------------
 class TForm1 : public TForm
 {
@@ -20,6 +24,9 @@ __published:	// IDE-managed Components
 	TEdit *passwordEdit;
 	TButton *loginSubmitButton;
 	TButton *loginregisterButton;
+	TSQLConnection *SQLConnection1;
+	TSQLQuery *SQLQuery1;
+	void __fastcall loginSubmitButtonClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);
