@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 
-#include <fmx.h>
+#include <fmx.cpp>
 #pragma hdrstop
 
 #include "prototype.h"
