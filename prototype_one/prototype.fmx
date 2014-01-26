@@ -75,6 +75,7 @@ object Form1: TForm1
     Position.Y = 264.000000000000000000
     Text = 'Register'
     Width = 80.000000000000000000
+    OnClick = loginregisterButtonClick
   end
   object SQLConnection1: TSQLConnection
     ConnectionName = 'MySQLConnection1'

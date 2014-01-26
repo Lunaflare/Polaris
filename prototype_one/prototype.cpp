@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------
 
+#include <windows.h>
 #include <fmx.h>
 #pragma hdrstop
 
@@ -27,6 +28,12 @@ void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 	}
 	else
 		usernameText->Text = "Failure";
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::loginregisterButtonClick(TObject *Sender)
+{
+	ShellExecute(NULL, L"open", L"http://baldwinserver.com/Lunaflare/generateKey.php", NULL, NULL, SW_SHOWNORMAL);
 }
 //---------------------------------------------------------------------------
 

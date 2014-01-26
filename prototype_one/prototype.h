@@ -27,6 +27,7 @@ __published:	// IDE-managed Components
 	TSQLConnection *SQLConnection1;
 	TSQLQuery *SQLQuery1;
 	void __fastcall loginSubmitButtonClick(TObject *Sender);
+	void __fastcall loginregisterButtonClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);
