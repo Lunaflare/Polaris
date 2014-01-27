@@ -49,6 +49,12 @@ object Form1: TForm1
     Position.Y = 136.000000000000000000
     Width = 193.000000000000000000
     Height = 25.000000000000000000
+    object usernameGlowEffect: TGlowEffect
+      Softness = 0.400000005960464500
+      GlowColor = claCrimson
+      Opacity = 0.899999976158142100
+      Enabled = False
+    end
   end
   object passwordEdit: TEdit
     DisableFocusEffect = False
@@ -58,6 +64,12 @@ object Form1: TForm1
     Position.Y = 200.000000000000000000
     Width = 193.000000000000000000
     Height = 25.000000000000000000
+    object passwordGlowEffect: TGlowEffect
+      Softness = 0.400000005960464500
+      GlowColor = claCrimson
+      Opacity = 0.899999976158142100
+      Enabled = False
+    end
   end
   object loginSubmitButton: TButton
     DisableFocusEffect = False
@@ -76,6 +88,17 @@ object Form1: TForm1
     Text = 'Register'
     Width = 80.000000000000000000
     OnClick = loginregisterButtonClick
+  end
+  object errorLabel: TLabel
+    Font.Size = 28.000000000000000000
+    FontColor = claCrimson
+    StyledSettings = [ssFamily]
+    Height = 57.000000000000000000
+    Position.X = 56.000000000000000000
+    Position.Y = 40.000000000000000000
+    Text = 'Error: username and/or password incorrect'
+    Visible = False
+    Width = 537.000000000000000000
   end
   object SQLConnection1: TSQLConnection
     ConnectionName = 'MySQLConnection1'

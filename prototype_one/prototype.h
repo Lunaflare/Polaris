@@ -14,6 +14,7 @@
 #include <Data.DBXMySQL.hpp>
 #include <Data.SqlExpr.hpp>
 #include <Data.FMTBcd.hpp>
+#include <FMX.Effects.hpp>
 //---------------------------------------------------------------------------
 class TForm1 : public TForm
 {
@@ -26,6 +27,9 @@ __published:	// IDE-managed Components
 	TButton *loginregisterButton;
 	TSQLConnection *SQLConnection1;
 	TSQLQuery *SQLQuery1;
+	TGlowEffect *usernameGlowEffect;
+	TGlowEffect *passwordGlowEffect;
+	TLabel *errorLabel;
 	void __fastcall loginSubmitButtonClick(TObject *Sender);
 	void __fastcall loginregisterButtonClick(TObject *Sender);
 private:	// User declarations
