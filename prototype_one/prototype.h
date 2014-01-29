@@ -30,6 +30,7 @@ __published:	// IDE-managed Components
 	TGlowEffect *usernameGlowEffect;
 	TGlowEffect *passwordGlowEffect;
 	TLabel *errorLabel;
+	TStyleBook *StyleBook2;
 	void __fastcall loginSubmitButtonClick(TObject *Sender);
 	void __fastcall loginregisterButtonClick(TObject *Sender);
 private:	// User declarations
