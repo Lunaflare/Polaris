@@ -3,9 +3,9 @@ object Form1: TForm1
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'Login'
-  ClientHeight = 303
+  ClientHeight = 310
   ClientWidth = 550
-  Position = poDesigned
+  Position = poScreenCenter
   StyleBook = StyleBook2
   FormFactor.Width = 1366
   FormFactor.Height = 768

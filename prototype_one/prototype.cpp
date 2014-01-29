@@ -1,12 +1,11 @@
 //---------------------------------------------------------------------------
 
-#include <iostream>
 #include <windows.h>
 #include <fmx.h>
 #pragma hdrstop
 
 #include "prototype.h"
-#include "unit2.h"
+#include "Unit2.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.fmx"
