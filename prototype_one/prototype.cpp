@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------
 
+#include <iostream>
 #include <windows.h>
 #include <fmx.h>
 #pragma hdrstop
@@ -33,31 +34,42 @@ void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 		//success, spawn next form
 		errorLabel->Visible = false;
 		Form2->Show();
+
+		//form2 (welcome form) is now the currently visible form, display username hello message
+		String username = usernameEdit->Text;
+		Form2->welcomeUserLabel->Text = "Hello " + username + "!";
+        Form2->welcomeUserLabel->Visible = true;
 	}
 	else
 	{
 		//failure, alert user to incorrect entry
+		errorLabel->Visible = true;
 
 		//add glow effect to empty edit text boxes
 		if (usernameEdit->Text == "")
 			usernameGlowEffect->Enabled = true;
 		else
 			usernameGlowEffect->Enabled = false;
+
 		if (passwordEdit->Text == "")
 			passwordGlowEffect->Enabled = true;
 		else
 			passwordGlowEffect->Enabled = false;
-
-        errorLabel->Visible = true;
 	}
 }
 //---------------------------------------------------------------------------
 
-//Opens browser with registration form when register button clicked
+//Opens browser with registration form when register button clicked (still need to create form)
 void __fastcall TForm1::loginregisterButtonClick(TObject *Sender)
 {
 	ShellExecute(NULL, L"open", L"http://baldwinserver.com/Lunaflare/generateKey.php", NULL, NULL, SW_SHOWNORMAL);
 }
 //---------------------------------------------------------------------------
 
+//Opens browser with recover password form when register button clicked (still need to create form)
+void __fastcall TForm1::recoverPasswordButtonClick(TObject *Sender)
+{
+	ShellExecute(NULL, L"open", L"http://baldwinserver.com/Lunaflare/generateKey.php", NULL, NULL, SW_SHOWNORMAL);
+}
+//---------------------------------------------------------------------------
 

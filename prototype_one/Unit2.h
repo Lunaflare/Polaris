@@ -12,7 +12,11 @@ class TForm2 : public TForm
 {
 __published:	// IDE-managed Components
 	TStyleBook *StyleBook2;
-	TButton *Button1;
+	TLabel *welcomeUserLabel;
+	TLabel *selectLabel;
+	TButton *inputSelectButton;
+	TButton *readSelectButton;
+	TButton *settingsSelectButton;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 private:	// User declarations

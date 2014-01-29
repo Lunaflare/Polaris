@@ -3,9 +3,8 @@ object Form1: TForm1
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'Login'
-  ClientHeight = 296
+  ClientHeight = 303
   ClientWidth = 550
-  Fill.Color = claBlack
   Position = poDesigned
   StyleBook = StyleBook2
   FormFactor.Width = 1366
@@ -89,53 +88,6 @@ object Form1: TForm1
     Text = 'Error: username and/or password incorrect'
     Visible = False
     Width = 537.000000000000000000
-  end
-  object SQLConnection1: TSQLConnection
-    ConnectionName = 'MySQLConnection1'
-    DriverName = 'MySQL'
-    LoginPrompt = False
-    Params.Strings = (
-      'DriverUnit=Data.DBXMySQL'
-      
-        'DriverPackageLoader=TDBXDynalinkDriverLoader,DbxCommonDriver170.' +
-        'bpl'
-      
-        'DriverAssemblyLoader=Borland.Data.TDBXDynalinkDriverLoader,Borla' +
-        'nd.Data.DbxCommonDriver,Version=17.0.0.0,Culture=neutral,PublicK' +
-        'eyToken=91d62ebb5b0d1b1b'
-      
-        'MetaDataPackageLoader=TDBXMySqlMetaDataCommandFactory,DbxMySQLDr' +
-        'iver170.bpl'
-      
-        'MetaDataAssemblyLoader=Borland.Data.TDBXMySqlMetaDataCommandFact' +
-        'ory,Borland.Data.DbxMySQLDriver,Version=17.0.0.0,Culture=neutral' +
-        ',PublicKeyToken=91d62ebb5b0d1b1b'
-      'GetDriverFunc=getSQLDriverMYSQL'
-      'LibraryName=dbxmys.dll'
-      'LibraryNameOsx=libsqlmys.dylib'
-      'VendorLib=LIBMYSQL.dll'
-      'VendorLibWin64=libmysql.dll'
-      'VendorLibOsx=libmysqlclient.dylib'
-      'HostName=baldwinserver.com'
-      'Database=baldwins_beta'
-      'User_Name=baldwins_program'
-      'Password=topsecret1'
-      'MaxBlobSize=-1'
-      'LocaleCode=0000'
-      'Compressed=False'
-      'Encrypted=True'
-      'BlobSize=-1'
-      'ErrorResourceFile=')
-    Connected = True
-    Left = 176
-    Top = 392
-  end
-  object SQLQuery1: TSQLQuery
-    MaxBlobSize = -1
-    Params = <>
-    SQLConnection = SQLConnection1
-    Left = 320
-    Top = 400
   end
   object StyleBook2: TStyleBook
     Resource.Strings = (
@@ -11301,5 +11253,61 @@ object Form1: TForm1
       '    end'
       '  end'
       'end')
+  end
+  object recoverPasswordButton: TButton
+    DisableFocusEffect = False
+    Height = 22.000000000000000000
+    Position.X = 264.000000000000000000
+    Position.Y = 264.000000000000000000
+    Text = 'Recover Password'
+    Width = 97.000000000000000000
+    OnClick = recoverPasswordButtonClick
+  end
+  object SQLConnection1: TSQLConnection
+    ConnectionName = 'MySQLConnection1'
+    DriverName = 'MySQL'
+    LoginPrompt = False
+    Params.Strings = (
+      'DriverUnit=Data.DBXMySQL'
+      
+        'DriverPackageLoader=TDBXDynalinkDriverLoader,DbxCommonDriver170.' +
+        'bpl'
+      
+        'DriverAssemblyLoader=Borland.Data.TDBXDynalinkDriverLoader,Borla' +
+        'nd.Data.DbxCommonDriver,Version=17.0.0.0,Culture=neutral,PublicK' +
+        'eyToken=91d62ebb5b0d1b1b'
+      
+        'MetaDataPackageLoader=TDBXMySqlMetaDataCommandFactory,DbxMySQLDr' +
+        'iver170.bpl'
+      
+        'MetaDataAssemblyLoader=Borland.Data.TDBXMySqlMetaDataCommandFact' +
+        'ory,Borland.Data.DbxMySQLDriver,Version=17.0.0.0,Culture=neutral' +
+        ',PublicKeyToken=91d62ebb5b0d1b1b'
+      'GetDriverFunc=getSQLDriverMYSQL'
+      'LibraryName=dbxmys.dll'
+      'LibraryNameOsx=libsqlmys.dylib'
+      'VendorLib=LIBMYSQL.dll'
+      'VendorLibWin64=libmysql.dll'
+      'VendorLibOsx=libmysqlclient.dylib'
+      'HostName=baldwinserver.com'
+      'Database=baldwins_beta'
+      'User_Name=baldwins_program'
+      'Password=topsecret1'
+      'MaxBlobSize=-1'
+      'LocaleCode=0000'
+      'Compressed=False'
+      'Encrypted=True'
+      'BlobSize=-1'
+      'ErrorResourceFile=')
+    Connected = True
+    Left = 176
+    Top = 392
+  end
+  object SQLQuery1: TSQLQuery
+    MaxBlobSize = -1
+    Params = <>
+    SQLConnection = SQLConnection1
+    Left = 320
+    Top = 400
   end
 end

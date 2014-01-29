@@ -31,8 +31,10 @@ __published:	// IDE-managed Components
 	TGlowEffect *passwordGlowEffect;
 	TLabel *errorLabel;
 	TStyleBook *StyleBook2;
+	TButton *recoverPasswordButton;
 	void __fastcall loginSubmitButtonClick(TObject *Sender);
 	void __fastcall loginregisterButtonClick(TObject *Sender);
+	void __fastcall recoverPasswordButtonClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);

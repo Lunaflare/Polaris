@@ -1,7 +1,7 @@
 object Form2: TForm2
   Left = 0
   Top = 0
-  Caption = 'Login Successful'
+  Caption = 'Welcome!'
   ClientHeight = 480
   ClientWidth = 640
   Position = poDesktopCenter
@@ -11,14 +11,6 @@ object Form2: TForm2
   FormFactor.Devices = [dkDesktop]
   OnClose = FormClose
   OnShow = FormShow
-  object Button1: TButton
-    DisableFocusEffect = False
-    Height = 22.000000000000000000
-    Position.X = 296.000000000000000000
-    Position.Y = 376.000000000000000000
-    Text = 'Button1'
-    Width = 80.000000000000000000
-  end
   object StyleBook2: TStyleBook
     Resource.Strings = (
       'object TLayout'
@@ -11183,5 +11175,50 @@ object Form2: TForm2
       '    end'
       '  end'
       'end')
+  end
+  object welcomeUserLabel: TLabel
+    Font.Size = 28.000000000000000000
+    FontColor = claSlategray
+    StyledSettings = [ssFamily]
+    Height = 65.000000000000000000
+    Position.X = 48.000000000000000000
+    Position.Y = 56.000000000000000000
+    Text = 'Hello'
+    Visible = False
+    Width = 513.000000000000000000
+  end
+  object selectLabel: TLabel
+    Font.Size = 28.000000000000000000
+    FontColor = claSlategray
+    StyledSettings = [ssFamily]
+    Height = 65.000000000000000000
+    Position.X = 216.000000000000000000
+    Position.Y = 160.000000000000000000
+    Text = 'Select an activity'
+    Width = 257.000000000000000000
+  end
+  object inputSelectButton: TButton
+    DisableFocusEffect = False
+    Height = 22.000000000000000000
+    Position.X = 120.000000000000000000
+    Position.Y = 304.000000000000000000
+    Text = 'INPUT'
+    Width = 80.000000000000000000
+  end
+  object readSelectButton: TButton
+    DisableFocusEffect = False
+    Height = 22.000000000000000000
+    Position.X = 280.000000000000000000
+    Position.Y = 304.000000000000000000
+    Text = 'READ'
+    Width = 80.000000000000000000
+  end
+  object settingsSelectButton: TButton
+    DisableFocusEffect = False
+    Height = 22.000000000000000000
+    Position.X = 440.000000000000000000
+    Position.Y = 304.000000000000000000
+    Text = 'SETTINGS'
+    Width = 80.000000000000000000
   end
 end
