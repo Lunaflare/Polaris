@@ -11176,4 +11176,101 @@ object Form5: TForm5
       '  end'
       'end')
   end
+  object readModeLabel: TLabel
+    Font.Size = 28.000000000000000000
+    FontColor = claSlategray
+    StyledSettings = [ssFamily]
+    Height = 65.000000000000000000
+    Position.X = 72.000000000000000000
+    Position.Y = 136.000000000000000000
+    Text = 'Read Mode:'
+    Width = 177.000000000000000000
+  end
+  object InputModeLabel: TLabel
+    Font.Size = 28.000000000000000000
+    FontColor = claSlategray
+    StyledSettings = [ssFamily]
+    Height = 65.000000000000000000
+    Position.X = 72.000000000000000000
+    Position.Y = 48.000000000000000000
+    Text = 'Input Mode:'
+    Width = 161.000000000000000000
+  end
+  object passwordChangeLabel: TLabel
+    Font.Size = 28.000000000000000000
+    FontColor = claSlategray
+    StyledSettings = [ssFamily]
+    Height = 65.000000000000000000
+    Position.X = 72.000000000000000000
+    Position.Y = 216.000000000000000000
+    Text = 'Password:'
+    Width = 145.000000000000000000
+  end
+  object inputDefaultRadio: TRadioButton
+    DisableFocusEffect = False
+    GroupName = 'Input'
+    Height = 19.000000000000000000
+    Position.X = 320.000000000000000000
+    Position.Y = 72.000000000000000000
+    Text = 'Default'
+    Width = 120.000000000000000000
+  end
+  object inputAdvancedRadio: TRadioButton
+    DisableFocusEffect = False
+    GroupName = 'Input'
+    Height = 19.000000000000000000
+    Position.X = 456.000000000000000000
+    Position.Y = 72.000000000000000000
+    Text = 'Advanced'
+    Width = 120.000000000000000000
+  end
+  object readDefaultRadio: TRadioButton
+    DisableFocusEffect = False
+    GroupName = 'Read'
+    Height = 19.000000000000000000
+    Position.X = 320.000000000000000000
+    Position.Y = 160.000000000000000000
+    Text = 'Default'
+    Width = 120.000000000000000000
+  end
+  object readAdvancedRadio: TRadioButton
+    DisableFocusEffect = False
+    GroupName = 'Read'
+    Height = 19.000000000000000000
+    Position.X = 456.000000000000000000
+    Position.Y = 160.000000000000000000
+    Text = 'Advanced'
+    Width = 120.000000000000000000
+  end
+  object passwordChangeEdit: TEdit
+    DisableFocusEffect = False
+    KeyboardType = vktDefault
+    Password = True
+    Position.X = 240.000000000000000000
+    Position.Y = 240.000000000000000000
+    Width = 193.000000000000000000
+    Height = 25.000000000000000000
+    object passwordGlowEffect: TGlowEffect
+      Softness = 0.400000005960464500
+      GlowColor = claCrimson
+      Opacity = 0.899999976158142100
+      Enabled = False
+    end
+  end
+  object changePasswordButton: TButton
+    DisableFocusEffect = False
+    Height = 22.000000000000000000
+    Position.X = 488.000000000000000000
+    Position.Y = 240.000000000000000000
+    Text = 'Change'
+    Width = 80.000000000000000000
+  end
+  object editDLRButton: TButton
+    DisableFocusEffect = False
+    Height = 22.000000000000000000
+    Position.X = 296.000000000000000000
+    Position.Y = 328.000000000000000000
+    Text = 'Edit DLR'
+    Width = 80.000000000000000000
+  end
 end
