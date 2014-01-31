@@ -1,0 +1,40 @@
+get_friends->SQL->Text="select distinct F.friend, O.online from friends F, info O where F.user='"+Form3->username->Text+"' and O.username=F.friend;";
+get_friends->Open();
+get_friends->First();
+UnicodeString a;
+UnicodeString name;
+while(!get_friends->Eof)
+	{
+	name=get_friends->Fields->Fields[0]->AsString;
+	a=name+" - ";
+	if(get_friends->Fields->Fields[1]->AsInteger==0)
+		a+="Offline";
+	else a+="Online!";
+	friends_box->Items->Add(a);
+	  get_friends->Next();
+	}
+
+
+I had this in FormCreate() 	TRegistry* reg = new TRegistry(KEY_READ);
+		reg->RootKey = HKEY_CURRENT_USER;
+		reg->Access = KEY_READ;
+		if(reg->OpenKey("Software\\Lunaflare\\Polaris\\", true))
+		{
+			username->Text=reg->ReadString("user");
+			if(reg->ValueExists("remember"))
+			{
+			  if(reg->ReadInteger("remember")==1)
+			{
+				Switch1->IsChecked=true;
+				password->Text=reg->ReadString("pass");
+			}
+			}
+			else
+			{
+			reg->Access = KEY_WRITE;
+			reg->OpenKey("Software\\BaldwinStudios\\Msnger\\", true);
+			reg->WriteInteger("remember", 0);
+			}
+		}
+		reg->CloseKey();
+		reg->Free();

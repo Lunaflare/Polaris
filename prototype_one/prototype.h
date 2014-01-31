@@ -36,8 +36,22 @@ __published:	// IDE-managed Components
 	void __fastcall loginregisterButtonClick(TObject *Sender);
 	void __fastcall recoverPasswordButtonClick(TObject *Sender);
 private:	// User declarations
+	String username;
+	String password;
+	String inputLevel;
+	String readLevel;
+	String accessLevel;
+	String userID;
 public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);
+	String getUsername() { return username; }
+	String getPassword() { return password; }
+	String getInputLevel() { return inputLevel; }
+	String getReadLevel() { return readLevel; }
+	void setReadLevel(String r) { readLevel = r; }
+	String getAccessLevel() { return accessLevel; }
+    void setInputLevel(String i) { inputLevel = i; }
+	String getUserID() { return userID; }
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm1 *Form1;

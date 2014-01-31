@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'Login'
-  ClientHeight = 310
+  ClientHeight = 324
   ClientWidth = 550
   Position = poScreenCenter
   StyleBook = StyleBook2

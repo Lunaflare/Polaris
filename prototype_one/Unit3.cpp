@@ -29,3 +29,12 @@ void __fastcall TForm3::FormClose(TObject *Sender, TCloseAction &Action)
 	Form2->Close();
 }
 //---------------------------------------------------------------------------
+
+//take user back to main menu when clicked
+void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
+{
+	Form3->Hide();
+	Form2->Show();
+}
+//---------------------------------------------------------------------------
+

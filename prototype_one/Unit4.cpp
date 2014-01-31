@@ -29,3 +29,12 @@ void __fastcall TForm4::FormClose(TObject *Sender, TCloseAction &Action)
 	Form2->Close();
 }
 //---------------------------------------------------------------------------
+
+//take user back to base menu when clicked
+void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
+{
+	Form4->Hide();
+	Form2->Show();
+}
+//---------------------------------------------------------------------------
+
