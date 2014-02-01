@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------
 
 #include <windows.h>
+#include <Registry.hpp>
 #include <fmx.h>
 #pragma hdrstop
 
@@ -41,6 +42,21 @@ void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 		readLevel = SQLQuery1->Fields->Fields[8]->AsString;
 		accessLevel = SQLQuery1->Fields->Fields[4]->AsString;
 		userID = SQLQuery1->Fields->Fields[0]->AsString;
+
+
+	//if rememberMe is set, update registry entry
+	TRegistry* reg = new TRegistry(KEY_READ);
+	reg->RootKey = HKEY_CURRENT_USER;
+	reg->Access = KEY_WRITE;
+	reg->OpenKey("Software\\Lunaflare\\Polaris\\", true);
+	reg->WriteString("user", usernameEdit->Text);
+	   if(Switch1->IsChecked)
+			reg->WriteInteger("remember", 1);
+	   else
+			reg->WriteInteger("remember", 0);
+
+	reg->CloseKey();
+	reg->Free();
 
 		//spawn the next form
 		Form2->Show();
@@ -103,6 +119,36 @@ if (Key==13)
 	{
 		loginSubmitButton->OnClick(NULL);
 	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::FormCreate(TObject *Sender)
+{
+//initialize registry settings
+TRegistry* reg = new TRegistry(KEY_READ);
+		reg->RootKey = HKEY_CURRENT_USER;
+		reg->Access = KEY_READ;
+		if(reg->OpenKey("Software\\Lunaflare\\Polaris\\", true))
+		{
+			if(reg->ValueExists("remember"))
+			{
+			  if(reg->ReadInteger("remember")==1)
+			  {
+				Switch1->IsChecked=true;
+				usernameEdit->Text=reg->ReadString("user");
+				passwordEdit->SetFocus();
+			  }
+			}
+			else
+			{
+			reg->Access = KEY_WRITE;
+			reg->OpenKey("Software\\Lunaflare\\Polaris\\", true);
+			reg->WriteInteger("remember", 0);
+			usernameEdit->SetFocus();
+			}
+		}
+		reg->CloseKey();
+		reg->Free();
 }
 //---------------------------------------------------------------------------
 

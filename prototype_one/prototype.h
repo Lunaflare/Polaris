@@ -42,6 +42,7 @@ __published:	// IDE-managed Components
 	void __fastcall recoverPasswordButtonClick(TObject *Sender);
 	void __fastcall passwordEditKeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
           TShiftState Shift);
+	void __fastcall FormCreate(TObject *Sender);
 private:	// User declarations
 	String username;
 	String password;
