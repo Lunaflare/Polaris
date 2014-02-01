@@ -48,6 +48,19 @@ void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 		//failure, alert user to incorrect entry
 		errorLabel->Visible = true;
 
+		//show recoverPasswordButton when user/pass is wrong(not blank)
+		if(usernameEdit->Text!="" && passwordEdit->Text!="")
+			{
+				recoverPasswordButton->Visible=true;
+				errorLabel->Text="Invalid username and/or password!";
+				errorLabel->Visible=true;
+			}
+		else
+			{
+				recoverPasswordButton->Visible=false;
+				errorLabel->Text="Please fill out the fields below.";
+				errorLabel->Visible=true;
+			}
 		//add glow effect to empty edit text boxes
 		if (usernameEdit->Text == "")
 			usernameGlowEffect->Enabled = true;
@@ -75,4 +88,7 @@ void __fastcall TForm1::recoverPasswordButtonClick(TObject *Sender)
 	ShellExecute(NULL, L"open", L"http://baldwinserver.com/Lunaflare/generateKey.php", NULL, NULL, SW_SHOWNORMAL);
 }
 //---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+
 

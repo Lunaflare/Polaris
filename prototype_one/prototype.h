@@ -32,6 +32,10 @@ __published:	// IDE-managed Components
 	TLabel *errorLabel;
 	TStyleBook *StyleBook2;
 	TButton *recoverPasswordButton;
+	TImage *logoImage;
+	TLabel *rememberLabel;
+	TSwitch *Switch1;
+	TLabel *copyrightLabel;
 	void __fastcall loginSubmitButtonClick(TObject *Sender);
 	void __fastcall loginregisterButtonClick(TObject *Sender);
 	void __fastcall recoverPasswordButtonClick(TObject *Sender);
