@@ -38,3 +38,19 @@ I had this in FormCreate() 	TRegistry* reg = new TRegistry(KEY_READ);
 		}
 		reg->CloseKey();
 		reg->Free();
+
+This was when the user clicked Login and the login was successful, it stored to the reg
+
+TRegistry* reg = new TRegistry(KEY_READ);
+	reg->RootKey = HKEY_CURRENT_USER;
+	reg->Access = KEY_WRITE;
+	reg->OpenKey("Software\\BaldwinStudios\\Msnger\\", true);
+	reg->WriteString("user", username->Text);
+	reg->WriteString("pass", password->Text);
+	   if(Switch1->IsChecked)
+			reg->WriteInteger("remember", 1);
+	   else
+			reg->WriteInteger("remember", 0);
+
+	reg->CloseKey();
+	reg->Free();

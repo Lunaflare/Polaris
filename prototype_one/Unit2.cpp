@@ -22,6 +22,7 @@ __fastcall TForm2::TForm2(TComponent* Owner)
 //hides the main form once this form is shown
 void __fastcall TForm2::FormShow(TObject *Sender)
 {
+
 	Form1->Hide();
 
 	//display username hello message, get username from form1

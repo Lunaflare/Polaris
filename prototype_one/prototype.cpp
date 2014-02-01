@@ -30,6 +30,8 @@ void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 	//check if empty return or not
 	if(!SQLQuery1->Eof)
 	{
+		loadIndicator->Enabled=true;
+		loadIndicator->Visible=true;
 		//success (not empty), spawn next form, get rid of error message
 		//first save some variables about the user
 		errorLabel->Visible = false;
@@ -91,4 +93,16 @@ void __fastcall TForm1::recoverPasswordButtonClick(TObject *Sender)
 
 //---------------------------------------------------------------------------
 
+
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::passwordEditKeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
+          TShiftState Shift)
+{
+if (Key==13)
+	{
+		loginSubmitButton->OnClick(NULL);
+	}
+}
+//---------------------------------------------------------------------------
 

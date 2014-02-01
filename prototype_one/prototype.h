@@ -36,9 +36,12 @@ __published:	// IDE-managed Components
 	TLabel *rememberLabel;
 	TSwitch *Switch1;
 	TLabel *copyrightLabel;
+	TAniIndicator *loadIndicator;
 	void __fastcall loginSubmitButtonClick(TObject *Sender);
 	void __fastcall loginregisterButtonClick(TObject *Sender);
 	void __fastcall recoverPasswordButtonClick(TObject *Sender);
+	void __fastcall passwordEditKeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
+          TShiftState Shift);
 private:	// User declarations
 	String username;
 	String password;
