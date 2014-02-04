@@ -7,6 +7,9 @@
 #include <FMX.Controls.hpp>
 #include <FMX.Forms.hpp>
 #include <FMX.Types.hpp>
+#include <FMX.Objects.hpp>
+#include <FMX.Filter.Effects.hpp>
+#include <FMX.Ani.hpp>
 //---------------------------------------------------------------------------
 class TForm2 : public TForm
 {
@@ -17,11 +20,38 @@ __published:	// IDE-managed Components
 	TButton *inputSelectButton;
 	TButton *readSelectButton;
 	TButton *settingsSelectButton;
+	TBrushObject *bg_gradient;
+	TImage *settingsButtonImage;
+	TImage *buttonShadowImage;
+	TImage *buttonSwapImage;
+	TImage *settingsButtonRolloverImage;
+	TFloatAnimation *opacityAnimation;
+	TBandedSwirlTransitionEffect *BandedSwirlTransitionEffect1;
+	TFloatAnimation *floatAnimation;
+	TImage *inputButtonRolloverImage;
+	TImage *inputButtonImage;
+	TImage *buttonShadowImage2;
+	TFloatAnimation *floatAnimation1;
+	TFloatAnimation *opacityAnimation1;
+	TImage *readButtonImage;
+	TImage *buttonShadowImage3;
+	TImage *readButtonRolloverImage;
+	TFloatAnimation *floatAnimation2;
+	TFloatAnimation *opacityAnimation2;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall inputSelectButtonClick(TObject *Sender);
 	void __fastcall readSelectButtonClick(TObject *Sender);
 	void __fastcall settingsSelectButtonClick(TObject *Sender);
+	void __fastcall settingsButtonImageClick(TObject *Sender);
+	void __fastcall settingsButtonImageMouseEnter(TObject *Sender);
+	void __fastcall settingsButtonImageMouseLeave(TObject *Sender);
+	void __fastcall inputButtonImageMouseEnter(TObject *Sender);
+	void __fastcall inputButtonImageMouseLeave(TObject *Sender);
+	void __fastcall inputButtonImageClick(TObject *Sender);
+	void __fastcall readButtonImageMouseEnter(TObject *Sender);
+	void __fastcall readButtonImageMouseLeave(TObject *Sender);
+	void __fastcall readButtonImageClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TForm2(TComponent* Owner);
