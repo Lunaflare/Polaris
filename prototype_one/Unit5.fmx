@@ -11246,8 +11246,8 @@ object Form5: TForm5
     DisableFocusEffect = False
     KeyboardType = vktDefault
     Password = True
-    Position.X = 240.000000000000000000
-    Position.Y = 240.000000000000000000
+    Position.X = 352.000000000000000000
+    Position.Y = 248.000000000000000000
     Width = 193.000000000000000000
     Height = 25.000000000000000000
     object passwordGlowEffect: TGlowEffect
@@ -11261,7 +11261,7 @@ object Form5: TForm5
     DisableFocusEffect = False
     Height = 22.000000000000000000
     Position.X = 296.000000000000000000
-    Position.Y = 296.000000000000000000
+    Position.Y = 368.000000000000000000
     Text = 'Save'
     Width = 80.000000000000000000
     OnClick = saveChangesButtonClick
@@ -11270,7 +11270,7 @@ object Form5: TForm5
     DisableFocusEffect = False
     Height = 22.000000000000000000
     Position.X = 296.000000000000000000
-    Position.Y = 344.000000000000000000
+    Position.Y = 416.000000000000000000
     Text = 'Edit DLR'
     Visible = False
     Width = 80.000000000000000000
@@ -11433,6 +11433,33 @@ object Form5: TForm5
     Position.X = 56.000000000000000000
     Position.Y = 440.000000000000000000
     Text = 'Home'
-    Width = 49.000000000000000000
+    Width = 65.000000000000000000
+  end
+  object confirmPasswordLabel: TLabel
+    Font.Size = 28.000000000000000000
+    FontColor = claSlategray
+    StyledSettings = [ssFamily]
+    Height = 65.000000000000000000
+    Position.X = 72.000000000000000000
+    Position.Y = 280.000000000000000000
+    Text = 'Confirm Password:'
+    Width = 265.000000000000000000
+  end
+  object confirmPasswordEdit: TEdit
+    DisableFocusEffect = False
+    FontColor = claSilver
+    KeyboardType = vktDefault
+    Password = True
+    TextAlign = taCenter
+    Position.X = 352.000000000000000000
+    Position.Y = 296.000000000000000000
+    Width = 193.000000000000000000
+    Height = 30.000000000000000000
+    object GlowEffect1: TGlowEffect
+      Softness = 0.400000005960464500
+      GlowColor = claCrimson
+      Opacity = 0.899999976158142100
+      Enabled = False
+    end
   end
 end

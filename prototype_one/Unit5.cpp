@@ -70,29 +70,83 @@ void __fastcall TForm5::homeImageButton5Click(TObject *Sender)
 //will take user back to base menu when clicked
 void __fastcall TForm5::saveChangesButtonClick(TObject *Sender)
 {
-	//set input and read levels appropriately based on status upon home button click
-	String currentInputLevel;
-	String currentReadLevel;
-	if (inputDefaultRadio->IsChecked)
-		currentInputLevel = "0";
+	//if password edit blank, save as normal, otherwise prompt as to whether really wish to change password, if so, change
+	if (passwordChangeEdit->Text != "")
+	{
+		if (passwordChangeEdit->Text != confirmPasswordEdit->Text)
+		{
+			ShowMessage(L"Passwords do not match");
+		}
+		else
+		{
+			int msgboxID = MessageBox(
+				NULL,
+				L"Would you really like to change your password?",
+				L"Confirm Password Change",
+				MB_ICONEXCLAMATION | MB_YESNO
+			);
+			if (msgboxID == IDYES)
+			{
+				//yes selected, save password and radios
+                //set input and read levels appropriately based on status upon home button click
+				String currentInputLevel;
+				String currentReadLevel;
+				String newPassword = passwordChangeEdit->Text;
+				if (inputDefaultRadio->IsChecked)
+					currentInputLevel = "0";
+				else
+					currentInputLevel = "1";
+				if (readDefaultRadio->IsChecked)
+					currentReadLevel = "0";
+				else
+					currentReadLevel = "1";
+
+				//query database and change input and read levels appropriately
+				Form1->SQLQuery1->SQL->Text="UPDATE baldwins_beta.user_info SET preference_read='"+currentReadLevel+"', password=md5('"+newPassword+"'), preference_write='"+currentInputLevel+"' WHERE user_info.userID='"+Form1->getUserID()+"';";
+				Form1->SQLQuery1->ExecSQL();
+
+				//set read and input levels appropriately given the desired changes (so populated upon return to this form)
+				Form1->setReadLevel(currentReadLevel);
+				Form1->setInputLevel(currentInputLevel);
+				Form1->setPassword(newPassword);
+
+				//hide current form and show base menu again
+				Form5->Hide();
+				Form2->Show();
+			}
+			else
+			{
+				//no selected, save nothing and show form again (do nothing)
+			}
+		}
+	}
 	else
-		currentInputLevel = "1";
-	if (readDefaultRadio->IsChecked)
-		currentReadLevel = "0";
-	else
-		currentReadLevel = "1";
+	{
+		//set input and read levels appropriately based on status upon home button click
+		String currentInputLevel;
+		String currentReadLevel;
+		if (inputDefaultRadio->IsChecked)
+			currentInputLevel = "0";
+		else
+			currentInputLevel = "1";
+		if (readDefaultRadio->IsChecked)
+			currentReadLevel = "0";
+		else
+			currentReadLevel = "1";
 
-	//query database and change input and read levels appropriately
-	Form1->SQLQuery1->SQL->Text="UPDATE baldwins_beta.user_info SET preference_read='"+currentReadLevel+"', preference_write='"+currentInputLevel+"' WHERE user_info.userID='"+Form1->getUserID()+"';";
-	Form1->SQLQuery1->ExecSQL();
+		//query database and change input and read levels appropriately
+		Form1->SQLQuery1->SQL->Text="UPDATE baldwins_beta.user_info SET preference_read='"+currentReadLevel+"', preference_write='"+currentInputLevel+"' WHERE user_info.userID='"+Form1->getUserID()+"';";
+		Form1->SQLQuery1->ExecSQL();
 
-	//set read and input levels appropriately given the desired changes (so populated upon return to this form)
-	Form1->setReadLevel(currentReadLevel);
-	Form1->setInputLevel(currentInputLevel);
+		//set read and input levels appropriately given the desired changes (so populated upon return to this form)
+		Form1->setReadLevel(currentReadLevel);
+		Form1->setInputLevel(currentInputLevel);
 
-	//hide current form and show base menu again
-    Form5->Hide();
-	Form2->Show();
+		//hide current form and show base menu again
+		Form5->Hide();
+		Form2->Show();
+    }
+
 }
 //---------------------------------------------------------------------------
 

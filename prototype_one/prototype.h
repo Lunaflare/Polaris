@@ -55,6 +55,7 @@ public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);
 	String getUsername() { return username; }
 	String getPassword() { return password; }
+	void setPassword(String p) { password = p; }
 	String getInputLevel() { return inputLevel; }
 	String getReadLevel() { return readLevel; }
 	void setReadLevel(String r) { readLevel = r; }

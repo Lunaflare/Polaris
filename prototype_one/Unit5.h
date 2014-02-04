@@ -32,6 +32,9 @@ __published:	// IDE-managed Components
 	TButton *editDLRButton;
 	TImage *homeImageButton5;
 	TLabel *homeLabel5;
+	TLabel *confirmPasswordLabel;
+	TEdit *confirmPasswordEdit;
+	TGlowEffect *GlowEffect1;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton5Click(TObject *Sender);
