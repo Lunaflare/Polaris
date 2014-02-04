@@ -37,7 +37,7 @@ __published:	// IDE-managed Components
 	TSwitch *Switch1;
 	TLabel *copyrightLabel;
 	TAniIndicator *loadIndicator;
-	TBrushObject *bg_gradient;
+	TBrushObject *BrushObject1;
 	void __fastcall loginSubmitButtonClick(TObject *Sender);
 	void __fastcall loginregisterButtonClick(TObject *Sender);
 	void __fastcall recoverPasswordButtonClick(TObject *Sender);

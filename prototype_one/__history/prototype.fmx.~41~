@@ -12374,7 +12374,7 @@ object Form1: TForm1
     Visible = False
     Width = 289.000000000000000000
   end
-  object BrushObject1: TBrushObject
+  object bg_gradient: TBrushObject
     StyleName = 'bg_gradient'
     Brush.Kind = bkGradient
     Brush.Gradient.Points = <
@@ -12390,8 +12390,6 @@ object Form1: TForm1
     Brush.Gradient.StartPosition.Y = 1.000000000000000000
     Brush.Gradient.StopPosition.X = 0.499999970197677600
     Brush.Gradient.StopPosition.Y = 0.000000000000000000
-    Left = 8
-    Top = 8
   end
   object SQLConnection1: TSQLConnection
     ConnectionName = 'MySQLConnection1'
