@@ -43,20 +43,19 @@ void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 		accessLevel = SQLQuery1->Fields->Fields[4]->AsString;
 		userID = SQLQuery1->Fields->Fields[0]->AsString;
 
-
-	//if rememberMe is set, update registry entry
-	TRegistry* reg = new TRegistry(KEY_READ);
-	reg->RootKey = HKEY_CURRENT_USER;
-	reg->Access = KEY_WRITE;
-	reg->OpenKey("Software\\Lunaflare\\Polaris\\", true);
-	reg->WriteString("user", usernameEdit->Text);
-	   if(Switch1->IsChecked)
+		//if rememberMe is set, update registry entry
+		TRegistry* reg = new TRegistry(KEY_READ);
+		reg->RootKey = HKEY_CURRENT_USER;
+		reg->Access = KEY_WRITE;
+		reg->OpenKey("Software\\Lunaflare\\Polaris\\", true);
+		reg->WriteString("user", usernameEdit->Text);
+		if(Switch1->IsChecked)
 			reg->WriteInteger("remember", 1);
-	   else
+		else
 			reg->WriteInteger("remember", 0);
 
-	reg->CloseKey();
-	reg->Free();
+		reg->CloseKey();
+		reg->Free();
 
 		//spawn the next form
 		Form2->Show();
@@ -75,9 +74,9 @@ void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 			}
 		else
 			{
-				recoverPasswordButton->Visible=false;
-				errorLabel->Text="Please fill out the fields below.";
-				errorLabel->Visible=true;
+				recoverPasswordButton->Visible = false;
+				errorLabel->Text = "Please fill out the fields below.";
+				errorLabel->Visible = true;
 			}
 		//add glow effect to empty edit text boxes
 		if (usernameEdit->Text == "")
@@ -106,9 +105,6 @@ void __fastcall TForm1::recoverPasswordButtonClick(TObject *Sender)
 	ShellExecute(NULL, L"open", L"http://baldwinserver.com/Lunaflare/generateKey.php", NULL, NULL, SW_SHOWNORMAL);
 }
 //---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
-
 
 //---------------------------------------------------------------------------
 
