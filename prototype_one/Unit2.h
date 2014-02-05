@@ -16,7 +16,6 @@ class TForm2 : public TForm
 __published:	// IDE-managed Components
 	TStyleBook *StyleBook2;
 	TLabel *welcomeUserLabel;
-	TLabel *selectLabel;
 	TButton *inputSelectButton;
 	TButton *readSelectButton;
 	TButton *settingsSelectButton;
@@ -38,6 +37,14 @@ __published:	// IDE-managed Components
 	TImage *readButtonRolloverImage;
 	TFloatAnimation *floatAnimation2;
 	TFloatAnimation *opacityAnimation2;
+	TImage *activityLabel;
+	TImage *inputLabelImage;
+	TImage *readLabelImage;
+	TImage *settingsLabelImage;
+	TImage *arrowImage;
+	TFloatAnimation *arrowFadeIn;
+	TLabel *Label1;
+	TImage *Image1;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall inputSelectButtonClick(TObject *Sender);

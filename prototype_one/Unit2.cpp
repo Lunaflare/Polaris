@@ -26,8 +26,9 @@ void __fastcall TForm2::FormShow(TObject *Sender)
 	Form1->Hide();
 
 	//display username hello message, get username from form1
-	Form2->welcomeUserLabel->Text = "Hello " + Form1->getUsername() + "!";
+	Form2->welcomeUserLabel->Text =  Form1->getUsername() + "!";
 	Form2->welcomeUserLabel->Visible = true;
+	arrowFadeIn->Enabled=true;
 }
 //---------------------------------------------------------------------------
 
@@ -72,6 +73,8 @@ void __fastcall TForm2::settingsButtonImageMouseEnter(TObject *Sender)
 {
 buttonSwapImage->Bitmap=settingsButtonImage->Bitmap;
 settingsButtonImage->Bitmap=settingsButtonRolloverImage->Bitmap;
+settingsLabelImage->Visible=true;
+arrowImage->Visible=false;
 
 }
 //---------------------------------------------------------------------------
@@ -79,6 +82,7 @@ settingsButtonImage->Bitmap=settingsButtonRolloverImage->Bitmap;
 void __fastcall TForm2::settingsButtonImageMouseLeave(TObject *Sender)
 {
 settingsButtonImage->Bitmap=buttonSwapImage->Bitmap;
+settingsLabelImage->Visible=false;
 
 }
 //---------------------------------------------------------------------------
@@ -87,12 +91,15 @@ void __fastcall TForm2::inputButtonImageMouseEnter(TObject *Sender)
 {
 buttonSwapImage->Bitmap=inputButtonImage->Bitmap;
 inputButtonImage->Bitmap=inputButtonRolloverImage->Bitmap;
+inputLabelImage->Visible=true;
+arrowImage->Visible=false;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm2::inputButtonImageMouseLeave(TObject *Sender)
 {
 inputButtonImage->Bitmap=buttonSwapImage->Bitmap;
+inputLabelImage->Visible=false;
 }
 //---------------------------------------------------------------------------
 
@@ -106,12 +113,15 @@ void __fastcall TForm2::readButtonImageMouseEnter(TObject *Sender)
 {
 buttonSwapImage->Bitmap=readButtonImage->Bitmap;
 readButtonImage->Bitmap=readButtonRolloverImage->Bitmap;
+readLabelImage->Visible=true;
+arrowImage->Visible=false;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm2::readButtonImageMouseLeave(TObject *Sender)
 {
 readButtonImage->Bitmap=buttonSwapImage->Bitmap;
+readLabelImage->Visible=false;
 }
 //---------------------------------------------------------------------------
 
@@ -120,4 +130,5 @@ void __fastcall TForm2::readButtonImageClick(TObject *Sender)
 inputSelectButton->OnClick(NULL);
 }
 //---------------------------------------------------------------------------
+
 
