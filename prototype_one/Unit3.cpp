@@ -62,7 +62,7 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 			//(inputObject.currentIndex)++;
 			(inputObject.size)++;
 
-			dbFieldEdit->Text = inputObject.currentIndex;
+			//dbFieldEdit->Text = inputObject.currentIndex;
 		}
 	}
 	else
@@ -114,16 +114,32 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 			temp.push_back(editedHeading);
 			temp.push_back(dbFieldEdit->Text);
 			inputObject.valueMap[inputObject.currentIndex + 1] = temp;
+			dbFieldEdit->Text = "";
 			(inputObject.currentIndex)++;
 			(inputObject.size)++;
 
-			dbFieldEdit->Text = inputObject.currentIndex;
+			//dbFieldEdit->Text = inputObject.currentIndex;
 			backImageButton->Visible = true;
 		}
 		else
 		{
 			//spawn next part that displays desired changes and asks if sure
 			//will also need to add the last item from the edit
+
+			//hide all other items on form besides home button
+			dbFieldLabel->Visible = false;
+			dbFieldEdit->Visible = false;
+			backImageButton->Visible = false;
+			nextImageButton->Visible = false;
+
+			//show and populate displayGrid
+			/*for (int i = 0; i < inputObject.size; ++i)
+			{
+				displayGrid->Cells[0][i] = "n/a"; //inputObject.valueMap[i][1];
+				displayGrid->Cells[1][i] = "n/a"; //inputObject.valueMap[i][2];
+			}
+
+			grdTimeSheet->Visible = true;*/
 		}
 	}
 	else
@@ -131,9 +147,10 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 		//don't query db, only go to next item in struct, replace item before advancing
 		inputObject.valueMap[inputObject.currentIndex].pop_back();
 		inputObject.valueMap[inputObject.currentIndex].push_back(dbFieldLabel->Text);
+		dbFieldEdit->Text = "";
 
 		(inputObject.currentIndex)++;
-		dbFieldEdit->Text = inputObject.currentIndex;
+		//dbFieldEdit->Text = inputObject.currentIndex;
 		dbFieldLabel->Text = inputObject.valueMap[inputObject.currentIndex][1];
 		backImageButton->Visible = true;
     }
@@ -144,8 +161,10 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 void __fastcall TForm3::backImageButtonClick(TObject *Sender)
 {
 	(inputObject.currentIndex)--;
+	if (inputObject.currentIndex == 0)
+		backImageButton->Visible = false;
 
-	dbFieldEdit->Text = inputObject.currentIndex;
+	//dbFieldEdit->Text = inputObject.currentIndex;
 	dbFieldLabel->Text = inputObject.valueMap[inputObject.currentIndex][1];
 }
 //---------------------------------------------------------------------------

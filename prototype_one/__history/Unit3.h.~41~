@@ -35,6 +35,14 @@
 #include <FMX.Layouts.hpp>
 
 using namespace std;
+
+struct inputValues
+{
+	map<int,vector<String> > valueMap;
+	int size;
+	int currentIndex;
+};
+
 //---------------------------------------------------------------------------
 class TForm3 : public TForm
 {
@@ -59,15 +67,9 @@ __published:	// IDE-managed Components
 	void __fastcall nextImageButtonClick(TObject *Sender);
 	void __fastcall backImageButtonClick(TObject *Sender);
 private:	// User declarations
+	inputValues inputObject;
 public:		// User declarations
 	__fastcall TForm3(TComponent* Owner);
-};
-
-struct inputValues
-{
-	map<int,String> = valueVector;
-	int size;
-	int currentIndex;
 };
 
 //---------------------------------------------------------------------------

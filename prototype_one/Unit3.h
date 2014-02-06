@@ -14,6 +14,8 @@
 #include <FMX.Objects.hpp>
 #include <FMX.Types.hpp>
 #include <System.Classes.hpp>
+#include <FMX.Grid.hpp>
+#include <FMX.Layouts.hpp>
 //---------------------------------------------------------------------------
 #include <iostream>
 #include <map>
