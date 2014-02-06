@@ -50,6 +50,19 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 				TReplaceFlags() << rfReplaceAll);
 			dbFieldLabel->Text = editedHeading;
 			dbFieldLabel->Visible = true;
+
+			//add to inputValues struct
+			vector<String> temp;
+			temp.push_back(originalHeading);
+			temp.push_back(editedHeading);
+			//inputValues inputObject;
+			inputObject.currentIndex = 0;
+			inputObject.size = 0;
+			inputObject.valueMap[inputObject.currentIndex] = temp;
+			//(inputObject.currentIndex)++;
+			(inputObject.size)++;
+
+			dbFieldEdit->Text = inputObject.currentIndex;
 		}
 	}
 	else
@@ -76,7 +89,8 @@ void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
 
 //advance column headings as desired by the user
 void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
-{
+{   if (inputObject.currentIndex + 1 == inputObject.size)
+	{
 	//strings used in if for holdling column headings
 	String originalHeading = "";
 	String editedHeading = "";
@@ -91,19 +105,45 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 		editedHeading = StringReplace(originalHeading, "_", " ",
 			TReplaceFlags() << rfReplaceAll);
 		dbFieldLabel->Text = editedHeading;
-		dbFieldLabel->Visible = true;
+		//dbFieldLabel->Visible = true;
+
+		//add to inputValues struct
+			vector<String> temp;
+			temp.push_back(originalHeading);
+			temp.push_back(editedHeading);
+			inputObject.valueMap[inputObject.currentIndex + 1] = temp;
+			(inputObject.currentIndex)++;
+			(inputObject.size)++;
+
+		dbFieldEdit->Text = inputObject.currentIndex;
 	}
 	else
 	{
 		//spawn next part that displays desired changes and asks if sure
 	}
+	}
+	else
+	{
+		//(inputObject.size)++;
+		(inputObject.currentIndex)++;
+
+		dbFieldEdit->Text = inputObject.currentIndex;
+		dbFieldLabel->Text = inputObject.valueMap[inputObject.currentIndex][1];
+		//dbFieldLabel->Visible = true;
+    }
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm3::backImageButtonClick(TObject *Sender)
 {
+	(inputObject.currentIndex)--;
+
+	dbFieldEdit->Text = inputObject.currentIndex;
+	dbFieldLabel->Text = inputObject.valueMap[inputObject.currentIndex][1];
+	//dbFieldLabel->Visible = true;
+
 	//strings used in if for holdling column headings
-	String originalHeading = "";
+	/*String originalHeading = "";
 	String editedHeading = "";
 	SQLQuery2->Last();
 
@@ -117,7 +157,7 @@ void __fastcall TForm3::backImageButtonClick(TObject *Sender)
 			TReplaceFlags() << rfReplaceAll);
 		dbFieldLabel->Text = editedHeading;
 		dbFieldLabel->Visible = true;
-	}
+	}*/
 }
 //---------------------------------------------------------------------------
 
