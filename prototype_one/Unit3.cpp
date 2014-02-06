@@ -26,10 +26,8 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 	//show user input screen based on input level (i.e. default or advanced)
 	if (Form1->getInputLevel() == 0)
 	{
-		//input level is "default"
-		SQLQuery2->SQL->Text =	"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_marriot_long_beach' AND TABLE_NAME = 'raw_input';";
-
-		//"select * from user_info where username='"+usernameEdit->Text+"' and password=md5('"+passwordEdit->Text+"');";
+		//input level is "default", query db schema
+		SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_marriot_long_beach' AND TABLE_NAME = 'raw_input';";
 
 		//open query and temporarily skip first two column headings
 		SQLQuery2->Open();
@@ -37,17 +35,22 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 		SQLQuery2->Next();
 		SQLQuery2->Next();
 
+		//strings used in if for holdling column headings
+		String originalHeading = "";
+		String editedHeading = "";
+
+		//set label to represent first editable column heading
 		if(!SQLQuery2->Eof)
 		{
+			//get initial column heading without formatting (i.e. removing "_")
+			originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
 
-			String temp = SQLQuery2->Fields->Fields[0]->AsString;
-
-
-			dbFieldLabel->Text = StringReplace(temp, "_", " ",
+			//replace underscores with spaces and set label
+			editedHeading = StringReplace(originalHeading, "_", " ",
 				TReplaceFlags() << rfReplaceAll);
-
+			dbFieldLabel->Text = editedHeading;
 			dbFieldLabel->Visible = true;
-        }
+		}
 	}
 	else
 	{
@@ -71,5 +74,50 @@ void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+//advance column headings as desired by the user
+void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
+{
+	//strings used in if for holdling column headings
+	String originalHeading = "";
+	String editedHeading = "";
+	SQLQuery2->Next();
 
+	if(!SQLQuery2->Eof)
+	{
+		//get initial column heading without formatting (i.e. removing "_")
+		originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+
+		//replace underscores with spaces and set label
+		editedHeading = StringReplace(originalHeading, "_", " ",
+			TReplaceFlags() << rfReplaceAll);
+		dbFieldLabel->Text = editedHeading;
+		dbFieldLabel->Visible = true;
+	}
+	else
+	{
+		//spawn next part that displays desired changes and asks if sure
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::backImageButtonClick(TObject *Sender)
+{
+	//strings used in if for holdling column headings
+	String originalHeading = "";
+	String editedHeading = "";
+	SQLQuery2->Last();
+
+	if(!SQLQuery2->Eof)
+	{
+		//get initial column heading without formatting (i.e. removing "_")
+		originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+
+		//replace underscores with spaces and set label
+		editedHeading = StringReplace(originalHeading, "_", " ",
+			TReplaceFlags() << rfReplaceAll);
+		dbFieldLabel->Text = editedHeading;
+		dbFieldLabel->Visible = true;
+	}
+}
+//---------------------------------------------------------------------------
 

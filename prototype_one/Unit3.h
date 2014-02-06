@@ -31,6 +31,8 @@ __published:	// IDE-managed Components
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton3Click(TObject *Sender);
+	void __fastcall nextImageButtonClick(TObject *Sender);
+	void __fastcall backImageButtonClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TForm3(TComponent* Owner);

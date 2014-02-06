@@ -60,74 +60,70 @@ void __fastcall TForm2::settingsSelectButtonClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------
-
 void __fastcall TForm2::settingsButtonImageClick(TObject *Sender)
 {
-settingsSelectButton->OnClick(NULL);
+	settingsSelectButton->OnClick(NULL);
 }
 //---------------------------------------------------------------------------
 
-
 void __fastcall TForm2::settingsButtonImageMouseEnter(TObject *Sender)
 {
-buttonSwapImage->Bitmap=settingsButtonImage->Bitmap;
-settingsButtonImage->Bitmap=settingsButtonRolloverImage->Bitmap;
-settingsLabelImage->Visible=true;
-arrowImage->Visible=false;
-
+	buttonSwapImage->Bitmap=settingsButtonImage->Bitmap;
+	settingsButtonImage->Bitmap=settingsButtonRolloverImage->Bitmap;
+	settingsLabelImage->Visible=true;
+	arrowImage->Visible=false;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm2::settingsButtonImageMouseLeave(TObject *Sender)
 {
-settingsButtonImage->Bitmap=buttonSwapImage->Bitmap;
-settingsLabelImage->Visible=false;
+	settingsButtonImage->Bitmap=buttonSwapImage->Bitmap;
+	settingsLabelImage->Visible=false;
 
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm2::inputButtonImageMouseEnter(TObject *Sender)
 {
-buttonSwapImage->Bitmap=inputButtonImage->Bitmap;
-inputButtonImage->Bitmap=inputButtonRolloverImage->Bitmap;
-inputLabelImage->Visible=true;
-arrowImage->Visible=false;
+	buttonSwapImage->Bitmap=inputButtonImage->Bitmap;
+	inputButtonImage->Bitmap=inputButtonRolloverImage->Bitmap;
+	inputLabelImage->Visible=true;
+	arrowImage->Visible=false;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm2::inputButtonImageMouseLeave(TObject *Sender)
 {
-inputButtonImage->Bitmap=buttonSwapImage->Bitmap;
-inputLabelImage->Visible=false;
+	inputButtonImage->Bitmap=buttonSwapImage->Bitmap;
+	inputLabelImage->Visible=false;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm2::inputButtonImageClick(TObject *Sender)
 {
-inputSelectButton->OnClick(NULL);
+	inputSelectButton->OnClick(NULL);
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm2::readButtonImageMouseEnter(TObject *Sender)
 {
-buttonSwapImage->Bitmap=readButtonImage->Bitmap;
-readButtonImage->Bitmap=readButtonRolloverImage->Bitmap;
-readLabelImage->Visible=true;
-arrowImage->Visible=false;
+	buttonSwapImage->Bitmap=readButtonImage->Bitmap;
+	readButtonImage->Bitmap=readButtonRolloverImage->Bitmap;
+	readLabelImage->Visible=true;
+	arrowImage->Visible=false;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm2::readButtonImageMouseLeave(TObject *Sender)
 {
-readButtonImage->Bitmap=buttonSwapImage->Bitmap;
-readLabelImage->Visible=false;
+	readButtonImage->Bitmap=buttonSwapImage->Bitmap;
+	readLabelImage->Visible=false;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm2::readButtonImageClick(TObject *Sender)
 {
-inputSelectButton->OnClick(NULL);
+	readSelectButton->OnClick(NULL);
 }
 //---------------------------------------------------------------------------
 
