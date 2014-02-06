@@ -61,6 +61,8 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 			inputObject.valueMap[inputObject.currentIndex] = temp;
 			//(inputObject.currentIndex)++;
 			(inputObject.size)++;
+
+			dbFieldEdit->Text = inputObject.currentIndex;
 		}
 	}
 	else
@@ -102,7 +104,6 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 		//replace underscores with spaces and set label
 		editedHeading = StringReplace(originalHeading, "_", " ",
 			TReplaceFlags() << rfReplaceAll);
-		dbFieldEdit->Text = inputObject.currentIndex;
 		dbFieldLabel->Text = editedHeading;
 		//dbFieldLabel->Visible = true;
 
@@ -110,9 +111,11 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 			vector<String> temp;
 			temp.push_back(originalHeading);
 			temp.push_back(editedHeading);
-			inputObject.valueMap[inputObject.currentIndex] = temp;
-            (inputObject.currentIndex)++;
+			inputObject.valueMap[inputObject.currentIndex + 1] = temp;
+			(inputObject.currentIndex)++;
 			(inputObject.size)++;
+
+		dbFieldEdit->Text = inputObject.currentIndex;
 	}
 	else
 	{

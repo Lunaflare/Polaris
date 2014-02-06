@@ -89,74 +89,61 @@ void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
 
 //advance column headings as desired by the user
 void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
-{   if (inputObject.currentIndex + 1 == inputObject.size)
+{
+	//will run when it is time to get the next column from the db
+	if (inputObject.currentIndex + 1 == inputObject.size)
 	{
-	//strings used in if for holdling column headings
-	String originalHeading = "";
-	String editedHeading = "";
-	SQLQuery2->Next();
+		//strings used in if for holdling column headings
+		String originalHeading = "";
+		String editedHeading = "";
+		SQLQuery2->Next();
 
-	if(!SQLQuery2->Eof)
-	{
-		//get initial column heading without formatting (i.e. removing "_")
-		originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+		if(!SQLQuery2->Eof)
+		{
+			//get initial column heading without formatting (i.e. removing "_")
+			originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
 
-		//replace underscores with spaces and set label
-		editedHeading = StringReplace(originalHeading, "_", " ",
-			TReplaceFlags() << rfReplaceAll);
-		dbFieldEdit->Text = inputObject.currentIndex;
-		dbFieldLabel->Text = editedHeading;
-		//dbFieldLabel->Visible = true;
+			//replace underscores with spaces and set label
+			editedHeading = StringReplace(originalHeading, "_", " ",
+				TReplaceFlags() << rfReplaceAll);
+			dbFieldLabel->Text = editedHeading;
 
-		//add to inputValues struct
+			//add to inputValues struct (including edit text from last add)
 			vector<String> temp;
 			temp.push_back(originalHeading);
 			temp.push_back(editedHeading);
-			inputObject.valueMap[inputObject.currentIndex] = temp;
-            (inputObject.currentIndex)++;
+			temp.push_back(dbFieldEdit->Text);
+			inputObject.valueMap[inputObject.currentIndex + 1] = temp;
+			(inputObject.currentIndex)++;
 			(inputObject.size)++;
+
+			dbFieldEdit->Text = inputObject.currentIndex;
+		}
+		else
+		{
+			//spawn next part that displays desired changes and asks if sure
+		}
 	}
 	else
 	{
-		//spawn next part that displays desired changes and asks if sure
-	}
-	}
-	else
-	{
-		//(inputObject.size)++;
+		//don't query db, only go to next item in struct
+		inputObject.valueMap[inputObject.currentIndex].pop_back();
+		inputObject.valueMap[inputObject.currentIndex].push_back(dbFieldLabel->Text);
 		(inputObject.currentIndex)++;
 
 		dbFieldEdit->Text = inputObject.currentIndex;
 		dbFieldLabel->Text = inputObject.valueMap[inputObject.currentIndex][1];
-		//dbFieldLabel->Visible = true;
     }
 }
 //---------------------------------------------------------------------------
 
+//go to previous item in struct, show in label field
 void __fastcall TForm3::backImageButtonClick(TObject *Sender)
 {
 	(inputObject.currentIndex)--;
 
 	dbFieldEdit->Text = inputObject.currentIndex;
 	dbFieldLabel->Text = inputObject.valueMap[inputObject.currentIndex][1];
-	//dbFieldLabel->Visible = true;
-
-	//strings used in if for holdling column headings
-	/*String originalHeading = "";
-	String editedHeading = "";
-	SQLQuery2->Last();
-
-	if(!SQLQuery2->Eof)
-	{
-		//get initial column heading without formatting (i.e. removing "_")
-		originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
-
-		//replace underscores with spaces and set label
-		editedHeading = StringReplace(originalHeading, "_", " ",
-			TReplaceFlags() << rfReplaceAll);
-		dbFieldLabel->Text = editedHeading;
-		dbFieldLabel->Visible = true;
-	}*/
 }
 //---------------------------------------------------------------------------
 
