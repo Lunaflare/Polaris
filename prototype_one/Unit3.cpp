@@ -52,17 +52,17 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 			dbFieldLabel->Visible = true;
 
 			//add to inputValues struct
-			vector<String> temp;
+			/*vector<String> temp;
 			temp.push_back(originalHeading);
-			temp.push_back(editedHeading);
+			temp.push_back(editedHeading); */
 			//inputValues inputObject;
 			inputObject.currentIndex = 0;
 			inputObject.size = 0;
-			inputObject.valueMap[inputObject.currentIndex] = temp;
+			//inputObject.valueMap[inputObject.currentIndex] = temp;
 			//(inputObject.currentIndex)++;
-			(inputObject.size)++;
+			//(inputObject.size)++;
 
-			//dbFieldEdit->Text = inputObject.currentIndex;
+			dbFieldEdit->Text = inputObject.currentIndex;
 		}
 	}
 	else
@@ -90,13 +90,50 @@ void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
 //advance column headings as desired by the user
 void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 {
+	if (inputObject.currentIndex == 0 && inputObject.size == 0)
+	{
+        //strings used in if for holdling column headings
+		String originalHeading = "";
+		String editedHeading = "";
+
+		//get initial column heading without formatting (i.e. removing "_")
+		originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+
+		//replace underscores with spaces and set label
+		editedHeading = StringReplace(originalHeading, "_", " ",
+			TReplaceFlags() << rfReplaceAll);
+
+		vector<String> temp;
+		temp.push_back(originalHeading);
+		temp.push_back(editedHeading);
+		temp.push_back(dbFieldEdit->Text);
+		//inputObject.valueMap[inputObject.currentIndex].push_back(dbFieldEdit->Text);
+		inputObject.valueMap[inputObject.currentIndex] = temp;
+		dbFieldEdit->Text = "";
+		(inputObject.currentIndex)++;
+		(inputObject.size)++;
+		originalHeading = "";
+		editedHeading = "";
+
+		SQLQuery2->Next();
+		//get initial column heading without formatting (i.e. removing "_")
+		originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+
+		//replace underscores with spaces and set label
+		editedHeading = StringReplace(originalHeading, "_", " ",
+			TReplaceFlags() << rfReplaceAll);
+		dbFieldLabel->Text = editedHeading;
+
+		dbFieldEdit->Text = inputObject.currentIndex;
+		backImageButton->Visible = true;
+		//SQLQuery2->Next();
+    }
 	//will run when it is time to get the next column from the db
-	if (inputObject.currentIndex + 1 == inputObject.size)
+	else if (inputObject.currentIndex == inputObject.size)
 	{
 		//strings used in if for holdling column headings
 		String originalHeading = "";
 		String editedHeading = "";
-		SQLQuery2->Next();
 
 		if(!SQLQuery2->Eof)
 		{
@@ -106,20 +143,30 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 			//replace underscores with spaces and set label
 			editedHeading = StringReplace(originalHeading, "_", " ",
 				TReplaceFlags() << rfReplaceAll);
-			dbFieldLabel->Text = editedHeading;
 
-			//add to inputValues struct (including edit text from last add)
 			vector<String> temp;
 			temp.push_back(originalHeading);
 			temp.push_back(editedHeading);
 			temp.push_back(dbFieldEdit->Text);
-			inputObject.valueMap[inputObject.currentIndex + 1] = temp;
+			inputObject.valueMap[inputObject.currentIndex] = temp;
 			dbFieldEdit->Text = "";
 			(inputObject.currentIndex)++;
 			(inputObject.size)++;
+			originalHeading = "";
+			editedHeading = "";
 
-			//dbFieldEdit->Text = inputObject.currentIndex;
+			SQLQuery2->Next();
+			//get initial column heading without formatting (i.e. removing "_")
+			originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+
+			//replace underscores with spaces and set label
+			editedHeading = StringReplace(originalHeading, "_", " ",
+				TReplaceFlags() << rfReplaceAll);
+			dbFieldLabel->Text = editedHeading;
+
+			dbFieldEdit->Text = inputObject.currentIndex;
 			backImageButton->Visible = true;
+			//SQLQuery2->Next();
 		}
 		else
 		{
@@ -133,24 +180,27 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 			nextImageButton->Visible = false;
 
 			//show and populate displayGrid
-			/*for (int i = 0; i < inputObject.size; ++i)
+			displayGrid->RowCount = inputObject.valueMap.size() + 1;
+			displayGrid->Cells[0][0] = "Heading";
+			displayGrid->Cells[1][0] = "Value";
+			for (int i = 0; i < inputObject.size; ++i)
 			{
-				displayGrid->Cells[0][i] = "n/a"; //inputObject.valueMap[i][1];
-				displayGrid->Cells[1][i] = "n/a"; //inputObject.valueMap[i][2];
+				displayGrid->Cells[0][i+1] = inputObject.valueMap[i][1];
+				displayGrid->Cells[1][i+1] = inputObject.valueMap[i][2];
 			}
 
-			grdTimeSheet->Visible = true;*/
+			displayGrid->Visible = true;
 		}
 	}
 	else
 	{
 		//don't query db, only go to next item in struct, replace item before advancing
-		inputObject.valueMap[inputObject.currentIndex].pop_back();
-		inputObject.valueMap[inputObject.currentIndex].push_back(dbFieldLabel->Text);
+		inputObject.valueMap[inputObject.currentIndex-1].pop_back();
+		inputObject.valueMap[inputObject.currentIndex-1].push_back(dbFieldEdit->Text);
 		dbFieldEdit->Text = "";
 
 		(inputObject.currentIndex)++;
-		//dbFieldEdit->Text = inputObject.currentIndex;
+		dbFieldEdit->Text = inputObject.currentIndex;
 		dbFieldLabel->Text = inputObject.valueMap[inputObject.currentIndex][1];
 		backImageButton->Visible = true;
     }
@@ -164,7 +214,7 @@ void __fastcall TForm3::backImageButtonClick(TObject *Sender)
 	if (inputObject.currentIndex == 0)
 		backImageButton->Visible = false;
 
-	//dbFieldEdit->Text = inputObject.currentIndex;
+	dbFieldEdit->Text = inputObject.currentIndex;
 	dbFieldLabel->Text = inputObject.valueMap[inputObject.currentIndex][1];
 }
 //---------------------------------------------------------------------------

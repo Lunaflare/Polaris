@@ -63,6 +63,9 @@ __published:	// IDE-managed Components
 	TDataSetProvider *DataSetProvider1;
 	TClientDataSet *ClientDataSet1;
 	TDataSource *DataSource1;
+	TStringGrid *displayGrid;
+	TStringColumn *StringColumn1;
+	TStringColumn *StringColumn2;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton3Click(TObject *Sender);
