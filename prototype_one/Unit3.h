@@ -66,11 +66,15 @@ __published:	// IDE-managed Components
 	TStringGrid *displayGrid;
 	TStringColumn *StringColumn1;
 	TStringColumn *StringColumn2;
+	TImage *submitButton;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton3Click(TObject *Sender);
 	void __fastcall nextImageButtonClick(TObject *Sender);
 	void __fastcall backImageButtonClick(TObject *Sender);
+	void __fastcall submitButtonClick(TObject *Sender);
+	void __fastcall dbFieldEditKeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
+          TShiftState Shift);
 private:	// User declarations
 	inputValues inputObject;
 public:		// User declarations

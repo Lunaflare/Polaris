@@ -33,6 +33,7 @@ void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 	{
 		loadIndicator->Enabled=true;
 		loadIndicator->Visible=true;
+
 		//success (not empty), spawn next form, get rid of error message
 		//first save some variables about the user
 		errorLabel->Visible = false;
