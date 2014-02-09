@@ -95,7 +95,6 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
         //strings used in if for holdling column headings
 		String originalHeading = "";
 		String editedHeading = "";
-		//SQLQuery2->Next();
 
 		//get initial column heading without formatting (i.e. removing "_")
 		originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
@@ -103,7 +102,6 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 		//replace underscores with spaces and set label
 		editedHeading = StringReplace(originalHeading, "_", " ",
 			TReplaceFlags() << rfReplaceAll);
-		dbFieldLabel->Text = editedHeading;
 
 		vector<String> temp;
 		temp.push_back(originalHeading);
@@ -112,20 +110,30 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 		//inputObject.valueMap[inputObject.currentIndex].push_back(dbFieldEdit->Text);
 		inputObject.valueMap[inputObject.currentIndex] = temp;
 		dbFieldEdit->Text = "";
-		//(inputObject.currentIndex)++;
+		(inputObject.currentIndex)++;
 		(inputObject.size)++;
+		originalHeading = "";
+		editedHeading = "";
+
+		SQLQuery2->Next();
+		//get initial column heading without formatting (i.e. removing "_")
+		originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+
+		//replace underscores with spaces and set label
+		editedHeading = StringReplace(originalHeading, "_", " ",
+			TReplaceFlags() << rfReplaceAll);
+		dbFieldLabel->Text = editedHeading;
 
 		dbFieldEdit->Text = inputObject.currentIndex;
 		backImageButton->Visible = true;
-        SQLQuery2->Next();
+		//SQLQuery2->Next();
     }
 	//will run when it is time to get the next column from the db
-	else if (inputObject.currentIndex + 1 == inputObject.size)
+	else if (inputObject.currentIndex == inputObject.size)
 	{
 		//strings used in if for holdling column headings
 		String originalHeading = "";
 		String editedHeading = "";
-		//SQLQuery2->Next();
 
 		if(!SQLQuery2->Eof)
 		{
@@ -135,20 +143,30 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 			//replace underscores with spaces and set label
 			editedHeading = StringReplace(originalHeading, "_", " ",
 				TReplaceFlags() << rfReplaceAll);
-			dbFieldLabel->Text = editedHeading;
 
 			vector<String> temp;
 			temp.push_back(originalHeading);
 			temp.push_back(editedHeading);
 			temp.push_back(dbFieldEdit->Text);
-			inputObject.valueMap[inputObject.currentIndex + 1] = temp;
+			inputObject.valueMap[inputObject.currentIndex] = temp;
 			dbFieldEdit->Text = "";
 			(inputObject.currentIndex)++;
 			(inputObject.size)++;
+			originalHeading = "";
+			editedHeading = "";
+
+			SQLQuery2->Next();
+			//get initial column heading without formatting (i.e. removing "_")
+			originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+
+			//replace underscores with spaces and set label
+			editedHeading = StringReplace(originalHeading, "_", " ",
+				TReplaceFlags() << rfReplaceAll);
+			dbFieldLabel->Text = editedHeading;
 
 			dbFieldEdit->Text = inputObject.currentIndex;
 			backImageButton->Visible = true;
-			SQLQuery2->Next();
+			//SQLQuery2->Next();
 		}
 		else
 		{
@@ -182,9 +200,77 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 		dbFieldEdit->Text = "";
 
 		(inputObject.currentIndex)++;
-		dbFieldEdit->Text = inputObject.currentIndex;
-		dbFieldLabel->Text = inputObject.valueMap[inputObject.currentIndex][1];
-		backImageButton->Visible = true;
+
+		if (inputObject.currentIndex == inputObject.size)
+		{
+			//strings used in if for holdling column headings
+			String originalHeading = "";
+			String editedHeading = "";
+
+			if(!SQLQuery2->Eof)
+			{
+				//get initial column heading without formatting (i.e. removing "_")
+				originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+
+				//replace underscores with spaces and set label
+				editedHeading = StringReplace(originalHeading, "_", " ",
+					TReplaceFlags() << rfReplaceAll);
+
+				vector<String> temp;
+				temp.push_back(originalHeading);
+				temp.push_back(editedHeading);
+				temp.push_back(dbFieldEdit->Text);
+				inputObject.valueMap[inputObject.currentIndex] = temp;
+				dbFieldEdit->Text = "";
+				(inputObject.currentIndex)++;
+				(inputObject.size)++;
+				originalHeading = "";
+				editedHeading = "";
+
+				//SQLQuery2->Next();
+				//get initial column heading without formatting (i.e. removing "_")
+				originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+
+				//replace underscores with spaces and set label
+				editedHeading = StringReplace(originalHeading, "_", " ",
+					TReplaceFlags() << rfReplaceAll);
+				dbFieldLabel->Text = editedHeading;
+
+				dbFieldEdit->Text = inputObject.currentIndex;
+				backImageButton->Visible = true;
+				//SQLQuery2->Next();
+			}
+			else
+			{
+				//spawn next part that displays desired changes and asks if sure
+				//will also need to add the last item from the edit
+
+				//hide all other items on form besides home button
+				dbFieldLabel->Visible = false;
+				dbFieldEdit->Visible = false;
+				backImageButton->Visible = false;
+				nextImageButton->Visible = false;
+
+				//show and populate displayGrid
+				displayGrid->RowCount = inputObject.valueMap.size() + 1;
+				displayGrid->Cells[0][0] = "Heading";
+				displayGrid->Cells[1][0] = "Value";
+				for (int i = 0; i < inputObject.size; ++i)
+				{
+					displayGrid->Cells[0][i+1] = inputObject.valueMap[i][1];
+					displayGrid->Cells[1][i+1] = inputObject.valueMap[i][2];
+				}
+
+				displayGrid->Visible = true;
+			}
+		}
+		else
+		{
+			dbFieldEdit->Text = inputObject.currentIndex;
+			dbFieldLabel->Text = inputObject.valueMap[inputObject.currentIndex][1];
+			backImageButton->Visible = true;
+        }
+
     }
 }
 //---------------------------------------------------------------------------

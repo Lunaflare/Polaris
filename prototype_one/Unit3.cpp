@@ -62,7 +62,7 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 			//(inputObject.currentIndex)++;
 			//(inputObject.size)++;
 
-			dbFieldEdit->Text = inputObject.currentIndex;
+			//dbFieldEdit->Text = inputObject.currentIndex;
 		}
 	}
 	else
@@ -124,7 +124,7 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 			TReplaceFlags() << rfReplaceAll);
 		dbFieldLabel->Text = editedHeading;
 
-		dbFieldEdit->Text = inputObject.currentIndex;
+		//dbFieldEdit->Text = inputObject.currentIndex;
 		backImageButton->Visible = true;
 		//SQLQuery2->Next();
     }
@@ -156,6 +156,31 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 			editedHeading = "";
 
 			SQLQuery2->Next();
+
+			if(SQLQuery2->Eof)
+			{
+             	//spawn next part that displays desired changes and asks if sure
+				//will also need to add the last item from the edit
+
+				//hide all other items on form besides home button
+				dbFieldLabel->Visible = false;
+				dbFieldEdit->Visible = false;
+				backImageButton->Visible = false;
+				nextImageButton->Visible = false;
+
+				//show and populate displayGrid
+				displayGrid->RowCount = inputObject.valueMap.size() + 1;
+				displayGrid->Cells[0][0] = "Heading";
+				displayGrid->Cells[1][0] = "Value";
+				for (int i = 0; i < inputObject.size; ++i)
+				{
+					displayGrid->Cells[0][i+1] = inputObject.valueMap[i][1];
+					displayGrid->Cells[1][i+1] = inputObject.valueMap[i][2];
+				}
+
+				displayGrid->Visible = true;
+			}
+
 			//get initial column heading without formatting (i.e. removing "_")
 			originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
 
@@ -164,7 +189,7 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 				TReplaceFlags() << rfReplaceAll);
 			dbFieldLabel->Text = editedHeading;
 
-			dbFieldEdit->Text = inputObject.currentIndex;
+			//dbFieldEdit->Text = inputObject.currentIndex;
 			backImageButton->Visible = true;
 			//SQLQuery2->Next();
 		}
@@ -195,14 +220,81 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 	else
 	{
 		//don't query db, only go to next item in struct, replace item before advancing
-		inputObject.valueMap[inputObject.currentIndex-1].pop_back();
-		inputObject.valueMap[inputObject.currentIndex-1].push_back(dbFieldEdit->Text);
+		inputObject.valueMap[inputObject.currentIndex].pop_back();
+		inputObject.valueMap[inputObject.currentIndex].push_back(dbFieldEdit->Text);
 		dbFieldEdit->Text = "";
-
 		(inputObject.currentIndex)++;
-		dbFieldEdit->Text = inputObject.currentIndex;
-		dbFieldLabel->Text = inputObject.valueMap[inputObject.currentIndex][1];
-		backImageButton->Visible = true;
+
+		if (inputObject.currentIndex == inputObject.size)
+		{
+			//strings used in if for holdling column headings
+			String originalHeading = "";
+			String editedHeading = "";
+
+			if(!SQLQuery2->Eof)
+			{
+				//get initial column heading without formatting (i.e. removing "_")
+				/*originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+
+				//replace underscores with spaces and set label
+				editedHeading = StringReplace(originalHeading, "_", " ",
+					TReplaceFlags() << rfReplaceAll);
+
+				vector<String> temp;
+				temp.push_back(originalHeading);
+				temp.push_back(editedHeading);
+				temp.push_back(dbFieldEdit->Text);
+				inputObject.valueMap[inputObject.currentIndex] = temp;
+				dbFieldEdit->Text = "";
+				(inputObject.currentIndex)++;
+				(inputObject.size)++;*/
+				originalHeading = "";
+				editedHeading = "";
+
+				//SQLQuery2->Next();
+				//get initial column heading without formatting (i.e. removing "_")
+				originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+
+				//replace underscores with spaces and set label
+				editedHeading = StringReplace(originalHeading, "_", " ",
+					TReplaceFlags() << rfReplaceAll);
+				dbFieldLabel->Text = editedHeading;
+
+				//dbFieldEdit->Text = inputObject.currentIndex;
+				backImageButton->Visible = true;
+				//SQLQuery2->Next();
+			}
+			else
+			{
+				//spawn next part that displays desired changes and asks if sure
+				//will also need to add the last item from the edit
+
+				//hide all other items on form besides home button
+				dbFieldLabel->Visible = false;
+				dbFieldEdit->Visible = false;
+				backImageButton->Visible = false;
+				nextImageButton->Visible = false;
+
+				//show and populate displayGrid
+				displayGrid->RowCount = inputObject.valueMap.size() + 1;
+				displayGrid->Cells[0][0] = "Heading";
+				displayGrid->Cells[1][0] = "Value";
+				for (int i = 0; i < inputObject.size; ++i)
+				{
+					displayGrid->Cells[0][i+1] = inputObject.valueMap[i][1];
+					displayGrid->Cells[1][i+1] = inputObject.valueMap[i][2];
+				}
+
+				displayGrid->Visible = true;
+			}
+		}
+		else
+		{
+			//dbFieldEdit->Text = inputObject.currentIndex;
+			dbFieldLabel->Text = inputObject.valueMap[inputObject.currentIndex][1];
+			backImageButton->Visible = true;
+        }
+
     }
 }
 //---------------------------------------------------------------------------
@@ -214,7 +306,7 @@ void __fastcall TForm3::backImageButtonClick(TObject *Sender)
 	if (inputObject.currentIndex == 0)
 		backImageButton->Visible = false;
 
-	dbFieldEdit->Text = inputObject.currentIndex;
+	//dbFieldEdit->Text = inputObject.currentIndex;
 	dbFieldLabel->Text = inputObject.valueMap[inputObject.currentIndex][1];
 }
 //---------------------------------------------------------------------------
