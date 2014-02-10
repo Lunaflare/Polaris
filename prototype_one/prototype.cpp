@@ -43,6 +43,7 @@ void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 		readLevel = SQLQuery1->Fields->Fields[8]->AsString;
 		accessLevel = SQLQuery1->Fields->Fields[4]->AsString;
 		userID = SQLQuery1->Fields->Fields[0]->AsString;
+		hotelID = SQLQuery1->Fields->Fields[7]->AsString;
 
 		//if rememberMe is set, update registry entry
 		TRegistry* reg = new TRegistry(KEY_READ);
@@ -105,9 +106,7 @@ void __fastcall TForm1::recoverPasswordButtonClick(TObject *Sender)
 {
 	ShellExecute(NULL, L"open", L"http://baldwinserver.com/Lunaflare/generateKey.php", NULL, NULL, SW_SHOWNORMAL);
 }
-//---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 void __fastcall TForm1::passwordEditKeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
           TShiftState Shift)

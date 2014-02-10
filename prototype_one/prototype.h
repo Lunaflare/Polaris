@@ -51,6 +51,7 @@ private:	// User declarations
 	String readLevel;
 	String accessLevel;
 	String userID;
+	String hotelID;
 public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);
 	String getUsername() { return username; }
@@ -62,6 +63,7 @@ public:		// User declarations
 	String getAccessLevel() { return accessLevel; }
     void setInputLevel(String i) { inputLevel = i; }
 	String getUserID() { return userID; }
+	String getHotelID() { return hotelID; }
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm1 *Form1;

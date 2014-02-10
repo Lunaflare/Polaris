@@ -23,11 +23,22 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 	//hide welcome form
 	Form2->Hide();
 
+	//get the hotelID and query hotel_ref to find out which table to input to
+	String currentHotelID = Form1->getHotelID();
+	inputTable = "";
+	SQLQuery2->SQL->Text = "SELECT input_table FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
+	SQLQuery2->Open();
+	SQLQuery2->First();
+	if (!SQLQuery2->Eof)
+	{
+		inputTable = SQLQuery2->Fields->Fields[0]->AsString;
+	}
+
 	//show user input screen based on input level (i.e. default or advanced)
 	if (Form1->getInputLevel() == 0)
 	{
 		//input level is "default", query db schema
-		SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_marriot_long_beach' AND TABLE_NAME = 'raw_input';";
+		SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_hotel_data' AND TABLE_NAME = '"+inputTable+"';";
 
 		//open query and temporarily skip first two column headings
 		SQLQuery2->Open();
@@ -60,7 +71,47 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 	}
 	else
 	{
-     	//input level is "advanced"
+		//hide form items
+		dbFieldLabel->Visible = false;
+		dbFieldEdit->Visible = false;
+		nextImageButton->Visible = false;
+
+		//input level is "advanced"
+		SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_hotel_data' AND TABLE_NAME = '"+inputTable+"';";
+
+		//open query and temporarily skip first two column headings
+		SQLQuery2->Open();
+		SQLQuery2->First();
+		SQLQuery2->Next();
+		SQLQuery2->Next();
+
+        displayGrid->Cells[0][0] = "Heading";
+		displayGrid->Cells[1][0] = "Value";
+		int count = 1;
+		//strings used in if for holdling column headings
+		String originalHeading = "";
+		String editedHeading = "";
+
+		while (!SQLQuery2->Eof)
+		{
+			//get initial column heading without formatting (i.e. removing "_")
+			originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+
+			//replace underscores with spaces and set label
+			editedHeading = StringReplace(originalHeading, "_", " ",
+				TReplaceFlags() << rfReplaceAll);
+
+			//show and populate displayGrid
+			displayGrid->Cells[0][count] = editedHeading;
+			displayGrid->Cells[1][count] = "";
+
+			++count;
+			SQLQuery2->Next();
+		}
+
+		displayGrid->RowCount = count;
+		displayGrid->Visible = true;
+		submitButton->Visible = true;
 	}
 }
 //---------------------------------------------------------------------------
@@ -352,7 +403,7 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 		}
 
 		//query db and insert new row
-		SQLQuery2->SQL->Text = "INSERT INTO baldwins_marriot_long_beach.raw_input ("+headings+") VALUES ("+values+");";
+		SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data."+inputTable+" ("+headings+") VALUES ("+values+");";
 		SQLQuery2->ExecSQL();
 
 		//Take back to welcome screen (form2)

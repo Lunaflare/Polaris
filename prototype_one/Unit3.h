@@ -77,6 +77,7 @@ __published:	// IDE-managed Components
           TShiftState Shift);
 private:	// User declarations
 	inputValues inputObject;
+	String inputTable;
 public:		// User declarations
 	__fastcall TForm3(TComponent* Owner);
 };

@@ -23,11 +23,22 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 	//hide welcome form
 	Form2->Hide();
 
+	//get the hotelID and query hotel_ref to find out which table to input to
+	String currentHotelID = Form1->getHotelID();
+	inputTable = "";
+	SQLQuery2->SQL->Text = "SELECT input_table FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
+	SQLQuery2->Open();
+	SQLQuery2->First();
+	if (!SQLQuery2->Eof)
+	{
+		inputTable = SQLQuery2->Fields->Fields[0]->AsString;
+	}
+
 	//show user input screen based on input level (i.e. default or advanced)
 	if (Form1->getInputLevel() == 0)
 	{
 		//input level is "default", query db schema
-		SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_marriot_long_beach' AND TABLE_NAME = 'raw_input';";
+		SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_hotel_data' AND TABLE_NAME = '"+inputTable+"';";
 
 		//open query and temporarily skip first two column headings
 		SQLQuery2->Open();
@@ -50,6 +61,8 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 				TReplaceFlags() << rfReplaceAll);
 			dbFieldLabel->Text = editedHeading;
 			dbFieldLabel->Visible = true;
+			dbFieldEdit->Visible = true;
+			nextImageButton->Visible = true;
 
 			//initially set index and size to zero
 			inputObject.currentIndex = 0;
@@ -58,7 +71,8 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 	}
 	else
 	{
-     	//input level is "advanced"
+		//input level is "advanced"
+
 	}
 }
 //---------------------------------------------------------------------------
@@ -73,6 +87,11 @@ void __fastcall TForm3::FormClose(TObject *Sender, TCloseAction &Action)
 //take user back to main menu when clicked
 void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
 {
+	//hide certain items
+	backImageButton->Visible = false;
+	displayGrid->Visible = false;
+	submitButton->Visible = false;
+
 	Form3->Hide();
 	Form2->Show();
 }
@@ -295,10 +314,7 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 
 		//get today's date
 		TDateTime d = Now();
-		String currentDate = DateToStr(d.FormatString(L"yyyy-mm-dd"));
-		tempLabel1->Visible = true;
-		tempLabel1->Text = currentDate;
-
+		String currentDate = d.FormatString(L"yyyy-mm-dd");
 
 		//get day of week
 		TDateTime Value = Date();
@@ -348,8 +364,12 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 		}
 
 		//query db and insert new row
-		SQLQuery2->SQL->Text = "INSERT INTO baldwins_marriot_long_beach.raw_input ("+headings+") VALUES ("+values+");";
+		SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data."+inputTable+" ("+headings+") VALUES ("+values+");";
 		SQLQuery2->ExecSQL();
+
+		//Take back to welcome screen (form2)
+		Form3->Hide();
+		Form2->Show();
 	}
 	else
 	{
