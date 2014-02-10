@@ -24,7 +24,11 @@ void __fastcall TForm5::FormShow(TObject *Sender)
 
 	//if admin, show the edit DLR button
 	if (Form1->getAccessLevel() == 2)
-		editDLRButton->Visible = true;
+		{
+			editDLRButton->Visible = true;
+			sep2Image->Visible=true;
+			adminLabel->Visible=true;
+		}
 
 	//change radio buttons (input and read) to represent current database values
 	if (Form1->getInputLevel() == 0)
@@ -149,4 +153,20 @@ void __fastcall TForm5::saveChangesButtonClick(TObject *Sender)
 
 }
 //---------------------------------------------------------------------------
+
+void __fastcall TForm5::homeImageButton5MouseEnter(TObject *Sender)
+{
+home_swapper->Bitmap=homeImageButton5->Bitmap;
+homeImageButton5->Bitmap=home_over->Bitmap;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm5::homeImageButton5MouseLeave(TObject *Sender)
+{
+homeImageButton5->Bitmap=home_swapper->Bitmap;
+}
+//---------------------------------------------------------------------------
+
+
+
 

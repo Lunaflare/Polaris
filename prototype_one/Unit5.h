@@ -14,6 +14,7 @@
 #include <Data.FMTBcd.hpp>
 #include <Data.SqlExpr.hpp>
 #include <FMX.Objects.hpp>
+#include <FMX.Ani.hpp>
 //---------------------------------------------------------------------------
 class TForm5 : public TForm
 {
@@ -27,7 +28,6 @@ __published:	// IDE-managed Components
 	TRadioButton *readDefaultRadio;
 	TRadioButton *readAdvancedRadio;
 	TEdit *passwordChangeEdit;
-	TGlowEffect *passwordGlowEffect;
 	TButton *saveChangesButton;
 	TButton *editDLRButton;
 	TImage *homeImageButton5;
@@ -35,10 +35,23 @@ __published:	// IDE-managed Components
 	TLabel *confirmPasswordLabel;
 	TEdit *confirmPasswordEdit;
 	TGlowEffect *GlowEffect1;
+	TBrushObject *BrushObject1;
+	TImage *settingsLabel;
+	TFloatAnimation *floatAnimation1;
+	TFloatAnimation *opacityAnimation1;
+	TImage *Image1;
+	TImage *home_swapper;
+	TImage *home_over;
+	TLabel *adminLabel;
+	TImage *sepImage;
+	TImage *sep2Image;
+	TGroupBox *changePasswordGroup;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton5Click(TObject *Sender);
 	void __fastcall saveChangesButtonClick(TObject *Sender);
+	void __fastcall homeImageButton5MouseEnter(TObject *Sender);
+	void __fastcall homeImageButton5MouseLeave(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TForm5(TComponent* Owner);
