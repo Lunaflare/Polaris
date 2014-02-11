@@ -46,7 +46,7 @@
         <IncludePath>..\..\..\Lunaflare\;$(IncludePath)</IncludePath>
         <ProjectType>FmxGuiApplication</ProjectType>
         <_TCHARMapping>wchar_t</_TCHARMapping>
-        <AllPackageLibs>rtl.lib;fmx.lib;dbrtl.lib;dbexpress.lib;DbxCommonDriver.lib;DBXMySQLDriver.lib</AllPackageLibs>
+        <AllPackageLibs>rtl.lib;fmx.lib;dbrtl.lib;dbexpress.lib;DbxCommonDriver.lib;DBXMySQLDriver.lib;dsnap.lib</AllPackageLibs>
         <ILINK_LibraryPath>..\..\..\Lunaflare\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
         <DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
         <DynamicRTL>true</DynamicRTL>
@@ -95,7 +95,7 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <LinkPackageImports>rtl.bpi;fmx.bpi;dbrtl.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DBXMySQLDriver.bpi</LinkPackageImports>
+        <LinkPackageImports>rtl.bpi;fmx.bpi;dbrtl.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DBXMySQLDriver.bpi;dsnap.bpi</LinkPackageImports>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -139,11 +139,11 @@
             <DependentOn>Unit5.h</DependentOn>
             <BuildOrder>6</BuildOrder>
         </CppCompile>
-        <FormResources Include="Unit2.fmx"/>
-        <FormResources Include="prototype.fmx"/>
         <FormResources Include="Unit3.fmx"/>
         <FormResources Include="Unit4.fmx"/>
         <FormResources Include="Unit5.fmx"/>
+        <FormResources Include="Unit2.fmx"/>
+        <FormResources Include="prototype.fmx"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

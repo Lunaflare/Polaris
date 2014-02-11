@@ -69,14 +69,15 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 			inputObject.size = 0;
 		}
 	}
-	else
+	/*else
 	{
+		//input level is "advanced"
+
 		//hide form items
 		dbFieldLabel->Visible = false;
 		dbFieldEdit->Visible = false;
 		nextImageButton->Visible = false;
 
-		//input level is "advanced"
 		SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_hotel_data' AND TABLE_NAME = '"+inputTable+"';";
 
 		//open query and temporarily skip first two column headings
@@ -112,7 +113,7 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 		displayGrid->RowCount = count;
 		displayGrid->Visible = true;
 		submitButton->Visible = true;
-	}
+	}*/
 }
 //---------------------------------------------------------------------------
 

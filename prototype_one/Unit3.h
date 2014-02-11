@@ -16,6 +16,7 @@
 #include <System.Classes.hpp>
 #include <FMX.Grid.hpp>
 #include <FMX.Layouts.hpp>
+#include <FMX.Menus.hpp>
 //---------------------------------------------------------------------------
 #include <iostream>
 #include <map>
@@ -67,6 +68,7 @@ __published:	// IDE-managed Components
 	TStringColumn *StringColumn1;
 	TStringColumn *StringColumn2;
 	TImage *submitButton;
+	TPopupBox *PopupBox1;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton3Click(TObject *Sender);
