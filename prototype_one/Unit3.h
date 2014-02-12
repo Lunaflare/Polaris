@@ -80,6 +80,7 @@ __published:	// IDE-managed Components
 private:	// User declarations
 	inputValues inputObject;
 	String inputTable;
+	String readTable;
 public:		// User declarations
 	__fastcall TForm3(TComponent* Owner);
 };

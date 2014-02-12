@@ -22,8 +22,43 @@ __fastcall TForm2::TForm2(TComponent* Owner)
 //hides the main form once this form is shown
 void __fastcall TForm2::FormShow(TObject *Sender)
 {
-
+    //hide the main login form
 	Form1->Hide();
+
+	//if lowest accessLevel, disable read button and possibly input button
+	if (Form1->getAccessLevel() == 0)
+	{
+		//disable read button (do we want to show balloon here too?)
+		readButtonImage->Enabled = false;
+
+		//check if current date already input for most basic user (should store input_table somewhere for use in Form3)
+        String currentHotelID = Form1->getHotelID();
+		String inputTable = "";
+		Form3->SQLQuery2->SQL->Text = "SELECT input_table FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
+		Form3->SQLQuery2->Open();
+		Form3->SQLQuery2->First();
+
+		if (!Form3->SQLQuery2->Eof)
+		{
+			//get today's date
+			TDateTime d = Now();
+			String currentDate = d.FormatString(L"yyyy-mm-dd");
+
+			//get what the inputTable is
+			inputTable = Form3->SQLQuery2->Fields->Fields[0]->AsString;
+
+			//query to see if tuple exists for current date
+			Form3->SQLQuery2->SQL->Text = "SELECT * FROM "+inputTable+" WHERE Date = '"+currentDate+"';";
+            Form3->SQLQuery2->Open();
+			Form3->SQLQuery2->First();
+
+			//if tuple exists, disable input button
+			if (!Form3->SQLQuery2->Eof)
+			{
+				inputButtonImage->Enabled = false;
+			}
+		}
+	}
 
 	//display username hello message, get username from form1
 	Form2->welcomeUserLabel->Text =  Form1->getUsername() + "!";

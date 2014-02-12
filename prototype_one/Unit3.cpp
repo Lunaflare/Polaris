@@ -23,15 +23,17 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 	//hide welcome form
 	Form2->Hide();
 
-	//get the hotelID and query hotel_ref to find out which table to input to
+	//get the hotelID and query hotel_ref to find out which table to input to and which table to read from
 	String currentHotelID = Form1->getHotelID();
 	inputTable = "";
-	SQLQuery2->SQL->Text = "SELECT input_table FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
+	readTable = "";
+	SQLQuery2->SQL->Text = "SELECT input_table, read_table FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
 	SQLQuery2->Open();
 	SQLQuery2->First();
 	if (!SQLQuery2->Eof)
 	{
 		inputTable = SQLQuery2->Fields->Fields[0]->AsString;
+		readTable = SQLQuery2->Fields->Fields[1]->AsString;
 	}
 
 	//show user input screen based on input level (i.e. default or advanced)
@@ -403,8 +405,12 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 			}
 		}
 
-		//query db and insert new row
+		//query input_table db and insert new row
 		SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data."+inputTable+" ("+headings+") VALUES ("+values+");";
+		SQLQuery2->ExecSQL();
+
+		//query read_table db and insert new row
+		SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data."+readTable+" ("+headings+") VALUES ("+values+");";
 		SQLQuery2->ExecSQL();
 
 		//Take back to welcome screen (form2)
