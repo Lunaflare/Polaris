@@ -23,99 +23,128 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 	//hide welcome form
 	Form2->Hide();
 
-	//get the hotelID and query hotel_ref to find out which table to input to and which table to read from
-	String currentHotelID = Form1->getHotelID();
-	inputTable = "";
-	readTable = "";
-	SQLQuery2->SQL->Text = "SELECT input_table, read_table FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
-	SQLQuery2->Open();
-	SQLQuery2->First();
-	if (!SQLQuery2->Eof)
+	if (Form1->getAccessLevel() == 0)
 	{
-		inputTable = SQLQuery2->Fields->Fields[0]->AsString;
-		readTable = SQLQuery2->Fields->Fields[1]->AsString;
-	}
-
-	//show user input screen based on input level (i.e. default or advanced)
-	if (Form1->getInputLevel() == 0)
-	{
-		//input level is "default", query db schema
-		SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_hotel_data' AND TABLE_NAME = '"+inputTable+"';";
-
-		//open query and temporarily skip first two column headings
+		//get the hotelID and query hotel_ref to find out which table to input to and which table to read from
+		String currentHotelID = Form1->getHotelID();
+		inputTable = "";
+		readTable = "";
+		SQLQuery2->SQL->Text = "SELECT input_table, read_table FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
 		SQLQuery2->Open();
 		SQLQuery2->First();
-		SQLQuery2->Next();
-		SQLQuery2->Next();
-
-		//strings used in if for holdling column headings
-		String originalHeading = "";
-		String editedHeading = "";
-
-		//set label to represent first editable column heading
-		if(!SQLQuery2->Eof)
+		if (!SQLQuery2->Eof)
 		{
-			//get initial column heading without formatting (i.e. removing "_")
-			originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
-
-			//replace underscores with spaces and set label
-			editedHeading = StringReplace(originalHeading, "_", " ",
-				TReplaceFlags() << rfReplaceAll);
-			dbFieldLabel->Text = editedHeading;
-			dbFieldLabel->Visible = true;
-			dbFieldEdit->Visible = true;
-			nextImageButton->Visible = true;
-
-			//initially set index and size to zero
-			inputObject.currentIndex = 0;
-			inputObject.size = 0;
+			inputTable = SQLQuery2->Fields->Fields[0]->AsString;
+			readTable = SQLQuery2->Fields->Fields[1]->AsString;
 		}
-	}
-	/*else
-	{
-		//input level is "advanced"
 
-		//hide form items
+		//show user input screen based on input level (i.e. default or advanced)
+		if (Form1->getInputLevel() == 0)
+		{
+			//input level is "default", query db schema
+			SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_hotel_data' AND TABLE_NAME = '"+inputTable+"';";
+
+			//open query and temporarily skip first two column headings
+			SQLQuery2->Open();
+			SQLQuery2->First();
+			SQLQuery2->Next();
+			SQLQuery2->Next();
+
+			//strings used in if for holdling column headings
+			String originalHeading = "";
+			String editedHeading = "";
+
+			//set label to represent first editable column heading
+			if(!SQLQuery2->Eof)
+			{
+				//get initial column heading without formatting (i.e. removing "_")
+				originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+
+				//replace underscores with spaces and set label
+				editedHeading = StringReplace(originalHeading, "_", " ",
+					TReplaceFlags() << rfReplaceAll);
+				dbFieldLabel->Text = editedHeading;
+				dbFieldLabel->Visible = true;
+				dbFieldEdit->Visible = true;
+				nextImageButton->Visible = true;
+
+				//initially set index and size to zero
+				inputObject.currentIndex = 0;
+				inputObject.size = 0;
+			}
+		}
+		/*else
+		{
+			//input level is "advanced" for when userAccess == 0
+
+			//hide form items
+			dbFieldLabel->Visible = false;
+			dbFieldEdit->Visible = false;
+			nextImageButton->Visible = false;
+
+			SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_hotel_data' AND TABLE_NAME = '"+inputTable+"';";
+
+			//open query and temporarily skip first two column headings
+			SQLQuery2->Open();
+			SQLQuery2->First();
+			SQLQuery2->Next();
+			SQLQuery2->Next();
+
+			displayGrid->Cells[0][0] = "Heading";
+			displayGrid->Cells[1][0] = "Value";
+			int count = 1;
+			//strings used in if for holdling column headings
+			String originalHeading = "";
+			String editedHeading = "";
+
+			while (!SQLQuery2->Eof)
+			{
+				//get initial column heading without formatting (i.e. removing "_")
+				originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+
+				//replace underscores with spaces and set label
+				editedHeading = StringReplace(originalHeading, "_", " ",
+					TReplaceFlags() << rfReplaceAll);
+
+				//show and populate displayGrid
+				displayGrid->Cells[0][count] = editedHeading;
+				displayGrid->Cells[1][count] = "";
+
+				++count;
+				SQLQuery2->Next();
+			}
+
+			displayGrid->RowCount = count;
+			displayGrid->Visible = true;
+			submitButton->Visible = true;
+		}*/
+	}
+	else
+	{
+		//accessLevel is not 0, show date picker before progressing
+
+		//hide uneccessary items from this page
 		dbFieldLabel->Visible = false;
 		dbFieldEdit->Visible = false;
 		nextImageButton->Visible = false;
 
-		SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_hotel_data' AND TABLE_NAME = '"+inputTable+"';";
+        //get today's date
+		TDateTime d = Now();
+		dateChosen = d.FormatString(L"yyyy-mm-dd");
+		String currentDate = d.FormatString(L"mm/dd/yyyy");
 
-		//open query and temporarily skip first two column headings
-		SQLQuery2->Open();
-		SQLQuery2->First();
-		SQLQuery2->Next();
-		SQLQuery2->Next();
-
-        displayGrid->Cells[0][0] = "Heading";
-		displayGrid->Cells[1][0] = "Value";
-		int count = 1;
-		//strings used in if for holdling column headings
-		String originalHeading = "";
-		String editedHeading = "";
-
-		while (!SQLQuery2->Eof)
+		//populate the datePopupBox with the last week's dates
+		datePopupBox->Items->Add(currentDate);
+		for (int i = 0; i < 6; ++i)
 		{
-			//get initial column heading without formatting (i.e. removing "_")
-			originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
-
-			//replace underscores with spaces and set label
-			editedHeading = StringReplace(originalHeading, "_", " ",
-				TReplaceFlags() << rfReplaceAll);
-
-			//show and populate displayGrid
-			displayGrid->Cells[0][count] = editedHeading;
-			displayGrid->Cells[1][count] = "";
-
-			++count;
-			SQLQuery2->Next();
+			datePopupBox->Items->Add((--d).FormatString(L"mm/dd/yyyy"));
 		}
 
-		displayGrid->RowCount = count;
-		displayGrid->Visible = true;
-		submitButton->Visible = true;
-	}*/
+		//make date popupBox visible to user and set current date as chosen
+		datePopupBox->ItemIndex = 0;
+		chooseDateImageButton->Visible = true;
+		datePopupBox->Visible = true;
+    }
 }
 //---------------------------------------------------------------------------
 
@@ -134,6 +163,10 @@ void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
 	displayGrid->Visible = false;
 	submitButton->Visible = false;
 
+	//clear datePopupBox items (need to do in other places also)
+	datePopupBox->Items->Clear();
+
+	//hide current form and show welcome screen
 	Form3->Hide();
 	Form2->Show();
 }
@@ -435,4 +468,27 @@ void __fastcall TForm3::dbFieldEditKeyDown(TObject *Sender, WORD &Key, System::W
 	}
 }
 //---------------------------------------------------------------------------
+
+//find out which date is chosen and then progress like normal depending on inputLevel
+void __fastcall TForm3::datePopupBoxChange(TObject *Sender)
+{
+	//find out the item chosen as the date
+	int temp = datePopupBox->ItemIndex;
+	dateChosen = StrToDate(datePopupBox->Items->operator [](temp)).FormatString(L"yyyy-mm-dd");
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
+{
+	//hide date related items
+	chooseDateImageButton->Visible = false;
+	datePopupBoxLabel->Visible = false;
+	datePopupBox->Visible = false;
+
+	//testing
+	dbFieldLabel->Visible = true;
+	dbFieldLabel->Text = dateChosen;
+}
+//---------------------------------------------------------------------------
+
 
