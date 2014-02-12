@@ -23,6 +23,9 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 	//hide welcome form
 	Form2->Hide();
 
+	//set alreadyThere boolean to false
+	alreadyThere = false;
+
 	if (Form1->getAccessLevel() == 0)
 	{
 		//get the hotelID and query hotel_ref to find out which table to input to and which table to read from
@@ -386,6 +389,8 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 		//create empty strings to add to query once populated from grid
 		String headings = "";
 		String values = "";
+		String update = "";
+		String updateHeading = "";
 
 		//get today's date
 		TDateTime d = Now();
@@ -423,8 +428,26 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 		headings += "Date, Day_Of_Week, ";
 		values += "'" + currentDate + "', '" + DayName + "', ";
 
+		//construct headings and values for an update query instead of insert query
+		if (alreadyThere)
+		{
+			//populate strings only from the grid
+			for (int i = 0; i < displayGrid->RowCount - 1; ++i)
+			{
+                updateHeading = StringReplace(displayGrid->Cells[0][i+1], " ", "_", TReplaceFlags() << rfReplaceAll);
+
+				if (i + 1 == displayGrid->RowCount - 1)
+				{
+					update += (updateHeading + " = '" + displayGrid->Cells[1][i+1] + "'");
+				}
+				else
+				{
+					update += (updateHeading + " = '" + displayGrid->Cells[1][i+1] + "', ");
+				}
+			}
+		}
 		//check if basic input was used, if so populate headings/values from inputObject
-		if (Form1->getInputLevel() == 0)
+		else if (Form1->getInputLevel() == 0)
 		{
 			//populate rest of strings from grid
 			for (int i = 0; i < inputObject.size; ++i)
@@ -456,17 +479,27 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 				{
 					headings += ("" + StringReplace(displayGrid->Cells[0][i+1], " ", "_", TReplaceFlags() << rfReplaceAll) + ", ");
 					values += ("'" + displayGrid->Cells[1][i+1] + "', ");
-                }
+				}
 			}
 		}
 
-		//query input_table db and insert new row
-		SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data."+inputTable+" ("+headings+") VALUES ("+values+");";
-		SQLQuery2->ExecSQL();
+		//run update query if item already in database
+		if (alreadyThere)
+		{
+			SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data."+inputTable+" SET "+update+" WHERE "+inputTable+".Date = '"+dateChosen+"';";
+        	SQLQuery2->ExecSQL();
+		}
+		//if item not there, then run the normal insert query
+		else
+		{
+			//query input_table db and insert new row
+			SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data."+inputTable+" ("+headings+") VALUES ("+values+");";
+			SQLQuery2->ExecSQL();
 
-		//query read_table db and insert new row
-		SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data."+readTable+" ("+headings+") VALUES ("+values+");";
-		SQLQuery2->ExecSQL();
+			//query read_table db and insert new row
+			SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data."+readTable+" ("+headings+") VALUES ("+values+");";
+			SQLQuery2->ExecSQL();
+        }
 
 		//Take back to welcome screen (form2)
 		Form3->Hide();
@@ -513,24 +546,25 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 	//query input_table to see if dateChosen is filled already or not
 	//if filled, show advanced view with data filled in
 	//if not filled, show basic view and allow normal progression
-	//check if current date already input for most basic user (should store input_table somewhere for use in Form3)
+
+	//check if current date already input for most basic user
 	String currentHotelID = Form1->getHotelID();
-	String inputTable = "";
-	SQLQuery2->SQL->Text = "SELECT input_table FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
+	SQLQuery2->SQL->Text = "SELECT input_table, read_table FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
 	SQLQuery2->Open();
 	SQLQuery2->First();
 
 	if (!SQLQuery2->Eof)
 	{
-		//get what the inputTable is
+		//get what the inputTable is and what read table is (for future insert)
 		inputTable = SQLQuery2->Fields->Fields[0]->AsString;
+		readTable = SQLQuery2->Fields->Fields[1]->AsString;
 
 		//query to see if tuple exists for dateChosen
 		SQLQuery2->SQL->Text = "SELECT * FROM "+inputTable+" WHERE Date = '"+dateChosen+"';";
 		SQLQuery2->Open();
 		SQLQuery2->First();
 
-		//if tuple exists, display in grid similar to advanced view (shouldn't be blank)
+		//if tuple exists, display in grid similar to advanced view
 		if (!SQLQuery2->Eof)
 		{
 			//hide form items
@@ -539,12 +573,17 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 			nextImageButton->Visible = false;
 
 			SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_hotel_data' AND TABLE_NAME = '"+inputTable+"';";
+            SQLQuery3->SQL->Text = "SELECT * FROM "+inputTable+" WHERE Date = '"+dateChosen+"';";
 
 			//open query and temporarily skip first two column headings (Date/Day_Of_Week)
 			SQLQuery2->Open();
 			SQLQuery2->First();
 			SQLQuery2->Next();
 			SQLQuery2->Next();
+
+			//open second query
+			SQLQuery3->Open();
+			SQLQuery3->First();
 
 			displayGrid->Cells[0][0] = "Heading";
 			displayGrid->Cells[1][0] = "Value";
@@ -564,8 +603,9 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 
 				//show and populate displayGrid
 				displayGrid->Cells[0][count] = editedHeading;
-				displayGrid->Cells[1][count] = "";
+				displayGrid->Cells[1][count] = SQLQuery3->Fields->Fields[count+1]->AsString;
 
+				//increase count and cursors
 				++count;
 				SQLQuery2->Next();
 			}
@@ -573,6 +613,9 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 			displayGrid->RowCount = count;
 			displayGrid->Visible = true;
 			submitButton->Visible = true;
+
+			//set alreadyThere boolean to true (signifying the need for an update query when submit is clicked)
+			alreadyThere = true;
 		}
 		//if inputLevel is advanced and no input for this date, show blank advanced view
 		else if (Form1->getInputLevel() == 1)
@@ -622,8 +665,11 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 		else
 		{
 
-        }
+		}
 	}
+
+	//clear datePopupBox items (need to do in other places also)
+	datePopupBox->Items->Clear();
 }
 //---------------------------------------------------------------------------
 

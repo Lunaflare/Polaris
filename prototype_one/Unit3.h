@@ -71,6 +71,7 @@ __published:	// IDE-managed Components
 	TPopupBox *datePopupBox;
 	TLabel *datePopupBoxLabel;
 	TImage *chooseDateImageButton;
+	TSQLQuery *SQLQuery3;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton3Click(TObject *Sender);
@@ -86,6 +87,7 @@ private:	// User declarations
 	String inputTable;
 	String readTable;
 	String dateChosen;
+	bool alreadyThere;
 public:		// User declarations
 	__fastcall TForm3(TComponent* Owner);
 };

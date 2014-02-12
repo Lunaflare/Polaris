@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'Login'
-  ClientHeight = 415
+  ClientHeight = 422
   ClientWidth = 539
   Fill.Kind = bkGradient
   Fill.Gradient.Points = <
@@ -57,7 +57,7 @@ object Form1: TForm1
     Width = 161.000000000000000000
     Height = 30.000000000000000000
     object usernameGlowEffect: TGlowEffect
-      Softness = 0.400000005960464400
+      Softness = 0.400000005960464500
       GlowColor = claCrimson
       Opacity = 0.899999976158142100
       Enabled = False
@@ -75,7 +75,7 @@ object Form1: TForm1
     Height = 30.000000000000000000
     OnKeyDown = passwordEditKeyDown
     object passwordGlowEffect: TGlowEffect
-      Softness = 0.400000005960464400
+      Softness = 0.400000005960464500
       GlowColor = claCrimson
       Opacity = 0.899999976158142100
       Enabled = False

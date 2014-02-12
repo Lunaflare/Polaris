@@ -65,6 +65,10 @@ void __fastcall TForm5::FormClose(TObject *Sender, TCloseAction &Action)
 //take user back to base menu when clicked, doesn't save changes
 void __fastcall TForm5::homeImageButton5Click(TObject *Sender)
 {
+	//erase data from password edit boxes
+	passwordChangeEdit->Text = "";
+	confirmPasswordEdit->Text = "";
+
 	Form5->Hide();
 	Form2->Show();
 }
@@ -114,6 +118,10 @@ void __fastcall TForm5::saveChangesButtonClick(TObject *Sender)
 				Form1->setInputLevel(currentInputLevel);
 				Form1->setPassword(newPassword);
 
+                //erase data from password edit boxes
+				passwordChangeEdit->Text = "";
+				confirmPasswordEdit->Text = "";
+
 				//hide current form and show base menu again
 				Form5->Hide();
 				Form2->Show();
@@ -145,6 +153,10 @@ void __fastcall TForm5::saveChangesButtonClick(TObject *Sender)
 		//set read and input levels appropriately given the desired changes (so populated upon return to this form)
 		Form1->setReadLevel(currentReadLevel);
 		Form1->setInputLevel(currentInputLevel);
+
+        //erase data from password edit boxes
+		passwordChangeEdit->Text = "";
+		confirmPasswordEdit->Text = "";
 
 		//hide current form and show base menu again
 		Form5->Hide();
