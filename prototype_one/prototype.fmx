@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'Login'
-  ClientHeight = 401
+  ClientHeight = 415
   ClientWidth = 539
   Fill.Kind = bkGradient
   Fill.Gradient.Points = <
@@ -31,7 +31,7 @@ object Form1: TForm1
     StyledSettings = [ssFamily]
     Height = 41.000000000000000000
     Position.X = 104.000000000000000000
-    Position.Y = 112.000000000000000000
+    Position.Y = 144.000000000000000000
     Text = 'Username:'
     Width = 105.000000000000000000
   end
@@ -41,7 +41,7 @@ object Form1: TForm1
     StyledSettings = [ssFamily]
     Height = 41.000000000000000000
     Position.X = 104.000000000000000000
-    Position.Y = 152.000000000000000000
+    Position.Y = 184.000000000000000000
     Text = 'Password:'
     Width = 89.000000000000000000
   end
@@ -53,7 +53,7 @@ object Form1: TForm1
     Password = False
     TextAlign = taCenter
     Position.X = 200.000000000000000000
-    Position.Y = 120.000000000000000000
+    Position.Y = 152.000000000000000000
     Width = 161.000000000000000000
     Height = 30.000000000000000000
     object usernameGlowEffect: TGlowEffect
@@ -70,7 +70,7 @@ object Form1: TForm1
     Password = True
     TextAlign = taCenter
     Position.X = 200.000000000000000000
-    Position.Y = 160.000000000000000000
+    Position.Y = 192.000000000000000000
     Width = 161.000000000000000000
     Height = 30.000000000000000000
     OnKeyDown = passwordEditKeyDown
@@ -85,7 +85,7 @@ object Form1: TForm1
     DisableFocusEffect = False
     Height = 25.000000000000000000
     Position.X = 288.000000000000000000
-    Position.Y = 224.000000000000000000
+    Position.Y = 256.000000000000000000
     Text = 'Login'
     Width = 89.000000000000000000
     OnClick = loginSubmitButtonClick
@@ -94,7 +94,7 @@ object Form1: TForm1
     DisableFocusEffect = False
     Height = 25.000000000000000000
     Position.X = 176.000000000000000000
-    Position.Y = 224.000000000000000000
+    Position.Y = 256.000000000000000000
     Text = 'Register'
     Width = 88.000000000000000000
     OnClick = loginregisterButtonClick
@@ -11981,7 +11981,7 @@ object Form1: TForm1
     DisableFocusEffect = False
     Height = 17.000000000000000000
     Position.X = 232.000000000000000000
-    Position.Y = 256.000000000000000000
+    Position.Y = 288.000000000000000000
     Text = 'Recover Password'
     Visible = False
     Width = 97.000000000000000000
@@ -12327,7 +12327,7 @@ object Form1: TForm1
     Height = 89.000000000000000000
     MarginWrapMode = iwOriginal
     Position.X = 176.000000000000000000
-    Position.Y = 16.000000000000000000
+    Position.Y = 48.000000000000000000
     Width = 185.000000000000000000
     WrapMode = iwOriginal
   end
@@ -12337,7 +12337,7 @@ object Form1: TForm1
     StyledSettings = [ssFamily]
     Height = 33.000000000000000000
     Position.X = 216.000000000000000000
-    Position.Y = 192.000000000000000000
+    Position.Y = 224.000000000000000000
     Text = 'Remember Me'
     Width = 113.000000000000000000
   end
@@ -12345,20 +12345,20 @@ object Form1: TForm1
     Height = 17.000000000000000000
     IsChecked = False
     Position.X = 328.000000000000000000
-    Position.Y = 200.000000000000000000
+    Position.Y = 232.000000000000000000
     Width = 33.000000000000000000
   end
   object copyrightLabel: TLabel
     Height = 15.000000000000000000
     Position.X = 240.000000000000000000
-    Position.Y = 312.000000000000000000
+    Position.Y = 344.000000000000000000
     Text = #169'2014 Lunaflare'
     Width = 89.000000000000000000
   end
   object loadIndicator: TAniIndicator
     Height = 50.000000000000000000
     Position.X = 256.000000000000000000
-    Position.Y = 128.000000000000000000
+    Position.Y = 160.000000000000000000
     Visible = False
     Width = 50.000000000000000000
   end
@@ -12368,7 +12368,7 @@ object Form1: TForm1
     StyledSettings = [ssFamily]
     Height = 41.000000000000000000
     Position.X = 112.000000000000000000
-    Position.Y = 88.000000000000000000
+    Position.Y = 120.000000000000000000
     Text = 'Invalid username and/or password!'
     TextAlign = taCenter
     Visible = False
