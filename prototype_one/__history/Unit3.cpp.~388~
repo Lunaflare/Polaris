@@ -133,7 +133,7 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 		dateChosen = d.FormatString(L"yyyy-mm-dd");
 		String currentDate = d.FormatString(L"mm/dd/yyyy");
 
-		//populate the datePopupBox with the last week's dates
+		//populate the datePopupBox with the last week's dates (including today)
 		datePopupBox->Items->Add(currentDate);
 		for (int i = 0; i < 6; ++i)
 		{
@@ -142,7 +142,7 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 
 		//make date popupBox visible to user and set current date as chosen
 		datePopupBox->ItemIndex = 0;
-		chooseImageButton->Visible = true;
+		chooseDateImageButton->Visible = true;
 		datePopupBox->Visible = true;
     }
 }
@@ -163,6 +163,10 @@ void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
 	displayGrid->Visible = false;
 	submitButton->Visible = false;
 
+	//clear datePopupBox items (need to do in other places also)
+	datePopupBox->Items->Clear();
+
+	//hide current form and show welcome screen
 	Form3->Hide();
 	Form2->Show();
 }
@@ -474,16 +478,130 @@ void __fastcall TForm3::datePopupBoxChange(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TForm3::chooseImageButtonClick(TObject *Sender)
+void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 {
 	//hide date related items
-	//chooseImageButton->Visible = false;
+	chooseDateImageButton->Visible = false;
 	datePopupBoxLabel->Visible = false;
 	datePopupBox->Visible = false;
 
-	//testing
-	dbFieldLabel->Visible = true;
-    dbFieldLabel->Text = dateChosen;
+	//at this point dateChosen has whatever date is desired
+	//need to now do normal basic or advanced input depending on accessLevel
+
+	//query input_table to see if dateChosen is filled already or not
+	//if filled, show advanced view with data filled in
+	//if not filled, show basic view and allow normal progression
+	//check if current date already input for most basic user (should store input_table somewhere for use in Form3)
+	String currentHotelID = Form1->getHotelID();
+	String inputTable = "";
+	SQLQuery2->SQL->Text = "SELECT input_table FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
+	SQLQuery2->Open();
+	SQLQuery2->First();
+
+	if (!SQLQuery2->Eof)
+	{
+		//get what the inputTable is
+		inputTable = SQLQuery2->Fields->Fields[0]->AsString;
+
+		//query to see if tuple exists for dateChosen
+		SQLQuery2->SQL->Text = "SELECT * FROM "+inputTable+" WHERE Date = '"+dateChosen+"';";
+		SQLQuery2->Open();
+		SQLQuery2->First();
+
+		//if tuple exists, display in grid similar to advanced view (shouldn't be blank)
+		if (!SQLQuery2->Eof)
+		{
+			//hide form items
+			dbFieldLabel->Visible = false;
+			dbFieldEdit->Visible = false;
+			nextImageButton->Visible = false;
+
+			SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_hotel_data' AND TABLE_NAME = '"+inputTable+"';";
+
+			//open query and temporarily skip first two column headings (Date/Day_Of_Week)
+			SQLQuery2->Open();
+			SQLQuery2->First();
+			SQLQuery2->Next();
+			SQLQuery2->Next();
+
+			displayGrid->Cells[0][0] = "Heading";
+			displayGrid->Cells[1][0] = "Value";
+			int count = 1;
+			//strings used in if for holdling column headings
+			String originalHeading = "";
+			String editedHeading = "";
+
+			while (!SQLQuery2->Eof)
+			{
+				//get initial column heading without formatting (i.e. removing "_")
+				originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+
+				//replace underscores with spaces and set label
+				editedHeading = StringReplace(originalHeading, "_", " ",
+					TReplaceFlags() << rfReplaceAll);
+
+				//show and populate displayGrid
+				displayGrid->Cells[0][count] = editedHeading;
+				displayGrid->Cells[1][count] = "";
+
+				++count;
+				SQLQuery2->Next();
+			}
+
+			displayGrid->RowCount = count;
+			displayGrid->Visible = true;
+			submitButton->Visible = true;
+		}
+		//if inputLevel is advanced and no input for this date, show blank advanced view
+		else if (Form1->getInputLevel() == 1)
+		{
+			//hide form items
+			dbFieldLabel->Visible = false;
+			dbFieldEdit->Visible = false;
+			nextImageButton->Visible = false;
+
+			SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_hotel_data' AND TABLE_NAME = '"+inputTable+"';";
+
+			//open query and temporarily skip first two column headings (Date/Day_Of_Week)
+			SQLQuery2->Open();
+			SQLQuery2->First();
+			SQLQuery2->Next();
+			SQLQuery2->Next();
+
+			displayGrid->Cells[0][0] = "Heading";
+			displayGrid->Cells[1][0] = "Value";
+			int count = 1;
+			//strings used in if for holdling column headings
+			String originalHeading = "";
+			String editedHeading = "";
+
+			while (!SQLQuery2->Eof)
+			{
+				//get initial column heading without formatting (i.e. removing "_")
+				originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+
+				//replace underscores with spaces and set label
+				editedHeading = StringReplace(originalHeading, "_", " ",
+					TReplaceFlags() << rfReplaceAll);
+
+				//show and populate displayGrid
+				displayGrid->Cells[0][count] = editedHeading;
+				displayGrid->Cells[1][count] = "";
+
+				++count;
+				SQLQuery2->Next();
+			}
+
+			displayGrid->RowCount = count;
+			displayGrid->Visible = true;
+			submitButton->Visible = true;
+		}
+		//otherwise, run basic input for this chosenDate
+		else
+		{
+
+        }
+	}
 }
 //---------------------------------------------------------------------------
 
