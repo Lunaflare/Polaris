@@ -37,26 +37,28 @@ void __fastcall TForm2::FormShow(TObject *Sender)
 		Form3->SQLQuery2->SQL->Text = "SELECT input_table FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
 		Form3->SQLQuery2->Open();
 		Form3->SQLQuery2->First();
+
 		if (!Form3->SQLQuery2->Eof)
 		{
 			//get today's date
 			TDateTime d = Now();
 			String currentDate = d.FormatString(L"yyyy-mm-dd");
 
-			//testing
-			welcomeUserLabel->Text = currentDate;
-
 			//get what the inputTable is
 			inputTable = Form3->SQLQuery2->Fields->Fields[0]->AsString;
 
 			//query to see if tuple exists for current date
-			Form3->SQLQuery2->SQL->Text = "SELECT * FROM '"+inputTable+"' WHERE Date = '"+currentDate+"';";
+			Form3->SQLQuery2->SQL->Text = "SELECT * FROM "+inputTable+" WHERE Date = '"+currentDate+"';";
+            Form3->SQLQuery2->Open();
+			Form3->SQLQuery2->First();
 
 			//if tuple exists, disable input button
 			if (!Form3->SQLQuery2->Eof)
 			{
 				inputButtonImage->Enabled = false;
 			}
+			else
+				inputButtonImage->Enabled = true;
 		}
 	}
 

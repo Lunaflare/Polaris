@@ -57,6 +57,9 @@ void __fastcall TForm2::FormShow(TObject *Sender)
 			{
 				inputButtonImage->Enabled = false;
 			}
+			//otherwise enable it in case something has changed while using the app
+			else
+				inputButtonImage->Enabled = true;
 		}
 	}
 

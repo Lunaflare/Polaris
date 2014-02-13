@@ -88,6 +88,7 @@ private:	// User declarations
 	String readTable;
 	String dateChosen;
 	bool alreadyThere;
+	TDateTime pureDate;
 public:		// User declarations
 	__fastcall TForm3(TComponent* Owner);
 };

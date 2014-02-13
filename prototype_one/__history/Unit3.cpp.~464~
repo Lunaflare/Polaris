@@ -26,6 +26,11 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 	//set alreadyThere boolean to false
 	alreadyThere = false;
 
+	//get the current date in case accessLevel is 0
+	TDateTime d = Now();
+	pureDate = d;
+	dateChosen = d.FormatString(L"yyyy-mm-dd");
+
 	if (Form1->getAccessLevel() == 0)
 	{
 		//get the hotelID and query hotel_ref to find out which table to input to and which table to read from
@@ -69,6 +74,7 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 				dbFieldLabel->Text = editedHeading;
 				dbFieldLabel->Visible = true;
 				dbFieldEdit->Visible = true;
+				dbFieldEdit->Text = "";
 				nextImageButton->Visible = true;
 
 				//initially set index and size to zero
@@ -76,10 +82,9 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 				inputObject.size = 0;
 			}
 		}
-		/*else
+		//input level is "advanced" for when userAccess == 0
+		else
 		{
-			//input level is "advanced" for when userAccess == 0
-
 			//hide form items
 			dbFieldLabel->Visible = false;
 			dbFieldEdit->Visible = false;
@@ -120,7 +125,7 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 			displayGrid->RowCount = count;
 			displayGrid->Visible = true;
 			submitButton->Visible = true;
-		}*/
+		}
 	}
 	else
 	{
@@ -147,7 +152,8 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 		datePopupBox->ItemIndex = 0;
 		chooseDateImageButton->Visible = true;
 		datePopupBox->Visible = true;
-    }
+		datePopupBoxLabel->Visible = true;
+	}
 }
 //---------------------------------------------------------------------------
 
@@ -168,6 +174,11 @@ void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
 
 	//clear datePopupBox items (need to do in other places also)
 	datePopupBox->Items->Clear();
+
+	//clear all items from inputObject
+	inputObject.valueMap.clear();
+	inputObject.size = 0;
+	inputObject.currentIndex = 0;
 
 	//hide current form and show welcome screen
 	Form3->Hide();
@@ -392,13 +403,8 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 		String update = "";
 		String updateHeading = "";
 
-		//get today's date
-		TDateTime d = Now();
-		String currentDate = d.FormatString(L"yyyy-mm-dd");
-
 		//get day of week
-		TDateTime Value = Date();
-		int Day = DayOfWeek(Value);
+		int Day = DayOfWeek(pureDate);
 		String DayName;
 		switch(Day)
 		{
@@ -425,8 +431,8 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 		}
 
 		//populate date and day of week (probably temporary solution)
-		headings += "Date, Day_Of_Week, ";
-		values += "'" + currentDate + "', '" + DayName + "', ";
+		headings += ("Date, Day_Of_Week, ");
+		values += ("'" + dateChosen + "', '" + DayName + "', ");
 
 		//construct headings and values for an update query instead of insert query
 		if (alreadyThere)
@@ -438,17 +444,11 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 
 				if (i + 1 == displayGrid->RowCount - 1)
 				{
-					update += (
-
-					headings += ("" + StringReplace(displayGrid->Cells[0][i+1], " ", "_", TReplaceFlags() << rfReplaceAll) + "");
-					values += ("'" + displayGrid->Cells[1][i+1] + "'");
+					update += (updateHeading + " = '" + displayGrid->Cells[1][i+1] + "'");
 				}
 				else
 				{
-
-
-					headings += ("" + StringReplace(displayGrid->Cells[0][i+1], " ", "_", TReplaceFlags() << rfReplaceAll) + ", ");
-					values += ("'" + displayGrid->Cells[1][i+1] + "', ");
+					update += (updateHeading + " = '" + displayGrid->Cells[1][i+1] + "', ");
 				}
 			}
 		}
@@ -492,7 +492,8 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 		//run update query if item already in database
 		if (alreadyThere)
 		{
-			SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data."+inputTable+" SET  `Offset_Rooms_Occupied` =  '2',";
+			SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data."+inputTable+" SET "+update+" WHERE "+inputTable+".Date = '"+dateChosen+"';";
+        	SQLQuery2->ExecSQL();
 		}
 		//if item not there, then run the normal insert query
 		else
@@ -514,6 +515,11 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 	{
 		//no selected, save nothing and show form again (do nothing)
 	}
+
+	//hide unecessary items
+	displayGrid->Visible = false;
+	submitButton->Visible = false;
+	backImageButton->Visible = false;
 }
 //---------------------------------------------------------------------------
 
@@ -534,6 +540,7 @@ void __fastcall TForm3::datePopupBoxChange(TObject *Sender)
 {
 	//find out the item chosen as the date
 	int temp = datePopupBox->ItemIndex;
+	pureDate = StrToDate(datePopupBox->Items->operator [](temp));
 	dateChosen = StrToDate(datePopupBox->Items->operator [](temp)).FormatString(L"yyyy-mm-dd");
 }
 //---------------------------------------------------------------------------
@@ -669,7 +676,45 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 		//otherwise, run basic input for this chosenDate
 		else
 		{
+			//hide/show uneccessary/necessary items from this page
+			dbFieldLabel->Visible = true;
+			dbFieldEdit->Visible = true;
+			nextImageButton->Visible = true;
+			chooseDateImageButton->Visible = false;
+			datePopupBox->Visible = false;
+			datePopupBoxLabel->Visible = false;
 
+         	//input level is "default", query db schema
+			SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_hotel_data' AND TABLE_NAME = '"+inputTable+"';";
+
+			//open query and temporarily skip first two column headings
+			SQLQuery2->Open();
+			SQLQuery2->First();
+			SQLQuery2->Next();
+			SQLQuery2->Next();
+
+			//strings used in if for holdling column headings
+			String originalHeading = "";
+			String editedHeading = "";
+
+			//set label to represent first editable column heading
+			if(!SQLQuery2->Eof)
+			{
+				//get initial column heading without formatting (i.e. removing "_")
+				originalHeading = SQLQuery2->Fields->Fields[0]->AsString;
+
+				//replace underscores with spaces and set label
+				editedHeading = StringReplace(originalHeading, "_", " ",
+					TReplaceFlags() << rfReplaceAll);
+				dbFieldLabel->Text = editedHeading;
+				dbFieldLabel->Visible = true;
+				dbFieldEdit->Visible = true;
+				nextImageButton->Visible = true;
+
+				//initially set index and size to zero
+				inputObject.currentIndex = 0;
+				inputObject.size = 0;
+			}
 		}
 	}
 
