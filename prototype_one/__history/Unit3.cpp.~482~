@@ -74,6 +74,7 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 				dbFieldLabel->Text = editedHeading;
 				dbFieldLabel->Visible = true;
 				dbFieldEdit->Visible = true;
+				dbFieldEdit->Text = "";
 				nextImageButton->Visible = true;
 
 				//initially set index and size to zero
@@ -96,10 +97,9 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 			SQLQuery2->First();
 			SQLQuery2->Next();
 			SQLQuery2->Next();
-
-			displayGrid->Cells[0][0] = "Heading";
-			displayGrid->Cells[1][0] = "Value";
-			int count = 1;
+			//displayGrid->Cells[0][0] = "Heading";
+			//displayGrid->Cells[1][0] = "Value";
+			int count = 0;
 			//strings used in if for holdling column headings
 			String originalHeading = "";
 			String editedHeading = "";
@@ -271,13 +271,11 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 				nextImageButton->Visible = false;
 
 				//show and populate displayGrid
-				displayGrid->RowCount = inputObject.valueMap.size() + 1;
-				displayGrid->Cells[0][0] = "Heading";
-				displayGrid->Cells[1][0] = "Value";
+				displayGrid->RowCount = inputObject.valueMap.size();
 				for (int i = 0; i < inputObject.size; ++i)
 				{
-					displayGrid->Cells[0][i+1] = inputObject.valueMap[i][1];
-					displayGrid->Cells[1][i+1] = inputObject.valueMap[i][2];
+					displayGrid->Cells[0][i] = inputObject.valueMap[i][1];
+					displayGrid->Cells[1][i] = inputObject.valueMap[i][2];
 				}
 
 				displayGrid->Visible = true;
@@ -437,17 +435,17 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 		if (alreadyThere)
 		{
 			//populate strings only from the grid
-			for (int i = 0; i < displayGrid->RowCount - 1; ++i)
+			for (int i = 0; i < displayGrid->RowCount; ++i)
 			{
-                updateHeading = StringReplace(displayGrid->Cells[0][i+1], " ", "_", TReplaceFlags() << rfReplaceAll);
+				updateHeading = StringReplace(displayGrid->Cells[0][i], " ", "_", TReplaceFlags() << rfReplaceAll);
 
-				if (i + 1 == displayGrid->RowCount - 1)
+				if (i + 1 == displayGrid->RowCount)
 				{
-					update += (updateHeading + " = '" + displayGrid->Cells[1][i+1] + "'");
+					update += (updateHeading + " = '" + displayGrid->Cells[1][i] + "'");
 				}
 				else
 				{
-					update += (updateHeading + " = '" + displayGrid->Cells[1][i+1] + "', ");
+					update += (updateHeading + " = '" + displayGrid->Cells[1][i] + "', ");
 				}
 			}
 		}
@@ -460,12 +458,12 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 				if (i + 1 == inputObject.size)
 				{
 					headings += ("" + inputObject.valueMap[i][0] + "");
-					values += ("'" + displayGrid->Cells[1][i+1] + "'");
+					values += ("'" + displayGrid->Cells[1][i] + "'");
 				}
 				else
 				{
 					headings += ("" + inputObject.valueMap[i][0] + ", ");
-					values += ("'" + displayGrid->Cells[1][i+1] + "', ");
+					values += ("'" + displayGrid->Cells[1][i] + "', ");
 				}
 			}
 		}
@@ -473,17 +471,17 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 		else
 		{
 			//populate strings only from the grid (might not be "minus 1")
-			for (int i = 0; i < displayGrid->RowCount - 1; ++i)
+			for (int i = 0; i < displayGrid->RowCount; ++i)
 			{
-				if (i + 1 == displayGrid->RowCount - 1)
+				if (i + 1 == displayGrid->RowCount)
 				{
-					headings += ("" + StringReplace(displayGrid->Cells[0][i+1], " ", "_", TReplaceFlags() << rfReplaceAll) + "");
-					values += ("'" + displayGrid->Cells[1][i+1] + "'");
+					headings += ("" + StringReplace(displayGrid->Cells[0][i], " ", "_", TReplaceFlags() << rfReplaceAll) + "");
+					values += ("'" + displayGrid->Cells[1][i] + "'");
 				}
 				else
 				{
-					headings += ("" + StringReplace(displayGrid->Cells[0][i+1], " ", "_", TReplaceFlags() << rfReplaceAll) + ", ");
-					values += ("'" + displayGrid->Cells[1][i+1] + "', ");
+					headings += ("" + StringReplace(displayGrid->Cells[0][i], " ", "_", TReplaceFlags() << rfReplaceAll) + ", ");
+					values += ("'" + displayGrid->Cells[1][i] + "', ");
 				}
 			}
 		}
@@ -596,9 +594,7 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 			SQLQuery3->Open();
 			SQLQuery3->First();
 
-			displayGrid->Cells[0][0] = "Heading";
-			displayGrid->Cells[1][0] = "Value";
-			int count = 1;
+			int count = 0;
 			//strings used in if for holdling column headings
 			String originalHeading = "";
 			String editedHeading = "";
@@ -614,7 +610,7 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 
 				//show and populate displayGrid
 				displayGrid->Cells[0][count] = editedHeading;
-				displayGrid->Cells[1][count] = SQLQuery3->Fields->Fields[count+1]->AsString;
+				displayGrid->Cells[1][count] = SQLQuery3->Fields->Fields[count+2]->AsString;
 
 				//increase count and cursors
 				++count;
@@ -644,9 +640,7 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 			SQLQuery2->Next();
 			SQLQuery2->Next();
 
-			displayGrid->Cells[0][0] = "Heading";
-			displayGrid->Cells[1][0] = "Value";
-			int count = 1;
+			int count = 0;
 			//strings used in if for holdling column headings
 			String originalHeading = "";
 			String editedHeading = "";
@@ -708,6 +702,7 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 				dbFieldLabel->Text = editedHeading;
 				dbFieldLabel->Visible = true;
 				dbFieldEdit->Visible = true;
+				dbFieldEdit->Text = "";
 				nextImageButton->Visible = true;
 
 				//initially set index and size to zero
