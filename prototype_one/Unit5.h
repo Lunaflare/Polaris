@@ -31,7 +31,6 @@ __published:	// IDE-managed Components
 	TButton *saveChangesButton;
 	TButton *editDLRButton;
 	TImage *homeImageButton5;
-	TLabel *homeLabel5;
 	TLabel *confirmPasswordLabel;
 	TEdit *confirmPasswordEdit;
 	TGlowEffect *GlowEffect1;
@@ -46,6 +45,8 @@ __published:	// IDE-managed Components
 	TImage *sepImage;
 	TImage *sep2Image;
 	TGroupBox *changePasswordGroup;
+	TImage *homeLabelImage;
+	TLabel *copyrightLabel;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton5Click(TObject *Sender);

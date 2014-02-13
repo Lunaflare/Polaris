@@ -69,9 +69,11 @@ __published:	// IDE-managed Components
 	TStringColumn *StringColumn2;
 	TImage *submitButton;
 	TPopupBox *datePopupBox;
-	TLabel *datePopupBoxLabel;
 	TImage *chooseDateImageButton;
 	TSQLQuery *SQLQuery3;
+	TBrushObject *bg_gradient;
+	TImage *datePopupBoxLabel;
+	TLabel *copyrightLabel;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton3Click(TObject *Sender);

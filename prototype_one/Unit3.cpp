@@ -97,7 +97,6 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 			SQLQuery2->First();
 			SQLQuery2->Next();
 			SQLQuery2->Next();
-
 			displayGrid->Cells[0][0] = "Heading";
 			displayGrid->Cells[1][0] = "Value";
 			int count = 1;

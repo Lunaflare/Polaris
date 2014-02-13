@@ -170,12 +170,14 @@ void __fastcall TForm5::homeImageButton5MouseEnter(TObject *Sender)
 {
 home_swapper->Bitmap=homeImageButton5->Bitmap;
 homeImageButton5->Bitmap=home_over->Bitmap;
+homeLabelImage->Visible=true;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm5::homeImageButton5MouseLeave(TObject *Sender)
 {
 homeImageButton5->Bitmap=home_swapper->Bitmap;
+homeLabelImage->Visible=false;
 }
 //---------------------------------------------------------------------------
 
