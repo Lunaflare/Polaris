@@ -15,6 +15,9 @@ __published:	// IDE-managed Components
 	TStyleBook *StyleBook2;
 	TImage *homeImageButton4;
 	TLabel *homeLabel4;
+	TImage *nextImageButton2;
+	TLabel *filtersLabel;
+	TImage *backImageButton2;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton4Click(TObject *Sender);
