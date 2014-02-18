@@ -5,4 +5,9 @@
 .add timer icon code between transitions with expected delays (excess database interaction, etc.)
 .add old input data to raw_input table
 .enforce password constraints when changing the password
-.for input both basic and advanced - type check/error check (i.e. blank cells)
+.sanitize login input
+.for input forms both basic and advanced - type check/error check (i.e. blank cells)
+.When inputting
+	*need to also get std hours from labor stds & put in read_data
+	*calculate percent performance & put in read_data
+.write message saying use arrow keys in grids (for users knowledge)
