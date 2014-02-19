@@ -135,21 +135,12 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 
         //get today's date
 		TDateTime d = Now();
+		pureDate = d;
 		dateChosen = d.FormatString(L"yyyy-mm-dd");
-		String currentDate = d.FormatString(L"mm/dd/yyyy");
 
-		//populate the datePopupBox with the last week's dates (including today)
-		datePopupBox->Items->Add(currentDate);
-		for (int i = 0; i < 6; ++i)
-		{
-			datePopupBox->Items->Add((--d).FormatString(L"mm/dd/yyyy"));
-		}
-
-		//make date popupBox visible to user and set current date as chosen
-		datePopupBox->ItemIndex = 0;
 		chooseDateImageButton->Visible = true;
-		datePopupBox->Visible = true;
 		datePopupBoxLabel->Visible = true;
+		calendar->Visible = true;
 	}
 }
 //---------------------------------------------------------------------------
@@ -169,8 +160,8 @@ void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
 	displayGrid->Visible = false;
 	submitButton->Visible = false;
 
-	//clear datePopupBox items (need to do in other places also)
-	datePopupBox->Items->Clear();
+	//set calendar choice back to current date
+	calendar->Date = Now();
 
 	//clear all items from inputObject
 	inputObject.valueMap.clear();
@@ -487,8 +478,13 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 		//run update query if item already in database
 		if (alreadyThere)
 		{
+			//update the raw_input table
 			SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data."+inputTable+" SET "+update+" WHERE "+inputTable+".Date = '"+dateChosen+"';";
-        	SQLQuery2->ExecSQL();
+			SQLQuery2->ExecSQL();
+
+			//update the read_data table
+			SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data."+readTable+" SET "+update+" WHERE "+readTable+".Date = '"+dateChosen+"';";
+			SQLQuery2->ExecSQL();
 		}
 		//if item not there, then run the normal insert query
 		else
@@ -530,22 +526,12 @@ void __fastcall TForm3::dbFieldEditKeyDown(TObject *Sender, WORD &Key, System::W
 }
 //---------------------------------------------------------------------------
 
-//find out which date is chosen and then progress like normal depending on inputLevel
-void __fastcall TForm3::datePopupBoxChange(TObject *Sender)
-{
-	//find out the item chosen as the date
-	int temp = datePopupBox->ItemIndex;
-	pureDate = StrToDate(datePopupBox->Items->operator [](temp));
-	dateChosen = StrToDate(datePopupBox->Items->operator [](temp)).FormatString(L"yyyy-mm-dd");
-}
-//---------------------------------------------------------------------------
-
 void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 {
 	//hide date related items
 	chooseDateImageButton->Visible = false;
 	datePopupBoxLabel->Visible = false;
-	datePopupBox->Visible = false;
+	calendar->Visible = false;
 
 	//at this point dateChosen has whatever date is desired
 	//need to now do normal basic or advanced input depending on accessLevel
@@ -672,7 +658,7 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 			dbFieldEdit->Visible = true;
 			nextImageButton->Visible = true;
 			chooseDateImageButton->Visible = false;
-			datePopupBox->Visible = false;
+			calendar->Visible = false;
 			datePopupBoxLabel->Visible = false;
 
          	//input level is "default", query db schema
@@ -710,9 +696,16 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 		}
 	}
 
-	//clear datePopupBox items (need to do in other places also)
-	datePopupBox->Items->Clear();
+	//set date chosen back to current date
+	calendar->Date = Now();
 }
 //---------------------------------------------------------------------------
 
+//when the calendar choice is changed, change variables accordingly
+void __fastcall TForm3::calendarChange(TObject *Sender)
+{
+	pureDate = calendar->Date;
+	dateChosen = StrToDate(pureDate).FormatString(L"yyyy-mm-dd");
+}
+//---------------------------------------------------------------------------
 

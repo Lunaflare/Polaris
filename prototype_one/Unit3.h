@@ -17,6 +17,7 @@
 #include <FMX.Grid.hpp>
 #include <FMX.Layouts.hpp>
 #include <FMX.Menus.hpp>
+#include <FMX.ExtCtrls.hpp>
 //---------------------------------------------------------------------------
 #include <iostream>
 #include <map>
@@ -68,12 +69,12 @@ __published:	// IDE-managed Components
 	TStringColumn *StringColumn1;
 	TStringColumn *StringColumn2;
 	TImage *submitButton;
-	TPopupBox *datePopupBox;
 	TImage *chooseDateImageButton;
 	TSQLQuery *SQLQuery3;
 	TBrushObject *bg_gradient;
 	TImage *datePopupBoxLabel;
 	TLabel *copyrightLabel;
+	TCalendar *calendar;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton3Click(TObject *Sender);
@@ -82,8 +83,8 @@ __published:	// IDE-managed Components
 	void __fastcall submitButtonClick(TObject *Sender);
 	void __fastcall dbFieldEditKeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
 		  TShiftState Shift);
-	void __fastcall datePopupBoxChange(TObject *Sender);
 	void __fastcall chooseDateImageButtonClick(TObject *Sender);
+	void __fastcall calendarChange(TObject *Sender);
 private:	// User declarations
 	inputValues inputObject;
 	String inputTable;
