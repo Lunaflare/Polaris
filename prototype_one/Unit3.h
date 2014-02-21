@@ -47,6 +47,35 @@ struct inputValues
 	int currentIndex;
 };
 
+class calculateInfo
+{
+	public:
+		calculateInfo(String r, String q, String b, String s, int c, double a, double l)
+		{
+			Role_Name = r;
+			roleStandardHours = q;
+			Bare_Role_Name = b;
+			Standard_Hours_Reference = s;
+			contextValue = c;
+			actualValue = a;
+			laborValue = l;
+
+			if (actualValue != 0)
+				percentPerformance = laborValue / actualValue;
+			else
+				percentPerformance = 0;
+		}
+
+		String Role_Name;
+		String roleStandardHours;
+		String Bare_Role_Name;
+		String Standard_Hours_Reference;
+		int contextValue;
+		double actualValue;
+		double laborValue;
+		double percentPerformance;
+};
+
 //---------------------------------------------------------------------------
 class TForm3 : public TForm
 {
@@ -89,6 +118,7 @@ private:	// User declarations
 	inputValues inputObject;
 	String inputTable;
 	String readTable;
+	String laborTable;
 	String dateChosen;
 	bool alreadyThere;
 	TDateTime pureDate;

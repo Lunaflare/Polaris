@@ -47,6 +47,48 @@ struct inputValues
 	int currentIndex;
 };
 
+class calculateInfo
+{
+	public:
+		calculateInfo(String r, String q, String b, String s)
+		{
+			Role_Name = r;
+			roleStandardHours = q;
+			Bare_Role_Name = b;
+			Standard_Hours_Reference = s;
+		}
+
+		calculateInfo(String r, String q, String b, String s, String c, String a)
+		{
+			Role_Name = r;
+			roleStandardHours = q;
+			Bare_Role_Name = b;
+			Standard_Hours_Reference = s;
+			contextValue = c;
+			actualValue = a;
+		}
+
+		calculateInfo(String r, String q, String b, String s, String c, String a, String l)
+		{
+			Role_Name = r;
+			roleStandardHours = q;
+			Bare_Role_Name = b;
+			Standard_Hours_Reference = s;
+			contextValue = c;
+			actualValue = a;
+			laborValue = l;
+		}
+
+	public:
+		String Role_Name;
+		String roleStandardHours;
+		String Bare_Role_Name;
+		String Standard_Hours_Reference;
+		String contextValue;
+		String actualValue;
+		String laborValue;
+};
+
 //---------------------------------------------------------------------------
 class TForm3 : public TForm
 {
@@ -69,14 +111,16 @@ __published:	// IDE-managed Components
 	TStringColumn *StringColumn1;
 	TStringColumn *StringColumn2;
 	TImage *submitButton;
-	TPopupBox *datePopupBox;
 	TImage *chooseDateImageButton;
 	TSQLQuery *SQLQuery3;
 	TBrushObject *bg_gradient;
 	TImage *datePopupBoxLabel;
 	TLabel *copyrightLabel;
-	TCalendarEdit *calendarEdit;
-	TCalendar *Calendar1;
+	TCalendar *calendar;
+	TLabel *Label1;
+	TLabel *Label2;
+	TLabel *Label3;
+	TLabel *Label4;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton3Click(TObject *Sender);
@@ -85,9 +129,8 @@ __published:	// IDE-managed Components
 	void __fastcall submitButtonClick(TObject *Sender);
 	void __fastcall dbFieldEditKeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
 		  TShiftState Shift);
-	void __fastcall datePopupBoxChange(TObject *Sender);
 	void __fastcall chooseDateImageButtonClick(TObject *Sender);
-	void __fastcall calendarEditChange(TObject *Sender);
+	void __fastcall calendarChange(TObject *Sender);
 private:	// User declarations
 	inputValues inputObject;
 	String inputTable;

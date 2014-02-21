@@ -37,13 +37,14 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 		String currentHotelID = Form1->getHotelID();
 		inputTable = "";
 		readTable = "";
-		SQLQuery2->SQL->Text = "SELECT input_table, read_table FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
+		SQLQuery2->SQL->Text = "SELECT input_table, read_table, labor_table FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
 		SQLQuery2->Open();
 		SQLQuery2->First();
 		if (!SQLQuery2->Eof)
 		{
 			inputTable = SQLQuery2->Fields->Fields[0]->AsString;
 			readTable = SQLQuery2->Fields->Fields[1]->AsString;
+			laborTable = SQLQuery2->Fields->Fields[2]->AsString;
 		}
 
 		//show user input screen based on input level (i.e. default or advanced)
@@ -498,6 +499,88 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 			SQLQuery2->ExecSQL();
         }
 
+		//Calculate and update values for Standard_Hours and Percent_Performance
+		//first, query role_table to get all the Role_Name, Bare_Role_Name and Standard_Hours_Reference
+		String currentHotelID = Form1->getHotelID();
+		vector<calculateInfo> infoVector;
+		String roleName = "";
+		String roleStandardHoursName = "";
+		String bareRoleName = "";
+		String standardHoursReference = "";
+		int context = 0;
+		double actual = 0;
+		double labor = 0;
+		SQLQuery2->SQL->Text = "SELECT Role_Name, Bare_Role_Name, Standard_Hours_Reference FROM baldwins_hotel_data.role_table WHERE hotelID = '"+currentHotelID+"';";
+		SQLQuery2->Open();
+		SQLQuery2->First();
+		while (!SQLQuery2->Eof)
+		{
+			//fill strings
+			roleName = SQLQuery2->Fields->Fields[0]->AsString;
+			roleStandardHoursName = StringReplace(roleName, "Hours_Paid", "Standard_Hours", TReplaceFlags() << rfReplaceAll);
+			bareRoleName = SQLQuery2->Fields->Fields[1]->AsString;
+			standardHoursReference = SQLQuery2->Fields->Fields[2]->AsString;
+
+			//get the integer value based on above strings
+			SQLQuery3->SQL->Text = "SELECT "+roleName+", "+standardHoursReference+" FROM baldwins_hotel_data."+readTable+" WHERE Date = '"+dateChosen+"';";
+			SQLQuery3->Open();
+			SQLQuery3->First();
+			if (!SQLQuery3->Eof)
+			{
+				actual = SQLQuery3->Fields->Fields[0]->AsFloat;
+				context = SQLQuery3->Fields->Fields[1]->AsInteger;
+			}
+
+			//get the labor value for standard hours
+			SQLQuery3->SQL->Text = "SELECT "+bareRoleName+" FROM baldwins_hotel_data."+laborTable+" WHERE "+context+" >= Rooms_Occupied_Low AND "+context+" <= Rooms_Occupied_High;";
+			SQLQuery3->Open();
+			SQLQuery3->First();
+			if (!SQLQuery3->Eof)
+			{
+               	labor = SQLQuery3->Fields->Fields[0]->AsFloat;
+			}
+
+			//push_back calculateInfo object
+			infoVector.push_back(calculateInfo(roleName, roleStandardHoursName, bareRoleName, standardHoursReference, context, actual, labor));
+
+			//reset strings to empty for next iteration
+			roleName = "";
+			roleStandardHoursName = "";
+			bareRoleName = "";
+			standardHoursReference = "";
+			actual = 0;
+			context = 0;
+			labor = 0;
+
+			//move cursor to next item
+			SQLQuery2->Next();
+		}
+
+		//run update query that updates standard hours and percent performance
+		updateHeading = "";
+		String updateHeading2 = "";
+		update = "";
+		labor = 0;
+		double percent = 0;
+		for (int i = 0; i < infoVector.size(); ++i)
+		{
+			updateHeading = infoVector[i].roleStandardHours;
+			updateHeading2 = StringReplace(updateHeading, "Standard_Hours", "Percent_Performance", TReplaceFlags() << rfReplaceAll);
+			labor = infoVector[i].laborValue;
+            percent = infoVector[i].percentPerformance;
+
+			if (i + 1 == infoVector.size())
+			{
+				update += (updateHeading + " = '" + labor + "', " + updateHeading2 + " = '" + percent + "'");
+			}
+			else
+			{
+				update += (updateHeading + " = '" + labor + "', " + updateHeading2 + " = '" + percent + "', ");
+			}
+		}
+		SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data."+readTable+" SET "+update+" WHERE "+readTable+".Date = '"+dateChosen+"';";
+		SQLQuery2->ExecSQL();
+
 		//Take back to welcome screen (form2)
 		Form3->Hide();
 		Form2->Show();
@@ -542,7 +625,7 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 
 	//check if current date already input for most basic user
 	String currentHotelID = Form1->getHotelID();
-	SQLQuery2->SQL->Text = "SELECT input_table, read_table FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
+	SQLQuery2->SQL->Text = "SELECT input_table, read_table, labor_table FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
 	SQLQuery2->Open();
 	SQLQuery2->First();
 
@@ -551,6 +634,7 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 		//get what the inputTable is and what read table is (for future insert)
 		inputTable = SQLQuery2->Fields->Fields[0]->AsString;
 		readTable = SQLQuery2->Fields->Fields[1]->AsString;
+		laborTable = SQLQuery2->Fields->Fields[2]->AsString;
 
 		//query to see if tuple exists for dateChosen
 		SQLQuery2->SQL->Text = "SELECT * FROM "+inputTable+" WHERE Date = '"+dateChosen+"';";
@@ -566,7 +650,7 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 			nextImageButton->Visible = false;
 
 			SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_hotel_data' AND TABLE_NAME = '"+inputTable+"';";
-            SQLQuery3->SQL->Text = "SELECT * FROM "+inputTable+" WHERE Date = '"+dateChosen+"';";
+			SQLQuery3->SQL->Text = "SELECT * FROM "+inputTable+" WHERE Date = '"+dateChosen+"';";
 
 			//open query and temporarily skip first two column headings (Date/Day_Of_Week)
 			SQLQuery2->Open();
