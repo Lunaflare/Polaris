@@ -1,0 +1,36 @@
+Overtime_Hours_Paid = from raw_input table
+Overtime_Standard_Hours = read_data.Overtime_Hours_Paid * hotel_ref.Overtime_Per_Hour
+Overtime_Percent_Performance = read_data.Overtime_Hours_Paid / read_data.Overtime_Standard_Hours
+
+Total_Labor_Hours_Actual_Hours = Sum of all Hours_Paid in read table
+Total_Labor_Hours_Standard_Hours = sum of all Standard_Hours in read table
+Total_Labor_Hours_Percent_Performance = read_data.Total_Labor_Hours_Standard_Hours / read_data.Total_Labor_Hours_Actual_Hours
+
+Total_Labor_Cost_Actual_Cost = sum of all roles hours worked multiplied by that role's wage. EX: read_data.AM_Room_Attendants_Hours_Paid * role_table.Role_Wages + ....
+Total_Labor_Cost_Standard_Cost = sum of all roles std hours multiplied by that role's wage
+Total_Labor_Cost_Percent_Performance = read_data.Total_Labor_Cost_Standard_Cost / read_data.Total_Labor_Cost_Actual_Cost
+
+
+_____________________________________________________________________________________________________
+
+THESE ARE ALL DISPLAY ONLY NO STORING INTO TABLES!!!!!
+For each of these there is a productivity goal this should only be shown in monthly or greater, not daily.
+When I say "sum of displayed...." this means the sum of such category that is on the screen.
+This is only for productivity goals because the display mode could be weekly, monthly or YTD.
+HMU if you need explaination.
+
+**** REGULAR ****
+Hours Variance = read_data.Total_Labor_Hours_Actual_Hours - read_data.Total_Labor_Hours_Standard_Hours
+Cost Variance = read_data.Total_Labor_Cost_Actual_Cost - read_data.Total_Labor_Cost_Standard_Cost
+Man Minutes per Room Cleaned = (read_data.Total_Labor_Hours_Actual_Hours * 60) / read_data.Total_Rooms_Cleaned
+Rooms Cleaned per AM GRA = read_data.AM_Rooms_Cleaned/(read_data.AM_Room_Attendants_Hours_Paid/8)
+Rooms Cleaned per PM GRA = read_data.PM_Rooms_Cleaned/(read_data.PM_Room_Attendants_Hours_Paid/8)
+Rooms Cleaned per Laundry Attendant = read_data.Total_Rooms_Cleaned / (read_data.Laundry_Attendant_Hours_Paid/7.5)
+
+**** PRODUCTIVITY GOALS ****
+Hours Variance = 0
+Cost Variance = 0
+Man Minutes per Room Cleaned = (sum of all displayed standard hours * 60)/ sum of total rooms cleaned displayed
+Rooms Cleaned per AM GRA = sum of displayed am rooms cleaned/ ( sum of am room attendant standard hours displayed / 8)
+Rooms Cleaned per PM GRA = sum of displayed pm rooms cleaned/ ( sum of pm room attendant standard hours displayed / 8)
+Rooms Cleaned per Laundry Attendant = sum of displayed total rooms cleaned /(sum of displayed laundry attendant standard hours/7.5)
