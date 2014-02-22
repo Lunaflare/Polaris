@@ -2,13 +2,13 @@ Overtime_Hours_Paid = from raw_input table
 Overtime_Standard_Hours = read_data.Overtime_Hours_Paid * hotel_ref.Overtime_Per_Hour
 Overtime_Percent_Performance = read_data.Overtime_Hours_Paid / read_data.Overtime_Standard_Hours
 
-Total_Labor_Hours_Actual_Hours = Sum of all Hours_Paid in read table
+Total_Labor_Hours_Hours_Paid = Sum of all Hours_Paid in read table
 Total_Labor_Hours_Standard_Hours = sum of all Standard_Hours in read table
-Total_Labor_Hours_Percent_Performance = read_data.Total_Labor_Hours_Standard_Hours / read_data.Total_Labor_Hours_Actual_Hours
+Total_Labor_Hours_Percent_Performance = read_data.Total_Labor_Hours_Standard_Hours / read_data.Total_Labor_Hours_Hours_Paid
 
-Total_Labor_Cost_Actual_Cost = sum of all roles hours worked multiplied by that role's wage. EX: read_data.AM_Room_Attendants_Hours_Paid * role_table.Role_Wages + ....
+Total_Labor_Cost_Hours_Paid = sum of all roles hours worked multiplied by that role's wage. EX: read_data.AM_Room_Attendants_Hours_Paid * role_table.Role_Wages + ....
 Total_Labor_Cost_Standard_Cost = sum of all roles std hours multiplied by that role's wage
-Total_Labor_Cost_Percent_Performance = read_data.Total_Labor_Cost_Standard_Cost / read_data.Total_Labor_Cost_Actual_Cost
+Total_Labor_Cost_Percent_Performance = read_data.Total_Labor_Cost_Standard_Cost / read_data.Total_Labor_Cost_Hours_Paid
 
 
 _____________________________________________________________________________________________________
@@ -20,9 +20,9 @@ This is only for productivity goals because the display mode could be weekly, mo
 HMU if you need explaination.
 
 **** REGULAR ****
-Hours Variance = read_data.Total_Labor_Hours_Actual_Hours - read_data.Total_Labor_Hours_Standard_Hours
-Cost Variance = read_data.Total_Labor_Cost_Actual_Cost - read_data.Total_Labor_Cost_Standard_Cost
-Man Minutes per Room Cleaned = (read_data.Total_Labor_Hours_Actual_Hours * 60) / read_data.Total_Rooms_Cleaned
+Hours Variance = read_data.Total_Labor_Hours_Hours_Paid - read_data.Total_Labor_Hours_Standard_Hours
+Cost Variance = read_data.Total_Labor_Cost_Hours_Paid - read_data.Total_Labor_Cost_Standard_Cost
+Man Minutes per Room Cleaned = (read_data.Total_Labor_Hours_Hours_Paid * 60) / read_data.Total_Rooms_Cleaned
 Rooms Cleaned per AM GRA = read_data.AM_Rooms_Cleaned/(read_data.AM_Room_Attendants_Hours_Paid/8)
 Rooms Cleaned per PM GRA = read_data.PM_Rooms_Cleaned/(read_data.PM_Room_Attendants_Hours_Paid/8)
 Rooms Cleaned per Laundry Attendant = read_data.Total_Rooms_Cleaned / (read_data.Laundry_Attendant_Hours_Paid/7.5)
