@@ -18,6 +18,7 @@
 #include <FMX.Layouts.hpp>
 #include <FMX.Menus.hpp>
 #include <FMX.ExtCtrls.hpp>
+#include <FMX.Ani.hpp>
 //---------------------------------------------------------------------------
 #include <iostream>
 #include <map>
@@ -81,8 +82,6 @@ class TForm3 : public TForm
 {
 __published:	// IDE-managed Components
 	TStyleBook *StyleBook2;
-	TImage *homeImageButton3;
-	TLabel *homeLabel3;
 	TLabel *dbFieldLabel;
 	TEdit *dbFieldEdit;
 	TGlowEffect *usernameGlowEffect;
@@ -104,6 +103,30 @@ __published:	// IDE-managed Components
 	TImage *datePopupBoxLabel;
 	TLabel *copyrightLabel;
 	TCalendar *calendar;
+	TImage *homeLabelImage;
+	TImage *Image2;
+	TImage *homeImageButton5;
+	TFloatAnimation *floatAnimation1;
+	TFloatAnimation *opacityAnimation1;
+	TImage *home_over;
+	TImage *home_swapper;
+	TFloatAnimation *FloatAnimation2;
+	TImage *inputLabelImage;
+	TFloatAnimation *FloatAnimation3;
+	TFloatAnimation *FloatAnimation4;
+	TImage *nextLabelImage;
+	TImage *Image3;
+	TImage *nextOver;
+	TImage *backOver;
+	TImage *Image5;
+	TFloatAnimation *FloatAnimation5;
+	TFloatAnimation *FloatAnimation6;
+	TImage *Image4;
+	TImage *submitOver;
+	TFloatAnimation *FloatAnimation7;
+	TFloatAnimation *FloatAnimation8;
+	TImage *Image1;
+	TImage *submitLabelImage;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton3Click(TObject *Sender);
@@ -114,6 +137,15 @@ __published:	// IDE-managed Components
 		  TShiftState Shift);
 	void __fastcall chooseDateImageButtonClick(TObject *Sender);
 	void __fastcall calendarChange(TObject *Sender);
+	void __fastcall homeImageButton5MouseEnter(TObject *Sender);
+	void __fastcall homeImageButton5MouseLeave(TObject *Sender);
+	void __fastcall homeImageButton5Click(TObject *Sender);
+	void __fastcall nextImageButtonMouseEnter(TObject *Sender);
+	void __fastcall nextImageButtonMouseLeave(TObject *Sender);
+	void __fastcall backImageButtonMouseEnter(TObject *Sender);
+	void __fastcall backImageButtonMouseLeave(TObject *Sender);
+	void __fastcall submitButtonMouseEnter(TObject *Sender);
+	void __fastcall submitButtonMouseLeave(TObject *Sender);
 private:	// User declarations
 	inputValues inputObject;
 	String inputTable;
@@ -122,8 +154,10 @@ private:	// User declarations
 	String dateChosen;
 	bool alreadyThere;
 	TDateTime pureDate;
+	String selectedDate;
 public:		// User declarations
 	__fastcall TForm3(TComponent* Owner);
+
 };
 
 //---------------------------------------------------------------------------

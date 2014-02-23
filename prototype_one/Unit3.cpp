@@ -121,8 +121,11 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 			}
 
 			displayGrid->RowCount = count;
+			Image3->Visible=false;
+			inputLabelImage->Visible=false;
 			displayGrid->Visible = true;
 			submitButton->Visible = true;
+			Image1->Visible=true;
 		}
 	}
 	else
@@ -158,8 +161,10 @@ void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
 {
 	//hide certain items
 	backImageButton->Visible = false;
+	Image4->Visible=false;
 	displayGrid->Visible = false;
 	submitButton->Visible = false;
+	Image1->Visible=false;
 
 	//set calendar choice back to current date
 	calendar->Date = Now();
@@ -259,6 +264,7 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 				dbFieldLabel->Visible = false;
 				dbFieldEdit->Visible = false;
 				nextImageButton->Visible = false;
+				nextLabelImage->Visible=false;
 
 				//show and populate displayGrid
 				displayGrid->RowCount = inputObject.valueMap.size();
@@ -267,9 +273,12 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 					displayGrid->Cells[0][i] = inputObject.valueMap[i][1];
 					displayGrid->Cells[1][i] = inputObject.valueMap[i][2];
 				}
-
+				Image3->Visible=false;
+				Image4->Visible=false;
+				 inputLabelImage->Visible=false;
 				displayGrid->Visible = true;
 				submitButton->Visible = true;
+				Image1->Visible=true;
 			}
 			else
 			{
@@ -324,6 +333,9 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 				dbFieldLabel->Visible = false;
 				dbFieldEdit->Visible = false;
 				nextImageButton->Visible = false;
+				Image3->Visible=false;
+				Image4->Visible=false;
+				nextLabelImage->Visible=false;
 
 				//show and populate displayGrid
 				for (int i = 0; i < inputObject.size; ++i)
@@ -332,7 +344,9 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 					displayGrid->Cells[1][i+1] = inputObject.valueMap[i][2];
 				}
 
+
 				submitButton->Visible = true;
+				Image1->Visible=true;
 				displayGrid->Visible = true;
 			}
 		}
@@ -356,6 +370,7 @@ void __fastcall TForm3::backImageButtonClick(TObject *Sender)
 	{
 		displayGrid->Visible = false;
 		submitButton->Visible = false;
+		Image1->Visible=false;
 		dbFieldLabel->Visible = true;
 		dbFieldEdit->Visible = true;
 		nextImageButton->Visible = true;
@@ -363,7 +378,10 @@ void __fastcall TForm3::backImageButtonClick(TObject *Sender)
 
 	(inputObject.currentIndex)--;
 	if (inputObject.currentIndex == 0)
-		backImageButton->Visible = false;
+		{
+			backImageButton->Visible = false;
+        	Image4->Visible=false;
+		}
 
 	dbFieldEdit->Text = inputObject.valueMap[inputObject.currentIndex][2];
 	dbFieldLabel->Text = inputObject.valueMap[inputObject.currentIndex][1];
@@ -497,8 +515,7 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 			//query read_table db and insert new row
 			SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data."+readTable+" ("+headings+") VALUES ("+values+");";
 			SQLQuery2->ExecSQL();
-        }
-
+		}
 		//Calculate and update values for Standard_Hours and Percent_Performance
 		//first, query role_table to get all the Role_Name, Bare_Role_Name and Standard_Hours_Reference
 		String currentHotelID = Form1->getHotelID();
@@ -555,7 +572,6 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 			//move cursor to next item
 			SQLQuery2->Next();
 		}
-
 		//run update query that updates standard hours and percent performance
 		updateHeading = "";
 		String updateHeading2 = "";
@@ -580,20 +596,23 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 		}
 		SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data."+readTable+" SET "+update+" WHERE "+readTable+".Date = '"+dateChosen+"';";
 		SQLQuery2->ExecSQL();
-
 		//Take back to welcome screen (form2)
 		Form3->Hide();
 		Form2->Show();
+
+		//hide unecessary items
+		displayGrid->Visible = false;
+		submitButton->Visible = false;
+		Image1->Visible=false;
+		backImageButton->Visible = false;
+		Image4->Visible=false;
+		inputLabelImage->Visible=false;
+		Image3->Visible=false;
 	}
 	else
 	{
 		//no selected, save nothing and show form again (do nothing)
 	}
-
-	//hide unecessary items
-	displayGrid->Visible = false;
-	submitButton->Visible = false;
-	backImageButton->Visible = false;
 }
 //---------------------------------------------------------------------------
 
@@ -615,6 +634,7 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 	chooseDateImageButton->Visible = false;
 	datePopupBoxLabel->Visible = false;
 	calendar->Visible = false;
+	inputLabelImage->Visible=true;
 
 	//at this point dateChosen has whatever date is desired
 	//need to now do normal basic or advanced input depending on accessLevel
@@ -684,10 +704,12 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 				++count;
 				SQLQuery2->Next();
 			}
-
+			inputLabelImage->Visible=false;
 			displayGrid->RowCount = count;
 			displayGrid->Visible = true;
+			Image3->Visible=false;
 			submitButton->Visible = true;
+			Image1->Visible=true;
 
 			//set alreadyThere boolean to true (signifying the need for an update query when submit is clicked)
 			alreadyThere = true;
@@ -696,9 +718,11 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 		else if (Form1->getInputLevel() == 1)
 		{
 			//hide form items
+			inputLabelImage->Visible=false;
 			dbFieldLabel->Visible = false;
 			dbFieldEdit->Visible = false;
 			nextImageButton->Visible = false;
+			Image3->Visible=false;
 
 			SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_hotel_data' AND TABLE_NAME = '"+inputTable+"';";
 
@@ -732,7 +756,10 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 
 			displayGrid->RowCount = count;
 			displayGrid->Visible = true;
+			inputLabelImage->Visible=false;
+			Image3->Visible=false;
 			submitButton->Visible = true;
+			Image1->Visible=true;
 		}
 		//otherwise, run basic input for this chosenDate
 		else
@@ -790,6 +817,99 @@ void __fastcall TForm3::calendarChange(TObject *Sender)
 {
 	pureDate = calendar->Date;
 	dateChosen = StrToDate(pureDate).FormatString(L"yyyy-mm-dd");
+}
+//---------------------------------------------------------------------------
+
+
+
+void __fastcall TForm3::homeImageButton5MouseEnter(TObject *Sender)
+{
+home_swapper->Bitmap=homeImageButton5->Bitmap;
+homeImageButton5->Bitmap=home_over->Bitmap;
+homeLabelImage->Visible=true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::homeImageButton5MouseLeave(TObject *Sender)
+{
+homeImageButton5->Bitmap=home_swapper->Bitmap;
+homeLabelImage->Visible=false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::homeImageButton5Click(TObject *Sender)
+{
+	//hide certain items
+	backImageButton->Visible = false;
+	Image4->Visible=false;
+	displayGrid->Visible = false;
+	submitButton->Visible = false;
+	Image1->Visible=false;
+	inputLabelImage->Visible=false;
+	Image3->Visible=false;
+
+	//set calendar choice back to current date
+	calendar->Date = Now();
+
+	//clear all items from inputObject
+	inputObject.valueMap.clear();
+	inputObject.size = 0;
+	inputObject.currentIndex = 0;
+
+	//hide current form and show welcome screen
+	Form3->Hide();
+	Form2->Show();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::nextImageButtonMouseEnter(TObject *Sender)
+{
+Image3->Visible=true;
+nextLabelImage->Visible=true;
+home_swapper->Bitmap=nextImageButton->Bitmap;
+nextImageButton->Bitmap=nextOver->Bitmap;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::nextImageButtonMouseLeave(TObject *Sender)
+{
+nextImageButton->Bitmap=home_swapper->Bitmap;
+nextLabelImage->Visible=false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::backImageButtonMouseEnter(TObject *Sender)
+{
+home_swapper->Bitmap=backImageButton->Bitmap;
+backImageButton->Bitmap=backOver->Bitmap;
+Image5->Visible=true;
+Image4->Visible=true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::backImageButtonMouseLeave(TObject *Sender)
+{
+Image4->Visible=false;
+Image5->Visible=false;
+backImageButton->Bitmap=home_swapper->Bitmap;
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::submitButtonMouseEnter(TObject *Sender)
+{
+home_swapper->Bitmap=submitButton->Bitmap;
+submitButton->Bitmap=submitOver->Bitmap;
+submitLabelImage->Visible=true;
+
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::submitButtonMouseLeave(TObject *Sender)
+{
+submitButton->Bitmap=home_swapper->Bitmap;
+submitLabelImage->Visible=false;
 }
 //---------------------------------------------------------------------------
 
