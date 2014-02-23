@@ -49,6 +49,7 @@ private:	// User declarations
 	String laborTable;
 	int basicState; //0=roles,1=view,2=week,3=display
 	vector<String> roleVector;
+	String viewType;
 public:		// User declarations
 	__fastcall TForm4(TComponent* Owner);
 };

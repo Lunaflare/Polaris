@@ -24,6 +24,9 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 	//hide welcome form
 	Form2->Hide();
 
+	//things the same for both basic and advanced
+    viewType = "Week";
+
     //get the hotelID and query hotel_ref to find out which table to input to and which table to read from
 	String currentHotelID = Form1->getHotelID();
 	inputTable = "";
@@ -92,6 +95,14 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	nextImageButton2->Visible = false;
 	filtersLabel->Visible = false;
 	selectAllButton->Visible = false;
+	dayRadio->Visible = false;
+	weekRadio->Visible = false;
+	monthRadio->Visible = false;
+	yearRadio->Visible = false;
+	dayRadio->IsChecked = false;
+	weekRadio->IsChecked = false;
+	monthRadio->IsChecked = false;
+	yearRadio->IsChecked = false;
 	selectAllButton->Text = "Select All";
 	roleListBox->Items->Clear();
 	roleVector.clear();
@@ -132,8 +143,19 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			monthRadio->Visible = false;
 			yearRadio->Visible = false;
 
+			//store things from view filter
+			if (dayRadio->IsChecked)
+				viewType = "Day";
+			else if (weekRadio->IsChecked)
+				viewType = "Week";
+			else if (monthRadio->IsChecked)
+				viewType = "Month";
+			else
+				viewType = "Year";
+
+			//increase basicState and display filterLabel appropriately
 			basicState++;
-			filtersLabel->Text = "Which...";
+			filtersLabel->Text = "Which " + viewType + "?";
 			break;
 		//basic show
 		case 2:
