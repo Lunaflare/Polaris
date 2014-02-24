@@ -1,13 +1,13 @@
-.balloon tip for why input/read buttons may not be enabled
-.make sure login form buttons go to correct links
+
+.make sure login form buttons go to correct links - ONLY "Register" needs changing
 .taskbar issue for all forms (does not show up as minimized in taskbar)
-.if minimize program, causes error (float error?)
+.if minimize program, causes error (float error?) - NOT ABLE TO RECREATE
 .add timer icon code between transitions with expected delays (excess database interaction, etc.)
 .add old input data to raw_input table
 .enforce password constraints when changing the password
 .sanitize login input
 .for input forms both basic and advanced - type check/error check (i.e. blank cells)
-.When inputting
+.When inputting - IN FINAL TESTING
 	*need to also get std hours from labor stds & put in read_data
 	*calculate percent performance & put in read_data
 .write message saying use arrow keys in grids (for users knowledge)
