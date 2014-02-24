@@ -18,6 +18,7 @@
 #include <FMX.Layouts.hpp>
 #include <FMX.Menus.hpp>
 #include <FMX.ExtCtrls.hpp>
+#include <FMX.Ani.hpp>
 //---------------------------------------------------------------------------
 #include <iostream>
 #include <map>
@@ -50,24 +51,6 @@ struct inputValues
 class calculateInfo
 {
 	public:
-		calculateInfo(String r, String q, String b, String s)
-		{
-			Role_Name = r;
-			roleStandardHours = q;
-			Bare_Role_Name = b;
-			Standard_Hours_Reference = s;
-		}
-
-		calculateInfo(String r, String q, String b, String s, int c, double a)
-		{
-			Role_Name = r;
-			roleStandardHours = q;
-			Bare_Role_Name = b;
-			Standard_Hours_Reference = s;
-			contextValue = c;
-			actualValue = a;
-		}
-
 		calculateInfo(String r, String q, String b, String s, int c, double a, double l)
 		{
 			Role_Name = r;
@@ -77,9 +60,13 @@ class calculateInfo
 			contextValue = c;
 			actualValue = a;
 			laborValue = l;
+
+			if (actualValue != 0)
+				percentPerformance = laborValue / actualValue;
+			else
+				percentPerformance = 0;
 		}
 
-	public:
 		String Role_Name;
 		String roleStandardHours;
 		String Bare_Role_Name;
@@ -95,8 +82,6 @@ class TForm3 : public TForm
 {
 __published:	// IDE-managed Components
 	TStyleBook *StyleBook2;
-	TImage *homeImageButton3;
-	TLabel *homeLabel3;
 	TLabel *dbFieldLabel;
 	TEdit *dbFieldEdit;
 	TGlowEffect *usernameGlowEffect;
@@ -118,10 +103,30 @@ __published:	// IDE-managed Components
 	TImage *datePopupBoxLabel;
 	TLabel *copyrightLabel;
 	TCalendar *calendar;
-	TLabel *Label1;
-	TLabel *Label2;
-	TLabel *Label3;
-	TLabel *Label4;
+	TImage *homeLabelImage;
+	TImage *Image2;
+	TImage *homeImageButton5;
+	TFloatAnimation *floatAnimation1;
+	TFloatAnimation *opacityAnimation1;
+	TImage *home_over;
+	TImage *home_swapper;
+	TFloatAnimation *FloatAnimation2;
+	TImage *inputLabelImage;
+	TFloatAnimation *FloatAnimation3;
+	TFloatAnimation *FloatAnimation4;
+	TImage *nextLabelImage;
+	TImage *Image3;
+	TImage *nextOver;
+	TImage *backOver;
+	TImage *Image5;
+	TFloatAnimation *FloatAnimation5;
+	TFloatAnimation *FloatAnimation6;
+	TImage *Image4;
+	TImage *submitOver;
+	TFloatAnimation *FloatAnimation7;
+	TFloatAnimation *FloatAnimation8;
+	TImage *Image1;
+	TImage *submitLabelImage;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton3Click(TObject *Sender);
@@ -132,15 +137,27 @@ __published:	// IDE-managed Components
 		  TShiftState Shift);
 	void __fastcall chooseDateImageButtonClick(TObject *Sender);
 	void __fastcall calendarChange(TObject *Sender);
+	void __fastcall homeImageButton5MouseEnter(TObject *Sender);
+	void __fastcall homeImageButton5MouseLeave(TObject *Sender);
+	void __fastcall homeImageButton5Click(TObject *Sender);
+	void __fastcall nextImageButtonMouseEnter(TObject *Sender);
+	void __fastcall nextImageButtonMouseLeave(TObject *Sender);
+	void __fastcall backImageButtonMouseEnter(TObject *Sender);
+	void __fastcall backImageButtonMouseLeave(TObject *Sender);
+	void __fastcall submitButtonMouseEnter(TObject *Sender);
+	void __fastcall submitButtonMouseLeave(TObject *Sender);
 private:	// User declarations
 	inputValues inputObject;
 	String inputTable;
 	String readTable;
+	String laborTable;
 	String dateChosen;
 	bool alreadyThere;
 	TDateTime pureDate;
+	String selectedDate;
 public:		// User declarations
 	__fastcall TForm3(TComponent* Owner);
+
 };
 
 //---------------------------------------------------------------------------

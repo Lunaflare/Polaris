@@ -151,6 +151,7 @@ private:	// User declarations
 	String inputTable;
 	String readTable;
 	String laborTable;
+	double overtimePerHour;
 	String dateChosen;
 	bool alreadyThere;
 	TDateTime pureDate;

@@ -37,7 +37,9 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 		String currentHotelID = Form1->getHotelID();
 		inputTable = "";
 		readTable = "";
-		SQLQuery2->SQL->Text = "SELECT input_table, read_table, labor_table FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
+		laborTable = "";
+		overtimePerHour = 0;
+		SQLQuery2->SQL->Text = "SELECT input_table, read_table, labor_table, Overtime_Per_Hour FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
 		SQLQuery2->Open();
 		SQLQuery2->First();
 		if (!SQLQuery2->Eof)
@@ -45,6 +47,7 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 			inputTable = SQLQuery2->Fields->Fields[0]->AsString;
 			readTable = SQLQuery2->Fields->Fields[1]->AsString;
 			laborTable = SQLQuery2->Fields->Fields[2]->AsString;
+			overtimePerHour = SQLQuery2->Fields->Fields[3]->AsFloat;
 		}
 
 		//show user input screen based on input level (i.e. default or advanced)
@@ -531,10 +534,10 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 		double roleWages = 0;
 		double totalLaborHoursHoursPaid = 0;
 		double totalLaborHoursStandardHours = 0;
-		double totalLablorHoursPercentPerformance = 0;
+		double totalLaborHoursPercentPerformance = 0;
 		double totalLaborCostHoursPaid = 0;
 		double totalLaborCostStandardHours = 0;
-		double totalLablorCostPercentPerformance = 0;
+		double totalLaborCostPercentPerformance = 0;
 		SQLQuery2->SQL->Text = "SELECT Role_Name, Bare_Role_Name, Standard_Hours_Reference, Role_Wages FROM baldwins_hotel_data.role_table WHERE hotelID = '"+currentHotelID+"';";
 		SQLQuery2->Open();
 		SQLQuery2->First();
@@ -545,7 +548,7 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 			roleStandardHoursName = StringReplace(roleName, "Hours_Paid", "Standard_Hours", TReplaceFlags() << rfReplaceAll);
 			bareRoleName = SQLQuery2->Fields->Fields[1]->AsString;
 			standardHoursReference = SQLQuery2->Fields->Fields[2]->AsString;
-            roleWages = SQLQuery2->Fields->Fields[3]->AsFloat;
+			roleWages = SQLQuery2->Fields->Fields[3]->AsFloat;
 
 			//get the integer value based on above strings
 			SQLQuery3->SQL->Text = "SELECT "+roleName+", "+standardHoursReference+" FROM baldwins_hotel_data."+readTable+" WHERE Date = '"+dateChosen+"';";
@@ -570,7 +573,7 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 			//push_back calculateInfo object
 			infoVector.push_back(calculateInfo(roleName, roleStandardHoursName, bareRoleName, standardHoursReference, context, actual, labor));
 
-            //compute values used below this while loop in actual update query
+			//compute values used below this while loop in actual update query
 			totalLaborHoursHoursPaid += actual;
 			totalLaborHoursStandardHours += labor;
 			totalLaborCostHoursPaid += (actual * roleWages);
@@ -585,12 +588,12 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 			context = 0;
 			labor = 0;
 			roleWages = 0;
-			totalLaborHoursHoursPaid = 0;
+			/*totalLaborHoursHoursPaid = 0;
 			totalLaborHoursStandardHours = 0;
-			totalLablorHoursPercentPerformance = 0;
+			totalLaborHoursPercentPerformance = 0;
 			totalLaborCostHoursPaid = 0;
 			totalLaborCostStandardHours = 0;
-			totalLablorCostPercentPerformance = 0;
+			totalLaborCostPercentPerformance = 0;*/
 
 			//move cursor to next item
 			SQLQuery2->Next();
@@ -609,20 +612,41 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 			labor = infoVector[i].laborValue;
             percent = infoVector[i].percentPerformance;
 
-			if (i + 1 == infoVector.size())
+			/*if (i + 1 == infoVector.size())
 			{
 				update += (updateHeading + " = '" + labor + "', " + updateHeading2 + " = '" + percent + "'");
-			}
-			else
-			{
+			}*/
+			//else
+			//{
 				update += (updateHeading + " = '" + labor + "', " + updateHeading2 + " = '" + percent + "', ");
-			}
+			//}
 		}
-		SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data."+readTable+" SET "+update+" WHERE "+readTable+".Date = '"+dateChosen+"';";
-		SQLQuery2->ExecSQL();
 
 		//calculate/store overtime, total_labor_hours, total_labor_cost in read_data
-
+		double overtimeHoursPaid = 0;
+		double overtimeStandardHours = 0;
+		double overtimePercentPerformance = 0;
+		SQLQuery3->SQL->Text = "SELECT Overtime_Hours_Paid FROM baldwins_hotel_data."+inputTable+" WHERE "+inputTable+".Date = '"+dateChosen+"';";
+		SQLQuery3->Open();
+		SQLQuery3->First();
+		if (!SQLQuery3->Eof)
+			overtimeHoursPaid = SQLQuery3->Fields->Fields[0]->AsFloat;
+		overtimeStandardHours = overtimePerHour * overtimeHoursPaid;
+		overtimePercentPerformance = overtimeStandardHours / 3;
+		if (totalLaborHoursHoursPaid != 0)
+			totalLaborHoursPercentPerformance = totalLaborHoursStandardHours / totalLaborHoursHoursPaid;
+		else
+			totalLaborHoursPercentPerformance = 0;
+		if (totalLaborCostHoursPaid != 0)
+			totalLaborCostPercentPerformance = totalLaborCostStandardHours / totalLaborCostHoursPaid;
+		else
+			totalLaborCostPercentPerformance = 0;
+		String spaceTaker = "";
+		update += (spaceTaker + "Overtime_Hours_Paid = '" + overtimeHoursPaid + "', " + "Overtime_Standard_Hours = '" + overtimeStandardHours + "', " + "Overtime_Percent_Performance = '" + overtimePercentPerformance + "', ");
+		update += (spaceTaker + "Total_Labor_Hours_Hours_Paid = '" + totalLaborHoursHoursPaid + "', " + "Total_Labor_Hours_Standard_Hours = '" + totalLaborHoursStandardHours + "', " + "Total_Labor_Hours_Percent_Performance = '" + totalLaborHoursPercentPerformance + "', ");
+		update += (spaceTaker + "Total_Labor_Cost_Hours_Paid = '" + totalLaborCostHoursPaid + "', " + "Total_Labor_Cost_Standard_Hours = '" + totalLaborCostStandardHours + "', " + "Total_Labor_Cost_Percent_Performance = '" + totalLaborCostPercentPerformance + "'");
+		SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data."+readTable+" SET "+update+" WHERE "+readTable+".Date = '"+dateChosen+"';";
+		SQLQuery2->ExecSQL();
 
 		//Take back to welcome screen (form2)
 		Form3->Hide();
@@ -673,7 +697,7 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 
 	//check if current date already input for most basic user
 	String currentHotelID = Form1->getHotelID();
-	SQLQuery2->SQL->Text = "SELECT input_table, read_table, labor_table FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
+	SQLQuery2->SQL->Text = "SELECT input_table, read_table, labor_table, Overtime_Per_Hour FROM hotel_ref WHERE hotelID = '"+currentHotelID+"';";
 	SQLQuery2->Open();
 	SQLQuery2->First();
 
@@ -683,6 +707,7 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 		inputTable = SQLQuery2->Fields->Fields[0]->AsString;
 		readTable = SQLQuery2->Fields->Fields[1]->AsString;
 		laborTable = SQLQuery2->Fields->Fields[2]->AsString;
+		overtimePerHour = SQLQuery2->Fields->Fields[3]->AsFloat;
 
 		//query to see if tuple exists for dateChosen
 		SQLQuery2->SQL->Text = "SELECT * FROM "+inputTable+" WHERE Date = '"+dateChosen+"';";
