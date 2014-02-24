@@ -45,6 +45,14 @@ __published:	// IDE-managed Components
 	TFloatAnimation *arrowFadeIn;
 	TLabel *Label1;
 	TImage *Image1;
+	TCalloutPanel *readCallout;
+	TLabel *Label2;
+	TImage *readIndicatorImage;
+	TFloatAnimation *FloatAnimation3;
+	TImage *inputIndicatorImage;
+	TCalloutPanel *inputCallout;
+	TLabel *inputCalloutImage;
+	TFloatAnimation *FloatAnimation4;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall inputSelectButtonClick(TObject *Sender);
@@ -59,6 +67,10 @@ __published:	// IDE-managed Components
 	void __fastcall readButtonImageMouseEnter(TObject *Sender);
 	void __fastcall readButtonImageMouseLeave(TObject *Sender);
 	void __fastcall readButtonImageClick(TObject *Sender);
+	void __fastcall readIndicatorImageMouseEnter(TObject *Sender);
+	void __fastcall readIndicatorImageMouseLeave(TObject *Sender);
+	void __fastcall inputIndicatorImageMouseEnter(TObject *Sender);
+	void __fastcall inputIndicatorImageMouseLeave(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TForm2(TComponent* Owner);

@@ -30,6 +30,7 @@ void __fastcall TForm2::FormShow(TObject *Sender)
 	{
 		//disable read button (do we want to show balloon here too?)
 		readButtonImage->Enabled = false;
+		readIndicatorImage->Visible=true;
 
 		//check if current date already input for most basic user (should store input_table somewhere for use in Form3)
         String currentHotelID = Form1->getHotelID();
@@ -56,6 +57,7 @@ void __fastcall TForm2::FormShow(TObject *Sender)
 			if (!Form3->SQLQuery2->Eof)
 			{
 				inputButtonImage->Enabled = false;
+				inputIndicatorImage->Visible=true;
 			}
 			//otherwise enable it in case something has changed while using the app
 			else
@@ -165,4 +167,30 @@ void __fastcall TForm2::readButtonImageClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+
+void __fastcall TForm2::readIndicatorImageMouseEnter(TObject *Sender)
+{
+readCallout->Visible=true;
+arrowImage->Visible=false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm2::readIndicatorImageMouseLeave(TObject *Sender)
+{
+readCallout->Visible=false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm2::inputIndicatorImageMouseEnter(TObject *Sender)
+{
+inputCallout->Visible=true;
+arrowImage->Visible=false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm2::inputIndicatorImageMouseLeave(TObject *Sender)
+{
+inputCallout->Visible=false;
+}
+//---------------------------------------------------------------------------
 
