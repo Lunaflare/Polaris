@@ -516,6 +516,7 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 			SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data."+readTable+" ("+headings+") VALUES ("+values+");";
 			SQLQuery2->ExecSQL();
 		}
+
 		//Calculate and update values for Standard_Hours and Percent_Performance
 		//first, query role_table to get all the Role_Name, Bare_Role_Name and Standard_Hours_Reference
 		String currentHotelID = Form1->getHotelID();
@@ -527,7 +528,14 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 		int context = 0;
 		double actual = 0;
 		double labor = 0;
-		SQLQuery2->SQL->Text = "SELECT Role_Name, Bare_Role_Name, Standard_Hours_Reference FROM baldwins_hotel_data.role_table WHERE hotelID = '"+currentHotelID+"';";
+		double roleWages = 0;
+		double totalLaborHoursHoursPaid = 0;
+		double totalLaborHoursStandardHours = 0;
+		double totalLablorHoursPercentPerformance = 0;
+		double totalLaborCostHoursPaid = 0;
+		double totalLaborCostStandardHours = 0;
+		double totalLablorCostPercentPerformance = 0;
+		SQLQuery2->SQL->Text = "SELECT Role_Name, Bare_Role_Name, Standard_Hours_Reference, Role_Wages FROM baldwins_hotel_data.role_table WHERE hotelID = '"+currentHotelID+"';";
 		SQLQuery2->Open();
 		SQLQuery2->First();
 		while (!SQLQuery2->Eof)
@@ -537,6 +545,7 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 			roleStandardHoursName = StringReplace(roleName, "Hours_Paid", "Standard_Hours", TReplaceFlags() << rfReplaceAll);
 			bareRoleName = SQLQuery2->Fields->Fields[1]->AsString;
 			standardHoursReference = SQLQuery2->Fields->Fields[2]->AsString;
+            roleWages = SQLQuery2->Fields->Fields[3]->AsFloat;
 
 			//get the integer value based on above strings
 			SQLQuery3->SQL->Text = "SELECT "+roleName+", "+standardHoursReference+" FROM baldwins_hotel_data."+readTable+" WHERE Date = '"+dateChosen+"';";
@@ -544,6 +553,7 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 			SQLQuery3->First();
 			if (!SQLQuery3->Eof)
 			{
+				//get values for normal use in this while loop
 				actual = SQLQuery3->Fields->Fields[0]->AsFloat;
 				context = SQLQuery3->Fields->Fields[1]->AsInteger;
 			}
@@ -560,7 +570,13 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 			//push_back calculateInfo object
 			infoVector.push_back(calculateInfo(roleName, roleStandardHoursName, bareRoleName, standardHoursReference, context, actual, labor));
 
-			//reset strings to empty for next iteration
+            //compute values used below this while loop in actual update query
+			totalLaborHoursHoursPaid += actual;
+			totalLaborHoursStandardHours += labor;
+			totalLaborCostHoursPaid += (actual * roleWages);
+			totalLaborCostStandardHours += (labor * roleWages);
+
+			//reset strings and doubles to empty for next iteration
 			roleName = "";
 			roleStandardHoursName = "";
 			bareRoleName = "";
@@ -568,10 +584,18 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 			actual = 0;
 			context = 0;
 			labor = 0;
+			roleWages = 0;
+			totalLaborHoursHoursPaid = 0;
+			totalLaborHoursStandardHours = 0;
+			totalLablorHoursPercentPerformance = 0;
+			totalLaborCostHoursPaid = 0;
+			totalLaborCostStandardHours = 0;
+			totalLablorCostPercentPerformance = 0;
 
 			//move cursor to next item
 			SQLQuery2->Next();
 		}
+
 		//run update query that updates standard hours and percent performance
 		updateHeading = "";
 		String updateHeading2 = "";
@@ -596,6 +620,10 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 		}
 		SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data."+readTable+" SET "+update+" WHERE "+readTable+".Date = '"+dateChosen+"';";
 		SQLQuery2->ExecSQL();
+
+		//calculate/store overtime, total_labor_hours, total_labor_cost in read_data
+
+
 		//Take back to welcome screen (form2)
 		Form3->Hide();
 		Form2->Show();
