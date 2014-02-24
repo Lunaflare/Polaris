@@ -8,6 +8,8 @@
 #include <FMX.Objects.hpp>
 #include <FMX.Types.hpp>
 #include <System.Classes.hpp>
+#include <FMX.ExtCtrls.hpp>
+#include <FMX.Menus.hpp>
 //---------------------------------------------------------------------------
 #include <vector>
 #include <iostream>
@@ -36,6 +38,9 @@ __published:	// IDE-managed Components
 	TRadioButton *monthRadio;
 	TRadioButton *yearRadio;
 	TButton *selectAllButton;
+	TCalendar *dayCalendar;
+	TPopupBox *monthPopupBox;
+	TPopupBox *yearPopupBox;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton4Click(TObject *Sender);

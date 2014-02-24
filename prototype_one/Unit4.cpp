@@ -18,6 +18,88 @@ __fastcall TForm4::TForm4(TComponent* Owner)
 }
 //---------------------------------------------------------------------------
 
+//computes the week number based on a date parameter (does not line up with calendar week numbers)
+typedef TDayTable* PDayTable;
+
+TDayTable MonthDays[2] = {
+{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
+{31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}};
+
+Word CDayMap[7] = {7, 1, 2, 3, 4, 5, 6};
+
+const int DayMonday = 1;
+const int DayTuesday = 2;
+const int DayWednesday = 3;
+const int DayThursday = 4;
+const int DayFriday = 5;
+const int DaySaturday = 6;
+const int DaySunday = 7;
+
+void __fastcall DivMod(int Dividend, Word Divisor, Word &Result, Word &Remainder)
+{
+Result = (Word) (Dividend / Divisor);
+Remainder = (Word) (Dividend % Divisor);
+}
+
+Word __fastcall DayOfTheWeek(const TDateTime &AValue)
+{
+return ((DateTimeToTimeStamp(AValue).Date - 1) % 7) + 1;
+}
+
+void __fastcall DecodeDateWeek(const TDateTime &AValue, Word &AYear,
+Word &AWeekOfYear, Word &ADayOfWeek)
+{
+int LDayOfYear;
+Word LMonth, LDay;
+TDateTime LStart;
+Word LStartDayOfWeek, LEndDayOfWeek;
+bool LLeap;
+
+LLeap = DecodeDateFully(AValue, AYear, LMonth, LDay, ADayOfWeek);
+ADayOfWeek = CDayMap[ADayOfWeek-1];
+LStart = EncodeDate(AYear, 1, 1);
+LDayOfYear = (int)(AValue - LStart + 1);
+LStartDayOfWeek = DayOfTheWeek(LStart);
+if( (LStartDayOfWeek >= DayFriday) && (LStartDayOfWeek <=
+DaySunday) )
+LDayOfYear -= (8 - LStartDayOfWeek);
+else
+LDayOfYear += (LStartDayOfWeek - 1);
+if( LDayOfYear <= 0 )
+DecodeDateWeek(LStart - 1, AYear, AWeekOfYear, LDay);
+else
+{
+AWeekOfYear = (LDayOfYear / 7);
+if( (LDayOfYear % 7) != 0 )
+++AWeekOfYear;
+if( AWeekOfYear > 52 )
+{
+LEndDayOfWeek = LStartDayOfWeek;
+if( LLeap )
+{
+if( LEndDayOfWeek == DaySunday )
+LEndDayOfWeek = DayMonday;
+else
+++LEndDayOfWeek;
+}
+if( (LEndDayOfWeek >= DayMonday) && (LEndDayOfWeek <=
+DayWednesday) )
+{
+++AYear;
+AWeekOfYear = 1;
+}
+}
+}
+}
+//end find week number stuff
+
+Word __fastcall WeekOfTheYear(const TDateTime &AValue)
+{
+Word LYear, LDOW, LResult;
+DecodeDateWeek(AValue, LYear, LResult, LDOW);
+return LResult;
+}
+
 //hides Form2 from view when this form is shown
 void __fastcall TForm4::FormShow(TObject *Sender)
 {
@@ -156,13 +238,78 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			//increase basicState and display filterLabel appropriately
 			basicState++;
 			filtersLabel->Text = "Which " + viewType + "?";
+
+			//depending on viewType, allow user to choose day, week, month or year respectively
+			if (viewType == "Day")
+			{
+				//show calendar and allow user to choose a day
+				dayCalendar->Visible = true;
+			}
+			else if (viewType == "Week")
+			{
+				//show calendar with week numbers on side
+				dayCalendar->Visible = true;
+			}
+			else if (viewType == "Month")
+			{
+				//show monthPopupBox with months as items
+				monthPopupBox->Visible = true;
+			}
+			else
+			{
+				//show yearPopupBox with years as items
+				yearPopupBox->Visible = true;
+            }
+
 			break;
 		//basic show
 		case 2:
+			//increase basicState and hide things
 			basicState++;
 			filtersLabel->Visible = false;
 			backImageButton2->Visible = false;
 			nextImageButton2->Visible = false;
+			dayCalendar->Visible = false;
+			monthPopupBox->Visible = false;
+			yearPopupBox->Visible = false;
+
+			//get whatever data was chosen by user (i.e. day, week, month or year)
+			if (viewType == "Day")
+			{
+				//get the date selected from the calendar
+				TDateTime dayChosen = dayCalendar->Date;
+				String dbDayChosen = StrToDate(dayChosen).FormatString(L"yyyy-mm-dd");
+
+				//testing
+				filtersLabel->Text = dbDayChosen;
+				filtersLabel->Visible = true;
+
+				//call display function
+			}
+			else if (viewType == "Week")
+			{
+				//get the week selected by the day selected from the calendar
+				TDateTime dayChosen = dayCalendar->Date;
+				String dbDayChosen = StrToDate(dayChosen).FormatString(L"yyyy-mm-dd");
+				int weekNum = WeekOfTheYear(dayChosen);
+				//need to check if weekNum == 1 (could either be first week 1 of current year or next year)
+				//just need to pull the year from the dayChosen
+
+				//testing
+				filtersLabel->Text = weekNum;
+				filtersLabel->Visible = true;
+			}
+			else if (viewType == "Month")
+			{
+				//get the month selected from the drop down
+			}
+			else
+			{
+				//get the year selected from the drop down
+			}
+
+			//call and give parameters (roleVector, viewBy, day/week/month/year) to display desired data
+
 			break;
 	}
 }
@@ -204,6 +351,10 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 			selectAllButton->Visible = false;
 			roleListBox->Visible = false;
 			backImageButton2->Visible = true;
+			dayCalendar->Visible = false;
+			dayCalendar->WeekNumbers = false;
+			monthPopupBox->Visible = false;
+			yearPopupBox->Visible = false;
 
             //handle signature things for view filter
 			dayRadio->Visible = true;
@@ -215,6 +366,7 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+//selects or deselects all items in the list
 void __fastcall TForm4::selectAllButtonClick(TObject *Sender)
 {
 	//check whether box is checked
@@ -237,6 +389,7 @@ void __fastcall TForm4::selectAllButtonClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+//ensures that the text of the selectAllButton stays correct and intuitive
 void __fastcall TForm4::roleListBoxChangeCheck(TObject *Sender)
 {
 	int counter = 0;
@@ -261,4 +414,6 @@ void __fastcall TForm4::roleListBoxChangeCheck(TObject *Sender)
     }
 }
 //---------------------------------------------------------------------------
+
+
 
