@@ -18,8 +18,7 @@ __fastcall TForm4::TForm4(TComponent* Owner)
 }
 //---------------------------------------------------------------------------
 
-//maybe this will work
-typedef Word TDayTable[12];
+//computes the week number based on a date parameter (does not line up with calendar week numbers)
 typedef TDayTable* PDayTable;
 
 TDayTable MonthDays[2] = {
@@ -41,71 +40,6 @@ void __fastcall DivMod(int Dividend, Word Divisor, Word &Result, Word &Remainder
 Result = (Word) (Dividend / Divisor);
 Remainder = (Word) (Dividend % Divisor);
 }
-
-/*bool __fastcall DecodeDateFully(const TDateTime &AValue, Word &AYear,
-Word &AMonth, Word &ADay, Word &ADayOfWeek)
-{
-const int D1 = 365;
-const int D4 = D1 * 4 + 1;
-const int D100 = D4 * 25 - 1;
-const int D400 = D100 * 4 + 1;
-
-Word Y, M, D, I;
-int T;
-PDayTable DayTable;
-bool Result;
-
-T = DateTimeToTimeStamp(AValue).Date;
-if( T <= 0 )
-{
-AYear = 0;
-AMonth = 0;
-ADay = 0;
-ADayOfWeek = 0;
-Result = false;
-}
-else
-{
-ADayOfWeek = ((T % 7) + 1);
---T;
-Y = 1;
-while( T >= D400 )
-{
-T -= D400;
-Y += 400;
-}
-DivMod(T, D100, I, D);
-if( I == 4 )
-{
---I;
-D += D100;
-}
-Y += (I * 100);
-DivMod(D, D4, I, D);
-Y += (I * 4);
-DivMod(D, D1, I, D);
-if( I == 4 )
-{
---I;
-D += D1;
-}
-Y += I;
-Result = IsLeapYear(Y);
-DayTable = &MonthDays[Result];
-M = 1;
-while( true )
-{
-I = *DayTable[M-1];
-if( D < I ) break;
-D -= I;
-++M;
-}
-AYear = Y;
-AMonth = M;
-ADay = (D + 1);
-}
-return Result;
-}*/
 
 Word __fastcall DayOfTheWeek(const TDateTime &AValue)
 {
@@ -157,6 +91,7 @@ AWeekOfYear = 1;
 }
 }
 }
+//end find week number stuff
 
 Word __fastcall WeekOfTheYear(const TDateTime &AValue)
 {
@@ -253,6 +188,8 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	selectAllButton->Text = "Select All";
 	roleListBox->Items->Clear();
 	roleVector.clear();
+	monthPopupBox->Items->Clear();
+	yearPopupBox->Items->Clear();
 }
 
 //---------------------------------------------------------------------------
@@ -358,17 +295,40 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				String dbDayChosen = StrToDate(dayChosen).FormatString(L"yyyy-mm-dd");
 				int weekNum = WeekOfTheYear(dayChosen);
 
+				//decode date to get year, month and day values
+				unsigned short Year, Month, Day;
+				dayChosen.DecodeDate(&Year, &Month, &Day);
+
+				//increase year for special case of week num being 1 when month is december
+				if (weekNum == 1 && Month == 12)
+				{
+					Year++;
+				}
+
 				//testing
-				filtersLabel->Text = weekNum;
+				String dummy = "";
+				filtersLabel->Text = dummy + Year + " " + weekNum;
 				filtersLabel->Visible = true;
 			}
 			else if (viewType == "Month")
 			{
-				//get the month selected from the drop down
+				//get the month selected from the drop down (value 1 through 12)
+				int currentMonthIndex = monthPopupBox->ItemIndex + 1;
+
+				//testing
+				filtersLabel->Text = currentMonthIndex;
+				filtersLabel->Visible = true;
 			}
 			else
 			{
 				//get the year selected from the drop down
+				int currentYearIndex = yearPopupBox->ItemIndex;
+				String currentYear = yearPopupBox->Items->operator [](currentYearIndex);
+
+				//testing
+				filtersLabel->Text = currentYear;
+				filtersLabel->Visible = true;
+
 			}
 
 			//call and give parameters (roleVector, viewBy, day/week/month/year) to display desired data

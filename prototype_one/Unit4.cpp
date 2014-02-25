@@ -188,6 +188,8 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	selectAllButton->Text = "Select All";
 	roleListBox->Items->Clear();
 	roleVector.clear();
+	monthPopupBox->ItemIndex = 0;
+	yearPopupBox->ItemIndex = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -292,20 +294,40 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				TDateTime dayChosen = dayCalendar->Date;
 				String dbDayChosen = StrToDate(dayChosen).FormatString(L"yyyy-mm-dd");
 				int weekNum = WeekOfTheYear(dayChosen);
-				//need to check if weekNum == 1 (could either be first week 1 of current year or next year)
-				//just need to pull the year from the dayChosen
+
+				//decode date to get year, month and day values
+				unsigned short Year, Month, Day;
+				dayChosen.DecodeDate(&Year, &Month, &Day);
+
+				//increase year for special case of week num being 1 when month is december
+				if (weekNum == 1 && Month == 12)
+				{
+					Year++;
+				}
 
 				//testing
-				filtersLabel->Text = weekNum;
+				String dummy = "";
+				filtersLabel->Text = dummy + Year + " " + weekNum;
 				filtersLabel->Visible = true;
 			}
 			else if (viewType == "Month")
 			{
-				//get the month selected from the drop down
+				//get the month selected from the drop down (value 1 through 12)
+				int currentMonthIndex = monthPopupBox->ItemIndex + 1;
+
+				//testing
+				filtersLabel->Text = currentMonthIndex;
+				filtersLabel->Visible = true;
 			}
 			else
 			{
 				//get the year selected from the drop down
+				int currentYearIndex = yearPopupBox->ItemIndex;
+				String currentYear = yearPopupBox->Items->operator [](currentYearIndex);
+
+				//testing
+				filtersLabel->Text = currentYear;
+				filtersLabel->Visible = true;
 			}
 
 			//call and give parameters (roleVector, viewBy, day/week/month/year) to display desired data
