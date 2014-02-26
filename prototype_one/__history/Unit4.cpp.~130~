@@ -188,8 +188,8 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	selectAllButton->Text = "Select All";
 	roleListBox->Items->Clear();
 	roleVector.clear();
-	monthPopupBox->Items->Clear();
-	yearPopupBox->Items->Clear();
+	monthPopupBox->ItemIndex = 0;
+	yearPopupBox->ItemIndex = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -328,10 +328,20 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				//testing
 				filtersLabel->Text = currentYear;
 				filtersLabel->Visible = true;
-
 			}
 
 			//call and give parameters (roleVector, viewBy, day/week/month/year) to display desired data
+
+			//hide things from testing
+			//filtersLabel->Visible = false;
+			//readGrid->Visible = true;
+
+			//tweaking grid testing
+			//StringGrid1.AddObject(TStringColumn.Create(Self));
+			//StringGrid1.Cells[0,0] := 'Hello World!';
+			readGrid->Columns->AddControlsToList(TStringColumn);
+			//readGrid->AddObject(TStringColumn);
+			filtersLabel->Text = readGrid->ColumnCount;
 
 			break;
 	}

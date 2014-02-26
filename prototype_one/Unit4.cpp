@@ -332,6 +332,19 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 
 			//call and give parameters (roleVector, viewBy, day/week/month/year) to display desired data
 
+			//hide things from testing
+			//filtersLabel->Visible = false;
+			//readGrid->Visible = true;
+
+			//tweaking grid testing
+			//StringGrid1.AddObject(TStringColumn.Create(Self));
+			//StringGrid1.Cells[0,0] := 'Hello World!';
+			//TStringColumn s();
+			//readGrid->Columns->AddControlsToList(TStringColumn);
+			//readGrid->Columns->AddObject(s);
+			//readGrid->AddObject(TStringColumn);
+			filtersLabel->Text = readGrid->ColumnCount;
+
 			break;
 	}
 }
