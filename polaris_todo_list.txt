@@ -1,13 +1,25 @@
 
 .make sure login form buttons go to correct links - ONLY "Register" needs changing
 .taskbar issue for all forms (does not show up as minimized in taskbar)
-.if minimize program, causes error (float error?) - NOT ABLE TO RECREATE
 .add timer icon code between transitions with expected delays (excess database interaction, etc.)
 .add old input data to raw_input table
 .enforce password constraints when changing the password
 .sanitize login input
 .for input forms both basic and advanced - type check/error check (i.e. blank cells)
-.When inputting - IN FINAL TESTING
-	*need to also get std hours from labor stds & put in read_data
-	*calculate percent performance & put in read_data
 .write message saying use arrow keys in grids (for users knowledge)
+.change first day of week in calendars to saturday (to match dlr)
+	-will this throw off week calculations?
+.Add button to remove a date?
+.Make way for user to change/upload new labor standards
+	-this should change any values in tables from old labor standards
+.when change in basic input & press back, it doesn't save
+	-may or may not want to implement this
+.make year selection in read dynamic (i.e. only pull years that are in read_data)
+.need to not allow next button to be clicked in read unless a filter has been selected
+.easy input of budget dollars & productivity (explanation needed)
+.when basic input & click back after edit, doesn't store in local struct
+	-may or may not want to implement this
+.allow user in input once they have selected a date if press back should let them select a new date
+.Asyncronous submission of data
+.might want to adjust db field types based on how we want to display (i.e. round before, sometimes want whole number)
+.allow user to add roles
