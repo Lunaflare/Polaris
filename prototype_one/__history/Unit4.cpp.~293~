@@ -19,7 +19,7 @@ __fastcall TForm4::TForm4(TComponent* Owner)
 //---------------------------------------------------------------------------
 
 //calculate what a value is as a percent
-float __fastcall makePercent(float value)
+float __fastcall TForm4::makePercent(float value)
 {
 	return floor((Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 310.0) * 100.0 * 100.0 + 0.5)/100.0;
 }
@@ -61,7 +61,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 		percentPerformance = withUnderscores + "_Percent_Performance";
 
 		//append necessary strings to query
-		select += ", " + hoursPaid, + ", " + standardHours + ", " + percentPerformance;
+		select += (", " + hoursPaid, + ", " + standardHours + ", " + percentPerformance);
 
 		//populate column zero with role name headings
 		columnIndex = 11 + i * 4;
@@ -144,6 +144,11 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 	//iterate through cursor until empty
 	columnIndex = 0;
 	String blank = "";
+
+	//index indicating where in query cursor you currently are (i.e. which field)
+	//just hardcoded for now but could be size of a return of another query
+	int queryIndex = 9;
+
 	while (!Form3->SQLQuery2->Eof)
 	{
 		//populate the header for this column with the day of the week
@@ -152,9 +157,29 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 		//continue populating items
 		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[0]->AsString;
 		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[2]->AsString;
-		readGrid->Cells[indexOn][columnIndex++] = blank + (floor((Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 310.0) * 100.0 * 100.0 + 0.5)/100.0) + " %";
+		readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 310.0) + " %";
 
-		//advance cursor
+		//fill with rest of non role type stuff
+		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[3]->AsString;
+		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[4]->AsString;
+		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[5]->AsString;
+		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[6]->AsString;
+		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[7]->AsString;
+		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[8]->AsString;
+
+		//fill with role items
+		++columnIndex;
+		for (int i = 0; i < rVector.size(); ++i)
+		{
+			for (int j = 0; j < 1; ++j)
+			{
+				readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsString;
+			}
+
+			//++columnIndex;
+		}
+
+		//advance cursor (for daily, should only be one iteration of cursor)
 		Form3->SQLQuery2->Next();
 	}
 
