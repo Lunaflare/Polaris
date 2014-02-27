@@ -18,6 +18,74 @@ __fastcall TForm4::TForm4(TComponent* Owner)
 }
 //---------------------------------------------------------------------------
 
+//populate grid for when viewing by day
+void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
+{
+	//set rowCount to reflect the number of roles we will be adding
+	readGrid->RowCount = readGrid->RowCount + 5 * rVector.size();
+
+	String hoursPaid = "";
+	String standardHours = "";
+	String percentPerformance = "";
+	String withUnderscores = "";
+	String select = "";
+	int columnIndex = 0;
+
+	//hide columns that will not be used
+	for (int i = readGrid->ColumnCount - 1; i > 2; --i)
+		readGrid->ColumnByIndex(i)->Visible = false;
+
+	//add items to select that will be required no matter what
+	select += "Date, Day_Of_Week, Offset_Rooms_Occupied, AM_Rooms_Cleaned, PM_Rooms_Cleaned, Rooms_Sold, Total_Rooms_Cleaned, Guestroom_Carpets_Cleaned, Documented_Inspections_Completed";
+
+	//construct select query
+	for (int i = 0; i < rVector.size(); ++i)
+	{
+		//adjust to create three different strings used in query
+		withUnderscores = StringReplace(rVector[i], " ", "_", TReplaceFlags() << rfReplaceAll);
+		hoursPaid = withUnderscores + "_Hours_Paid";
+		standardHours = withUnderscores + "_Standard_Hours";
+		percentPerformance = withUnderscores + "_Percent_Performance";
+
+		//append necessary strings to query
+		select += ", " + hoursPaid, + ", " + standardHours + ", " + percentPerformance;
+
+		//populate column zero with role name headings
+		columnIndex = 12 + i * 4;
+		readGrid->Cells[0][columnIndex] = rVector[i];
+	}
+
+	//add more static items to column zero headings
+	String nonRoleHeadings[3] = {"Overtime Premium Cost", "Total Labor Hours", "Total Labor Cost"};
+	for (int i = 0; i < 3; ++i)
+	{
+		columnIndex += 4;
+		readGrid->Cells[0][columnIndex] = nonRoleHeadings[i];
+	}
+
+	//add more static items to column zero headings
+	columnIndex += 3;
+
+	//add more items to select that will be required no matter what
+	select += ", Overtime_Hours_Paid ,  Overtime_Standard_Hours , Overtime_Percent_Performance";
+	select += ", Total_Labor_Hours_Hours_Paid ,  Total_Labor_Hours_Standard_Hours , Total_Labor_Hours_Percent_Performance";
+	select += ", Total_Labor_Cost_Hours_Paid ,  Total_Labor_Cost_Standard_Hours , Total_Labor_Cost_Percent_Performance";
+
+	//construct actual query
+	Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE Date = '" + currentDate + "';";
+	Form3->SQLQuery2->Open();
+	Form3->SQLQuery2->First();
+
+	//get side headings for
+
+	/*while (!Form3->SQLQuery2->Eof)
+	{
+
+    }*/
+
+  	readGrid->Visible = true;
+}
+
 //computes the week number based on a date parameter (does not line up with calendar week numbers)
 typedef TDayTable* PDayTable;
 
@@ -190,6 +258,7 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	roleVector.clear();
 	monthPopupBox->ItemIndex = 0;
 	yearPopupBox->ItemIndex = 0;
+	readGrid->Visible = false;
 }
 
 //---------------------------------------------------------------------------
@@ -275,18 +344,22 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			monthPopupBox->Visible = false;
 			yearPopupBox->Visible = false;
 
+			//needed to compile
+			String dbDayChosen = "";
+
 			//get whatever data was chosen by user (i.e. day, week, month or year)
 			if (viewType == "Day")
 			{
 				//get the date selected from the calendar
 				TDateTime dayChosen = dayCalendar->Date;
-				String dbDayChosen = StrToDate(dayChosen).FormatString(L"yyyy-mm-dd");
+				dbDayChosen = StrToDate(dayChosen).FormatString(L"yyyy-mm-dd");
 
 				//testing
 				filtersLabel->Text = dbDayChosen;
 				filtersLabel->Visible = true;
 
 				//call display function
+				populateGrid(roleVector, dbDayChosen);
 			}
 			else if (viewType == "Week")
 			{
@@ -330,20 +403,10 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				filtersLabel->Visible = true;
 			}
 
-			//call and give parameters (roleVector, viewBy, day/week/month/year) to display desired data
-
 			//hide things from testing
-			//filtersLabel->Visible = false;
-			//readGrid->Visible = true;
+			filtersLabel->Visible = false;
 
-			//tweaking grid testing
-			//StringGrid1.AddObject(TStringColumn.Create(Self));
-			//StringGrid1.Cells[0,0] := 'Hello World!';
-			//TStringColumn s();
-			//readGrid->Columns->AddControlsToList(TStringColumn);
-			//readGrid->Columns->AddObject(s);
-			//readGrid->AddObject(TStringColumn);
-			filtersLabel->Text = readGrid->ColumnCount;
+			//call and give parameters (roleVector, viewBy, day/week/month/year) to display desired data
 
 			break;
 	}
