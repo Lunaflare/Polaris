@@ -14,6 +14,7 @@
 //---------------------------------------------------------------------------
 #include <vector>
 #include <iostream>
+#include <math.h>
 #include <System.Classes.hpp>
 #include <FMX.Controls.hpp>
 #include <FMX.Forms.hpp>
@@ -70,6 +71,7 @@ private:	// User declarations
 public:		// User declarations
 	__fastcall TForm4(TComponent* Owner);
 	void __fastcall populateGrid(vector<String>, String);
+	float __fastcall makePercent(float);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm4 *Form4;

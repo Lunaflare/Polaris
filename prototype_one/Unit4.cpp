@@ -18,11 +18,17 @@ __fastcall TForm4::TForm4(TComponent* Owner)
 }
 //---------------------------------------------------------------------------
 
+//calculate what a value is as a percent
+float __fastcall TForm4::makePercent(float value)
+{
+	return floor((Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 310.0) * 100.0 * 100.0 + 0.5)/100.0;
+}
+
 //populate grid for when viewing by day
 void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 {
 	//set rowCount to reflect the number of roles we will be adding
-	readGrid->RowCount = readGrid->RowCount + 5 * rVector.size();
+	readGrid->RowCount = (readGrid->RowCount + 5 * rVector.size()) - 1;
 
 	String hoursPaid = "";
 	String standardHours = "";
@@ -36,7 +42,14 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 		readGrid->ColumnByIndex(i)->Visible = false;
 
 	//add items to select that will be required no matter what
-	select += "Date, Day_Of_Week, Offset_Rooms_Occupied, AM_Rooms_Cleaned, PM_Rooms_Cleaned, Rooms_Sold, Total_Rooms_Cleaned, Guestroom_Carpets_Cleaned, Documented_Inspections_Completed";
+	String firstColumnHeadings[9] = {"Date", "Day_Of_Week", "Offset_Rooms_Occupied", "AM_Rooms_Cleaned", "PM_Rooms_Cleaned", "Rooms_Sold", "Total_Rooms_Cleaned", "Guestroom_Carpets_Cleaned", "Documented_Inspections_Completed"};
+	for (int i = 0; i < 9; ++i)
+	{
+		if (i + 1 == 9)
+			select += firstColumnHeadings[i];
+		else
+			select += firstColumnHeadings[i] + ", ";
+	}
 
 	//construct select query
 	for (int i = 0; i < rVector.size(); ++i)
@@ -51,7 +64,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 		select += ", " + hoursPaid, + ", " + standardHours + ", " + percentPerformance;
 
 		//populate column zero with role name headings
-		columnIndex = 12 + i * 4;
+		columnIndex = 11 + i * 4;
 		readGrid->Cells[0][columnIndex] = rVector[i];
 	}
 
@@ -64,7 +77,13 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 	}
 
 	//add more static items to column zero headings
-	columnIndex += 3;
+	columnIndex += 2;
+	String productivityHeadings[7] = {"Hours Variance (Act. minus Std.)", "Cost Variance (Act. Minus Std.)", "Man Minutes per Room Cleaned", "Rooms Cleaned per AM GRA", "Rooms Cleaned per PM GRA", "Rooms per Carpet Cleaner", "Rooms per Laundry Attendant"};
+	for (int i = 0; i < 7; ++i)
+	{
+		columnIndex++;
+		readGrid->Cells[0][columnIndex] = productivityHeadings[i];
+	}
 
 	//add more items to select that will be required no matter what
 	select += ", Overtime_Hours_Paid ,  Overtime_Standard_Hours , Overtime_Percent_Performance";
@@ -76,12 +95,70 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 	Form3->SQLQuery2->Open();
 	Form3->SQLQuery2->First();
 
-	//get side headings for
+	//start filling column 1
+	String firstColumnNoDayWeek[9] = {"Date", "Offset_Rooms_Occupied", "Occupancy_Percent", "AM_Rooms_Cleaned", "PM_Rooms_Cleaned", "Rooms_Sold", "Total_Rooms_Cleaned", "Guestroom_Carpets_Cleaned", "Documented_Inspections"};
+	for (int i = 0; i < 9; ++i)
+		readGrid->Cells[1][i] = StringReplace(firstColumnNoDayWeek[i], "_", " ", TReplaceFlags() << rfReplaceAll);
 
-	/*while (!Form3->SQLQuery2->Eof)
+	//continue filling column 1 with headings
+	String roleTypes[3] = {"Actual Hours", "Standard Hours", "% Performance"};
+	columnIndex = 10;
+	for (int i = 0; i < rVector.size(); ++i)
 	{
+		for (int j = 0; j < 3; ++j)
+		{
+			readGrid->Cells[1][columnIndex++] = roleTypes[j];
+		}
 
-    }*/
+		++columnIndex;
+	}
+
+	//continue filling column 1 with headers
+	String overtimeHeaders[3] = {"Overtime Hours", "Overtime Cost", "Overtime Premium Cost"};
+	for (int i = 0; i < 3; ++i)
+	{
+       	readGrid->Cells[1][columnIndex++] = overtimeHeaders[i];
+	}
+	++columnIndex;
+
+	//continue filling column 1 with headers
+	for (int i = 0; i < 3; ++i)
+	{
+		readGrid->Cells[1][columnIndex++] = roleTypes[i];
+	}
+	++columnIndex;
+
+	//continue filling column 1 with headers
+	for (int i = 0; i < 3; ++i)
+	{
+		readGrid->Cells[1][columnIndex++] = StringReplace(roleTypes[i], "Hours", "Cost", TReplaceFlags() << rfReplaceAll);
+	}
+	readGrid->Cells[1][columnIndex++] = "Productivity Goals";
+
+	//get productivity index to be used later
+    int productivityStartIndex = columnIndex;
+
+	//create index indicating which column I am currently filling
+	int indexOn = 2;
+
+	//iterate through cursor until empty
+	columnIndex = 0;
+	String blank = "";
+	while (!Form3->SQLQuery2->Eof)
+	{
+		//populate the header for this column with the day of the week
+		readGrid->ColumnByIndex(indexOn)->Header = Form3->SQLQuery2->Fields->Fields[1]->AsString;
+
+		//continue populating items
+		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[0]->AsString;
+		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[2]->AsString;
+		readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 310.0) + " %";
+
+        //fill with rest of non role type stuff
+
+		//advance cursor
+		Form3->SQLQuery2->Next();
+	}
 
   	readGrid->Visible = true;
 }
