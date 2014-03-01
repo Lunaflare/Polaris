@@ -23,6 +23,8 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <ctype.h>
+#include <string>
 #include <System.Classes.hpp>
 #include <FMX.Controls.hpp>
 #include <FMX.Forms.hpp>
@@ -127,6 +129,8 @@ __published:	// IDE-managed Components
 	TFloatAnimation *FloatAnimation8;
 	TImage *Image1;
 	TImage *submitLabelImage;
+	TImage *useArrowsImage;
+	TFloatAnimation *FloatAnimation9;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton3Click(TObject *Sender);
@@ -146,6 +150,11 @@ __published:	// IDE-managed Components
 	void __fastcall backImageButtonMouseLeave(TObject *Sender);
 	void __fastcall submitButtonMouseEnter(TObject *Sender);
 	void __fastcall submitButtonMouseLeave(TObject *Sender);
+	void __fastcall StringColumn2KeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
+          TShiftState Shift);
+	void __fastcall displayGridClick(TObject *Sender);
+	void __fastcall displayGridKeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
+          TShiftState Shift);
 private:	// User declarations
 	inputValues inputObject;
 	String inputTable;

@@ -653,6 +653,7 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 		Form2->Show();
 
 		//hide unecessary items
+		useArrowsImage->Visible=false;
 		displayGrid->Visible = false;
 		submitButton->Visible = false;
 		Image1->Visible=false;
@@ -894,6 +895,7 @@ void __fastcall TForm3::homeImageButton5Click(TObject *Sender)
 {
 	//hide certain items
 	backImageButton->Visible = false;
+	useArrowsImage->Visible =false;
 	Image4->Visible=false;
 	displayGrid->Visible = false;
 	submitButton->Visible = false;
@@ -963,6 +965,34 @@ void __fastcall TForm3::submitButtonMouseLeave(TObject *Sender)
 {
 submitButton->Bitmap=home_swapper->Bitmap;
 submitLabelImage->Visible=false;
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::StringColumn2KeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
+          TShiftState Shift)
+{
+useArrowsImage->Visible=true;
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TForm3::displayGridClick(TObject *Sender)
+{
+useArrowsImage->Visible=true;
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TForm3::displayGridKeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
+          TShiftState Shift)
+{
+if(Key==VK_UP || Key==VK_DOWN)
+	{
+	useArrowsImage->Visible=false;
+	}
 }
 //---------------------------------------------------------------------------
 

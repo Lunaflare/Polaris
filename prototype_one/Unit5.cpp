@@ -26,6 +26,7 @@ void __fastcall TForm5::FormShow(TObject *Sender)
 	if (Form1->getAccessLevel() == 2)
 		{
 			editDLRButton->Visible = true;
+			addRoleButton->Visible = true;
 			sep2Image->Visible=true;
 			adminLabel->Visible=true;
 		}
@@ -85,8 +86,20 @@ void __fastcall TForm5::saveChangesButtonClick(TObject *Sender)
 		{
 			ShowMessage(L"Passwords do not match");
 		}
+		else if(passwordChangeEdit->Text.Length()<8)
+		{
+			ShowMessage(L"Password must be atleast 8 characters");
+		}
+		else if(passwordChangeEdit->Text.Length()>24)
+		{
+			ShowMessage(L"Password must be less than 25 characters");
+		}
 		else
 		{
+		 char* test = AnsiString(passwordChangeEdit->Text).c_str();
+
+
+
 			int msgboxID = MessageBox(
 				NULL,
 				L"Would you really like to change your password?",
@@ -180,6 +193,7 @@ homeImageButton5->Bitmap=home_swapper->Bitmap;
 homeLabelImage->Visible=false;
 }
 //---------------------------------------------------------------------------
+
 
 
 

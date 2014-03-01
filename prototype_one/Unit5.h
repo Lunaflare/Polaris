@@ -2,7 +2,15 @@
 
 #ifndef Unit5H
 #define Unit5H
+#include <FMX.Ani.hpp>
+#include <FMX.Controls.hpp>
+#include <FMX.Edit.hpp>
+#include <FMX.Effects.hpp>
+#include <FMX.Objects.hpp>
+#include <FMX.Types.hpp>
+#include <System.Classes.hpp>
 //---------------------------------------------------------------------------
+#include <string>
 #include <System.Classes.hpp>
 #include <FMX.Controls.hpp>
 #include <FMX.Forms.hpp>
@@ -16,6 +24,8 @@
 #include <FMX.Objects.hpp>
 #include <FMX.Ani.hpp>
 //---------------------------------------------------------------------------
+
+using namespace std;
 class TForm5 : public TForm
 {
 __published:	// IDE-managed Components
@@ -47,6 +57,7 @@ __published:	// IDE-managed Components
 	TGroupBox *changePasswordGroup;
 	TImage *homeLabelImage;
 	TLabel *copyrightLabel;
+	TButton *addRoleButton;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton5Click(TObject *Sender);
