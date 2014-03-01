@@ -18,10 +18,56 @@ __fastcall TForm4::TForm4(TComponent* Owner)
 }
 //---------------------------------------------------------------------------
 
-//calculate what a value is as a percent
+//calculate what a value is as a percent to one decimal point
 float __fastcall TForm4::makePercent(float value)
 {
-	return floor((Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 310.0) * 100.0 * 100.0 + 0.5)/100.0;
+	return floor(value * 100.0 * 10.0 + 0.5)/10.0;
+}
+
+//round a decimal value to 2 places
+float __fastcall TForm4::roundTwo(float value)
+{
+	return floor(value * 100.0 + 0.5)/100.0;
+}
+
+int __fastcall TForm4::nearestDollar(float value)
+{
+	return floor(value +.5);
+}
+
+string __fastcall TForm4::IntToStr(long int n)
+{
+	ostringstream result;
+	result << n;
+	return result.str();
+}
+
+string __fastcall TForm4::commas(string num)
+{
+	string temp;
+	int endstring = num.length(), i;
+	for( i = endstring - 3; i >= 0; i -= 3) {
+		if (i > 0) {
+			temp = ","+ num.substr(i, 3) + temp;
+		} else {
+			temp = num.substr(i, 3) + temp;
+		}
+
+	}
+	if (i < 0) {
+		temp = num.substr(0, 3+i) + temp;
+	}
+    return temp;
+}
+
+
+template<class T>
+String __fastcall TForm4::FormatWithCommas(T value)
+{
+	stringstream ss;
+	ss.imbue(locale("spanish"));
+    ss << fixed << value;
+    return String(ss.str().c_str());
 }
 
 //populate grid for when viewing by day
@@ -61,7 +107,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 		percentPerformance = withUnderscores + "_Percent_Performance";
 
 		//append necessary strings to query
-		select += (", " + hoursPaid, + ", " + standardHours + ", " + percentPerformance);
+		select += (", " + hoursPaid + ", " + standardHours + ", " + percentPerformance);
 
 		//populate column zero with role name headings
 		columnIndex = 11 + i * 4;
@@ -171,12 +217,50 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 		++columnIndex;
 		for (int i = 0; i < rVector.size(); ++i)
 		{
-			for (int j = 0; j < 1; ++j)
+			//need to round when appropriate and make it a percentage
+			for (int j = 0; j < 3; ++j)
 			{
-				readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsString;
+				//if j == 2, these should be percents
+				if (j == 2)
+					readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+				else
+					readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
 			}
 
-			//++columnIndex;
+			//skip spaces when appropriate
+			++columnIndex;
+		}
+
+		//fill with overtime, total labor hours, total labor cost
+		for (int i = 0; i < 3; ++i)
+		{
+			for (int j = 0; j < 3; ++j)
+			{
+				if (i == 0)
+				{
+					if (j == 0)
+						readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+					else
+                        readGrid->Cells[indexOn][columnIndex++] = blank + "$" + nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+                }
+				else if (i == 1)
+				{
+					if (j == 2)
+						readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+					else
+						readGrid->Cells[indexOn][columnIndex++] = nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+				}
+				else
+				{
+					if (j == 2)
+						readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+					else
+						readGrid->Cells[indexOn][columnIndex++] = commas(intToStr(nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat)));
+				}
+			}
+
+			//skip spaces when appropriate
+			++columnIndex;
 		}
 
 		//advance cursor (for daily, should only be one iteration of cursor)

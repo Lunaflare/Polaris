@@ -14,6 +14,10 @@
 //---------------------------------------------------------------------------
 #include <vector>
 #include <iostream>
+#include <math.h>
+#include <locale>
+#include <iomanip>
+#include <sstream>
 #include <System.Classes.hpp>
 #include <FMX.Controls.hpp>
 #include <FMX.Forms.hpp>
@@ -44,6 +48,15 @@ __published:	// IDE-managed Components
 	TPopupBox *yearPopupBox;
 	TStringGrid *readGrid;
 	TStringColumn *StringColumn1;
+	TStringColumn *StringColumn2;
+	TStringColumn *StringColumn3;
+	TStringColumn *StringColumn4;
+	TStringColumn *StringColumn5;
+	TStringColumn *StringColumn6;
+	TStringColumn *StringColumn7;
+	TStringColumn *StringColumn8;
+	TStringColumn *StringColumn9;
+	TStringColumn *StringColumn10;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton4Click(TObject *Sender);
@@ -60,6 +73,11 @@ private:	// User declarations
 	String viewType;
 public:		// User declarations
 	__fastcall TForm4(TComponent* Owner);
+	void __fastcall populateGrid(vector<String>, String);
+	float __fastcall makePercent(float);
+	float __fastcall roundTwo(float value);
+	int __fastcall nearestDollar(float value);
+	template<class T> String __fastcall FormatWithCommas(T value);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm4 *Form4;

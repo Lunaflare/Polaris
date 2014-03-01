@@ -15,6 +15,8 @@
 #include <vector>
 #include <iostream>
 #include <math.h>
+#include <sstream>
+#include <string>
 #include <System.Classes.hpp>
 #include <FMX.Controls.hpp>
 #include <FMX.Forms.hpp>
@@ -72,6 +74,10 @@ public:		// User declarations
 	__fastcall TForm4(TComponent* Owner);
 	void __fastcall populateGrid(vector<String>, String);
 	float __fastcall makePercent(float);
+	float __fastcall roundTwo(float value);
+	int __fastcall nearestDollar(float value);
+	string __fastcall IntToStr(long int n);
+	String __fastcall commas(string num);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm4 *Form4;

@@ -26,3 +26,4 @@
 .in db store number of things in read that are not roles (i.e. everything that comes before the roles)
 	-right now I am using a static number for this
 	-in db create table holding things we have in read table that are not roles
+.round to exact same number of decimal points in read as in excel?
