@@ -46,28 +46,23 @@ String __fastcall TForm4::commas(string num)
 {
 	string temp;
 	int endstring = num.length(), i;
-	for( i = endstring - 3; i >= 0; i -= 3) {
-		if (i > 0) {
+	for( i = endstring - 3; i >= 0; i -= 3)
+	{
+		if (i > 0)
+		{
 			temp = ","+ num.substr(i, 3) + temp;
-		} else {
+		} else
+		{
 			temp = num.substr(i, 3) + temp;
 		}
 
 	}
-	if (i < 0) {
+	if (i < 0)
+	{
 		temp = num.substr(0, 3+i) + temp;
 	}
+
     return String(temp.c_str());
-}
-
-
-template<class T>
-String __fastcall TForm4::FormatWithCommas(T value)
-{
-	stringstream ss;
-	ss.imbue(locale("spanish"));
-    ss << fixed << value;
-    return String(ss.str().c_str());
 }
 
 //populate grid for when viewing by day
@@ -195,6 +190,9 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 	//just hardcoded for now but could be size of a return of another query
 	int queryIndex = 9;
 
+	//manMinutesRoomsCleaned standard hours running calculation
+	double manMinutesRoomsCleaned = 0;
+
 	while (!Form3->SQLQuery2->Eof)
 	{
 		//populate the header for this column with the day of the week
@@ -223,6 +221,13 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 				//if j == 2, these should be percents
 				if (j == 2)
 					readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+				else if (j == 1)
+				{
+					//compute productivity man hours
+                    manMinutesRoomsCleaned += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+
+					readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+				}
 				else
 					readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
 			}
@@ -255,7 +260,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 					if (j == 2)
 						readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
 					else
-						readGrid->Cells[indexOn][columnIndex++] = commas(IntToStr(nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat)));
+						readGrid->Cells[indexOn][columnIndex++] = blank + "$" + commas(IntToStr(nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat)));
 				}
 			}
 
@@ -266,6 +271,20 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 		//advance cursor (for daily, should only be one iteration of cursor)
 		Form3->SQLQuery2->Next();
 	}
+
+	//get what the productivity column is (probably ok to stay hardcoded)
+	int productivityColumn = 1;
+
+	//change first two productivity things to 0.00
+	readGrid->Cells[productivityColumn][productivityStartIndex++] = "0.00";
+	readGrid->Cells[productivityColumn][productivityStartIndex++] = "0.00";
+
+	//compute productivity for man hours
+	manMinutesRoomsCleaned = roundTwo((manMinutesRoomsCleaned * 60.0) / Form3->SQLQuery2->Fields->Fields[6]->AsFloat);
+	readGrid->Cells[productivityColumn][productivityStartIndex++] = manMinutesRoomsCleaned;
+
+	//compute productivity for roomsCleanedAM
+
 
   	readGrid->Visible = true;
 }

@@ -27,3 +27,5 @@
 	-right now I am using a static number for this
 	-in db create table holding things we have in read table that are not roles
 .round to exact same number of decimal points in read as in excel?
+.add another way to view data in read that is a range of dates
+	-maybe not use week numbers at all any more for various reasons that I, Alex, can explain

@@ -190,6 +190,10 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 	//just hardcoded for now but could be size of a return of another query
 	int queryIndex = 9;
 
+	//running calculations for productivity goals
+	double manMinutesRoomsCleaned = 0;
+	double roomsCleanedAM = 0;
+
 	while (!Form3->SQLQuery2->Eof)
 	{
 		//populate the header for this column with the day of the week
@@ -218,6 +222,13 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 				//if j == 2, these should be percents
 				if (j == 2)
 					readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+				else if (j == 1)
+				{
+					//compute productivity man hours
+                    manMinutesRoomsCleaned += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+
+					readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+				}
 				else
 					readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
 			}
@@ -261,6 +272,23 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 		//advance cursor (for daily, should only be one iteration of cursor)
 		Form3->SQLQuery2->Next();
 	}
+
+	//get what the productivity column is (probably ok to stay hardcoded)
+	int productivityColumn = 1;
+
+	//change first two productivity things to 0.00
+	readGrid->Cells[productivityColumn][productivityStartIndex++] = "0.00";
+	readGrid->Cells[productivityColumn][productivityStartIndex++] = "0.00";
+
+	//compute productivity for man hours
+	if (Form3->SQLQuery2->Fields->Fields[6]->AsFloat != 0)
+		manMinutesRoomsCleaned = roundTwo((manMinutesRoomsCleaned * 60.0) / Form3->SQLQuery2->Fields->Fields[6]->AsFloat);
+	else
+        manMinutesRoomsCleaned = 0;
+	readGrid->Cells[productivityColumn][productivityStartIndex++] = manMinutesRoomsCleaned;
+
+	//compute productivity for roomsCleanedAM
+
 
   	readGrid->Visible = true;
 }
