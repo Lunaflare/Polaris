@@ -15,7 +15,10 @@
 #include <Data.SqlExpr.hpp>
 #include <Data.FMTBcd.hpp>
 #include <FMX.Effects.hpp>
+#include <string>
 //---------------------------------------------------------------------------
+using namespace std;
+
 class TForm1 : public TForm
 {
 __published:	// IDE-managed Components

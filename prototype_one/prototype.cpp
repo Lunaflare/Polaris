@@ -23,6 +23,21 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 //If not, will display error message
 void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 {
+	//checking for the sql comment to prevent hack
+	string check=AnsiString(usernameEdit->Text).c_str();
+	if(check.find("#")!=check.npos)
+		{
+				errorLabel->Text = "Username contains invalid symbol!";
+				errorLabel->Visible = true;
+			return;
+		}
+	check=AnsiString(passwordEdit->Text).c_str();
+		if(check.find("#")!=check.npos)
+		{
+			errorLabel->Text = "Password contains invalid symbol!";
+				errorLabel->Visible = true;
+			return;
+		}
 	//query the db for username and password
 	SQLQuery1->SQL->Text="select * from user_info where username='"+usernameEdit->Text+"' and password=md5('"+passwordEdit->Text+"');";
 	SQLQuery1->Open();

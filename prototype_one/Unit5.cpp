@@ -96,9 +96,13 @@ void __fastcall TForm5::saveChangesButtonClick(TObject *Sender)
 		}
 		else
 		{
-		 char* test = AnsiString(passwordChangeEdit->Text).c_str();
-
-
+		 //check to make sure the new password does not contain # to prevent hack
+		 string checkValid = AnsiString(passwordChangeEdit->Text).c_str();
+			if(checkValid.find("#")!=checkValid.npos)
+		{
+			ShowMessage(L"Password cannot contain #!");
+			return;
+		}
 
 			int msgboxID = MessageBox(
 				NULL,
