@@ -262,13 +262,20 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 						productivityRoomsCleanedPM += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
 					else if (queryIndex == productivityLaundryIndex)
 						productivityLaundry += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-					else if (queryIndex == productivityAMIndex - 1)
-						productivityNonGoalAM = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
 
 					readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
 				}
 				else
+				{
+					if (queryIndex == (productivityAMIndex - 1))
+						productivityNonGoalAM = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+					else if (queryIndex == (productivityPMIndex - 1))
+						productivityNonGoalPM = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+					else if (queryIndex == (productivityLaundryIndex - 1))
+						productivityNonGoalLaundry = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+
 					readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+				}
 			}
 
 			//skip spaces when appropriate
@@ -325,6 +332,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 		roomsCleanedAM += Form3->SQLQuery2->Fields->Fields[3]->AsInteger;
 		roomsCleanedAMSingleInstance = Form3->SQLQuery2->Fields->Fields[3]->AsInteger;
 		roomsCleanedPM += Form3->SQLQuery2->Fields->Fields[4]->AsInteger;
+		roomsCleanedPMSingleInstance = Form3->SQLQuery2->Fields->Fields[4]->AsInteger;
 
 		//fill in all productivity things for each iteration of cursor
 		readGrid->Cells[indexOn][columnIndex++] = nearestDollar(hoursVarianceOne - hoursVarianceTwo);
@@ -338,6 +346,16 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 			readGrid->Cells[indexOn][columnIndex++] = 0;
 		else
 			readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) roomsCleanedAMSingleInstance) / productivityNonGoalAM);
+		productivityNonGoalPM /= 8.0;
+		if (productivityNonGoalPM == 0)
+			readGrid->Cells[indexOn][columnIndex++] = 0;
+		else
+			readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) roomsCleanedPMSingleInstance) / productivityNonGoalPM);
+		productivityNonGoalLaundry /= 7.5;
+		if (productivityNonGoalLaundry == 0)
+			readGrid->Cells[indexOn][columnIndex++] = 0;
+		else
+			readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) totalRoomsCleanedSingleInstance) / productivityNonGoalLaundry);
 
 		//advance cursor (for daily, should only be one iteration of cursor)
 		++indexOn;

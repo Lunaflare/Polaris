@@ -207,10 +207,16 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 	double manMinutesRoomsCleaned = 0;
 	int roomsCleanedAM = 0;
 	int roomsCleanedPM = 0;
+	int roomsCleanedAMSingleInstance = 0;
+	int roomsCleanedPMSingleInstance = 0;
 	double productivityRoomsCleanedAM = 0;
 	double productivityRoomsCleanedPM = 0;
 	double productivityLaundry = 0;
+	double productivityNonGoalAM = 0;
+	double productivityNonGoalPM = 0;
+	double productivityNonGoalLaundry = 0;
 	int totalRoomsCleaned = 0;
+	int totalRoomsCleanedSingleInstance = 0;
 	double hoursVarianceOne = 0;
 	double hoursVarianceTwo = 0;
 	double costVarianceOne = 0;
@@ -260,7 +266,16 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 					readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
 				}
 				else
+				{
+					if (queryIndex == (productivityAMIndex - 1))
+						productivityNonGoalAM = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+					else if (queryIndex == (productivityPMIndex - 1))
+						productivityNonGoalPM = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+					else if (queryIndex == (productivityLaundryIndex - 1))
+						productivityNonGoalLaundry = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+
 					readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+				}
 			}
 
 			//skip spaces when appropriate
@@ -294,6 +309,12 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 				}
 				else
 				{
+					//productivity computation
+					if (j == 0)
+						costVarianceOne = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+					else if (j == 1)
+						costVarianceTwo = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+
 					if (j == 2)
 						readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
 					else
@@ -307,11 +328,34 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 
 		//keep running total for productivity goal computation
 		totalRoomsCleaned += Form3->SQLQuery2->Fields->Fields[6]->AsInteger;
+		totalRoomsCleanedSingleInstance = Form3->SQLQuery2->Fields->Fields[6]->AsInteger;
 		roomsCleanedAM += Form3->SQLQuery2->Fields->Fields[3]->AsInteger;
+		roomsCleanedAMSingleInstance = Form3->SQLQuery2->Fields->Fields[3]->AsInteger;
 		roomsCleanedPM += Form3->SQLQuery2->Fields->Fields[4]->AsInteger;
+		roomsCleanedPMSingleInstance = Form3->SQLQuery2->Fields->Fields[4]->AsInteger;
 
 		//fill in all productivity things for each iteration of cursor
 		readGrid->Cells[indexOn][columnIndex++] = nearestDollar(hoursVarianceOne - hoursVarianceTwo);
+		readGrid->Cells[indexOn][columnIndex++] = nearestDollar(costVarianceOne - costVarianceTwo);
+		if (totalRoomsCleanedSingleInstance == 0)
+			readGrid->Cells[indexOn][columnIndex++] = 0;
+		else
+			readGrid->Cells[indexOn][columnIndex++] = roundTwo((hoursVarianceOne * 60.0) / totalRoomsCleanedSingleInstance);
+		productivityNonGoalAM /= 8.0;
+		if (productivityNonGoalAM == 0)
+			readGrid->Cells[indexOn][columnIndex++] = 0;
+		else
+			readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) roomsCleanedAMSingleInstance) / productivityNonGoalAM);
+		productivityNonGoalPM /= 8.0;
+		if (productivityNonGoalPM == 0)
+			readGrid->Cells[indexOn][columnIndex++] = 0;
+		else
+			readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) roomsCleanedPMSingleInstance) / productivityNonGoalPM);
+		productivityNonGoalLaundry = /= 7.5;
+		if (productivityNonGoalLaundry == 0)
+			readGrid->Cells[indexOn][columnIndex++] = 0;
+		else if ( productivityNonGoalLaundry < .3)
+			readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) totalRoomsCleanedSingleInstance) / productivityNonGoalLaundry);
 
 		//advance cursor (for daily, should only be one iteration of cursor)
 		++indexOn;
