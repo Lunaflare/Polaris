@@ -29,3 +29,4 @@
 .round to exact same number of decimal points in read as in excel?
 .add another way to view data in read that is a range of dates
 	-maybe not use week numbers at all any more for various reasons that I, Alex, can explain
+.certain roles should not be excluded from the filter in read

@@ -15,7 +15,8 @@
 #include <vector>
 #include <iostream>
 #include <math.h>
-#include <locale>
+#include <sstream>
+#include <string>
 #include <System.Classes.hpp>
 #include <FMX.Controls.hpp>
 #include <FMX.Forms.hpp>
@@ -75,6 +76,8 @@ public:		// User declarations
 	float __fastcall makePercent(float);
 	float __fastcall roundTwo(float value);
 	int __fastcall nearestDollar(float value);
+	string __fastcall IntToStr(long int n);
+	String __fastcall commas(string num);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm4 *Form4;
