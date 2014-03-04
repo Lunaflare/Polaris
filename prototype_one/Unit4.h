@@ -79,6 +79,7 @@ public:		// User declarations
 	int __fastcall nearestDollar(float value);
 	string __fastcall IntToStr(long int n);
 	String __fastcall commas(string num);
+	double __fastcall toDouble(String);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm4 *Form4;

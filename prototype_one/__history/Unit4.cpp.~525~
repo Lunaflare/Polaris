@@ -65,6 +65,14 @@ String __fastcall TForm4::commas(string num)
     return String(temp.c_str());
 }
 
+double __fastcall TForm4::toDouble(String gridString)
+{
+	gridString = StringReplace(gridString, ",", "", TReplaceFlags() << rfReplaceAll);
+	string temp = AnsiString(StringReplace(gridString, "$", "", TReplaceFlags() << rfReplaceAll)).c_str();
+
+	return atof(temp.c_str());
+}
+
 //populate grid for when viewing by month
 void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen)
 {
@@ -415,9 +423,8 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen)
 	readGrid->Cells[productivityColumn][productivityStartIndex++] = productivityLaundry;
 
 	//populate total column (last one)
-
 	//get the month name for the header
-	String DayName;
+	String DayName = "";
 	switch(monthChosen)
 	{
 		case 1:
@@ -451,6 +458,38 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen)
 		case 12:
 			DayName = L"December";
 	}
+	indexOn = 9;
+	columnIndex = 0;
+	//make the header the month
+	readGrid->ColumnByIndex(indexOn)->Header = DayName;
+	//fill with top portion (non roles) with totals
+	double totalCounter = 0;
+	double occupancyPercent = 0;
+	for (columnIndex = 0; columnIndex < 8; ++columnIndex)
+	{
+		for (int j = 2; j < 9; ++j)
+			totalCounter += toDouble(readGrid->Cells[j][columnIndex]);
+
+		if (columnIndex == 0)
+			occupancyPercent = totalCounter / 8680.0;
+
+		if (columnIndex == 1)
+            readGrid->Cells[indexOn][columnIndex] = blank + makePercent(occupancyPercent) + "%";
+		else
+			readGrid->Cells[indexOn][columnIndex] = totalCounter;
+		totalCounter = 0;
+	}
+	//fill rest of totals besides productivity
+	for (columnIndex; columnIndex < readGrid->RowCount - 7; ++columnIndex)
+	{
+		for (int j = 2; j < 9; ++j)
+		{
+			totalCounter += toDouble(readGrid->Cells[j][columnIndex]);
+		}
+
+		readGrid->Cells[indexOn][columnIndex] = totalCounter;
+		totalCounter = 0;
+    }
 
 	//make grid visible to user
   	readGrid->Visible = true;
