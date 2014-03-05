@@ -67,9 +67,10 @@ String __fastcall TForm4::commas(string num)
 
 double __fastcall TForm4::toDouble(String gridString)
 {
-	string temp = AnsiString(StringReplace(gridString, "$", "", TReplaceFlags() << rfReplaceAll).c_str);
+	gridString = StringReplace(gridString, ",", "", TReplaceFlags() << rfReplaceAll);
+	string temp = AnsiString(StringReplace(gridString, "$", "", TReplaceFlags() << rfReplaceAll)).c_str();
 
-	return atof(temp);
+	return atof(temp.c_str());
 }
 
 //populate grid for when viewing by month
@@ -478,7 +479,8 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen)
 			readGrid->Cells[indexOn][columnIndex] = totalCounter;
 		totalCounter = 0;
 	}
-	//fill rest of totals besides productivity
+	//fill rest of totals besides productivity (i.e. roles, overtime, totla labor hours, total labor cost)
+	int modThree = 0;
 	for (columnIndex; columnIndex < readGrid->RowCount - 7; ++columnIndex)
 	{
 		for (int j = 2; j < 9; ++j)
@@ -486,9 +488,37 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen)
 			totalCounter += toDouble(readGrid->Cells[j][columnIndex]);
 		}
 
-		readGrid->Cells[indexOn][columnIndex] = totalCounter;
+		if (!SameText(readGrid->Cells[1][columnIndex], ""))
+		{
+			//increase counter
+			++modThree;
+
+			//fill grid with computed value, if counter multiple of 3 then treat as percent
+			if (SameText(readGrid->Cells[1][columnIndex], "Overtime Premium Cost") || SameText(readGrid->Cells[1][columnIndex], "Overtime Cost"))
+				readGrid->Cells[indexOn][columnIndex] = blank + "$" + totalCounter;
+			else if (SameText(readGrid->Cells[1][columnIndex], "Actual Cost") || SameText(readGrid->Cells[1][columnIndex], "Standard Cost"))
+				readGrid->Cells[indexOn][columnIndex] = blank + "$" + commas(IntToStr(nearestDollar(totalCounter)));
+			else if (modThree % 3 == 0)
+				if (readGrid->Cells[indexOn][columnIndex-2] != 0)
+					readGrid->Cells[indexOn][columnIndex] = blank + makePercent(readGrid->Cells[indexOn][columnIndex-1] / readGrid->Cells[indexOn][columnIndex-2]) + "%";
+				else
+                   	readGrid->Cells[indexOn][columnIndex] = "0%";
+			else
+				readGrid->Cells[indexOn][columnIndex] = totalCounter;
+		}
+
 		totalCounter = 0;
-    }
+	}
+	//increase columnIndex for productivity totals
+	++columnIndex;
+
+	//fill productivity for hours variance
+	if (readGrid->Cells[indexOn][columnIndex - 8] == 0)
+		readGrid->Cells[indexOn][columnIndex] = 0;
+	else
+		readGrid->Cells[indexOn][columnIndex] = readGrid->Cells[indexOn][columnIndex - 8];
+
+	//fill productivity for cost variance
 
 	//make grid visible to user
   	readGrid->Visible = true;

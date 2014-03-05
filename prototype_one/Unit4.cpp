@@ -479,7 +479,8 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen)
 			readGrid->Cells[indexOn][columnIndex] = totalCounter;
 		totalCounter = 0;
 	}
-	//fill rest of totals besides productivity
+	//fill rest of totals besides productivity (i.e. roles, overtime, totla labor hours, total labor cost)
+	int modThree = 0;
 	for (columnIndex; columnIndex < readGrid->RowCount - 7; ++columnIndex)
 	{
 		for (int j = 2; j < 9; ++j)
@@ -488,9 +489,40 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen)
 		}
 
 		if (!SameText(readGrid->Cells[1][columnIndex], ""))
-			readGrid->Cells[indexOn][columnIndex] = totalCounter;
+		{
+			//increase counter
+			++modThree;
+
+			//fill grid with computed value, if counter multiple of 3 then treat as percent
+			if (SameText(readGrid->Cells[1][columnIndex], "Overtime Premium Cost") || SameText(readGrid->Cells[1][columnIndex], "Overtime Cost"))
+				readGrid->Cells[indexOn][columnIndex] = blank + "$" + totalCounter;
+			else if (SameText(readGrid->Cells[1][columnIndex], "Actual Cost") || SameText(readGrid->Cells[1][columnIndex], "Standard Cost"))
+				readGrid->Cells[indexOn][columnIndex] = blank + "$" + commas(IntToStr(nearestDollar(totalCounter)));
+			else if (modThree % 3 == 0)
+				if (readGrid->Cells[indexOn][columnIndex-2] != 0)
+					readGrid->Cells[indexOn][columnIndex] = blank + makePercent(readGrid->Cells[indexOn][columnIndex-1] / readGrid->Cells[indexOn][columnIndex-2]) + "%";
+				else
+                   	readGrid->Cells[indexOn][columnIndex] = "0%";
+			else
+				readGrid->Cells[indexOn][columnIndex] = totalCounter;
+		}
+
 		totalCounter = 0;
-    }
+	}
+	//increase columnIndex for productivity totals
+	++columnIndex;
+
+	//fill productivity for hours variance
+	if (readGrid->Cells[indexOn][columnIndex - 8] == 0)
+		readGrid->Cells[indexOn][columnIndex++] = 0;
+	else
+		readGrid->Cells[indexOn][columnIndex++] = readGrid->Cells[indexOn][columnIndex-8] - readGrid->Cells[indexOn][columnIndex-7];
+
+	//fill productivity for cost variance
+	/*if (readGrid->Cells[indexOn][columnIndex - 8] == 0)
+		readGrid->Cells[indexOn][columnIndex++] = 0;
+	else
+		readGrid->Cells[indexOn][columnIndex++] = readGrid->Cells[indexOn][columnIndex-8] - readGrid->Cells[indexOn][columnIndex-7];*/
 
 	//make grid visible to user
   	readGrid->Visible = true;
