@@ -73,7 +73,7 @@ private:	// User declarations
 public:		// User declarations
 	__fastcall TForm4(TComponent* Owner);
 	void __fastcall populateGrid(vector<String>, String);
-	void __fastcall populateGrid(vector<String>, int);
+	void __fastcall populateGrid(vector<String>, int, String, String, String);
 	float __fastcall makePercent(float);
 	float __fastcall roundTwo(float value);
 	int __fastcall nearestDollar(float value);

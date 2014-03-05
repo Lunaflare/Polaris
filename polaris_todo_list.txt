@@ -30,3 +30,7 @@
 .add another way to view data in read that is a range of dates
 	-maybe not use week numbers at all any more for various reasons that I, Alex, can explain
 .certain roles should not be excluded from the filter in read
+.in month of read also need to pick a year
+	*or do we assume month and week are always the current year?
+.sometimes in read get error (floating point)
+.on calander if only change one of top drop down filters and don't actually click a date...doesn't select a new date

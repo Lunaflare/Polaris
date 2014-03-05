@@ -73,8 +73,8 @@ double __fastcall TForm4::toDouble(String gridString)
 	return atof(temp.c_str());
 }
 
-//populate grid for when viewing by month
-void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen)
+//populate grid for when viewing by month, week, year, or arbitrary date range
+void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, String rangeStart, String rangeEnd, String type)
 {
 	//set rowCount to reflect the number of roles we will be adding
 	readGrid->RowCount = (readGrid->RowCount + 5 * rVector.size()) - 3;
@@ -150,9 +150,18 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen)
 	select += ", SUM(Total_Labor_Cost_Hours_Paid) ,  SUM(Total_Labor_Cost_Standard_Hours) , SUM(Total_Labor_Cost_Percent_Performance)";
 
 	//construct actual query
-	Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE MONTH(Date) = '" + monthChosen + "' GROUP BY Day_Of_Week;";
-	Form3->SQLQuery2->Open();
-	Form3->SQLQuery2->First();
+	if (SameText(type, "month"))
+	{
+		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE MONTH(Date) = '" + monthChosen + "' GROUP BY Day_Of_Week;";
+		Form3->SQLQuery2->Open();
+		Form3->SQLQuery2->First();
+	}
+	else if (SameText(type, "year"))
+	{
+		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE YEAR(Date) = '" + monthChosen + "' GROUP BY Day_Of_Week;";
+		Form3->SQLQuery2->Open();
+		Form3->SQLQuery2->First();
+	}
 
 	//start filling column 1
 	String firstColumnNoDayWeek[8] = {"Offset_Rooms_Occupied", "Occupancy_Percent", "AM_Rooms_Cleaned", "PM_Rooms_Cleaned", "Rooms_Sold", "Total_Rooms_Cleaned", "Guestroom_Carpets_Cleaned", "Documented_Inspections"};
@@ -423,45 +432,61 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen)
 	readGrid->Cells[productivityColumn][productivityStartIndex++] = productivityLaundry;
 
 	//populate total column (last one)
-	//get the month name for the header
-	String DayName = "";
-	switch(monthChosen)
-	{
-		case 1:
-			DayName = L"January";
-			break;
-		case 2:
-			DayName = L"February";
-			break;
-		case 3:
-			DayName = L"March";
-			break;
-		case 4:
-			DayName = L"April";
-			break;
-		case 5:
-			DayName = L"May";
-			break;
-		case 6:
-			DayName = L"June";
-			break;
-		case 7:
-			DayName = L"July";
-		case 8:
-			DayName = L"August";
-		case 9:
-			DayName = L"September";
-		case 10:
-			DayName = L"October";
-		case 11:
-			DayName = L"November";
-		case 12:
-			DayName = L"December";
-	}
 	indexOn = 9;
 	columnIndex = 0;
-	//make the header the month
-	readGrid->ColumnByIndex(indexOn)->Header = DayName;
+	if (SameText(type, "month"))
+	{
+		//get the month name for the header
+		String DayName = "";
+		switch(monthChosen)
+		{
+			case 1:
+				DayName = L"January";
+				break;
+			case 2:
+				DayName = L"February";
+				break;
+			case 3:
+				DayName = L"March";
+				break;
+			case 4:
+				DayName = L"April";
+				break;
+			case 5:
+				DayName = L"May";
+				break;
+			case 6:
+				DayName = L"June";
+				break;
+			case 7:
+				DayName = L"July";
+				break;
+			case 8:
+				DayName = L"August";
+				break;
+			case 9:
+				DayName = L"September";
+				break;
+			case 10:
+				DayName = L"October";
+				break;
+			case 11:
+				DayName = L"November";
+				break;
+			case 12:
+				DayName = L"December";
+				break;
+		}
+
+		//make the header the month
+		readGrid->ColumnByIndex(indexOn)->Header = DayName;
+	}
+	else if (SameText(type, "year"))
+	{
+		//make the header the year (monthChosen actuall stores the year in this case
+		readGrid->ColumnByIndex(indexOn)->Header = monthChosen;
+	}
+
 	//fill with top portion (non roles) with totals
 	double totalCounter = 0;
 	double occupancyPercent = 0;
@@ -1213,7 +1238,7 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			{
 				//get the week selected by the day selected from the calendar
 				TDateTime dayChosen = dayCalendar->Date;
-				String dbDayChosen = StrToDate(dayChosen).FormatString(L"yyyy-mm-dd");
+				dbDayChosen = StrToDate(dayChosen).FormatString(L"yyyy-mm-dd");
 				int weekNum = WeekOfTheYear(dayChosen);
 
 				//decode date to get year, month and day values
@@ -1241,7 +1266,7 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				filtersLabel->Visible = true;
 
 				//call display function
-				populateGrid(roleVector, currentMonthIndex);
+				populateGrid(roleVector, currentMonthIndex, "null", "null", "month");
 			}
 			else
 			{
@@ -1252,6 +1277,9 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				//testing
 				filtersLabel->Text = currentYear;
 				filtersLabel->Visible = true;
+
+				//call display function
+				populateGrid(roleVector, (int) toDouble(currentYear), "null", "null", "year");
 			}
 
 			//hide things from testing
