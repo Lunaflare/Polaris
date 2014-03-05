@@ -465,6 +465,9 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen)
 	//fill with top portion (non roles) with totals
 	double totalCounter = 0;
 	double occupancyPercent = 0;
+	double totalRoomsCleanedTotal = 0;
+	double amRoomsCleanedTotal = 0;
+	double pmRoomsCleanedTotal = 0;
 	for (columnIndex = 0; columnIndex < 8; ++columnIndex)
 	{
 		for (int j = 2; j < 9; ++j)
@@ -474,13 +477,24 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen)
 			occupancyPercent = totalCounter / 8680.0;
 
 		if (columnIndex == 1)
-            readGrid->Cells[indexOn][columnIndex] = blank + makePercent(occupancyPercent) + "%";
+			readGrid->Cells[indexOn][columnIndex] = blank + makePercent(occupancyPercent) + "%";
 		else
 			readGrid->Cells[indexOn][columnIndex] = totalCounter;
 		totalCounter = 0;
+
+		//get some values for productivity calculations at bottom
+		if (SameText(readGrid->Cells[1][columnIndex], "Total Rooms Cleaned"))
+			totalRoomsCleanedTotal = toDouble(readGrid->Cells[indexOn][columnIndex]);
+		else if (SameText(readGrid->Cells[1][columnIndex], "AM Rooms Cleaned"))
+			amRoomsCleanedTotal = toDouble(readGrid->Cells[indexOn][columnIndex]);
+		else if (SameText(readGrid->Cells[1][columnIndex], "PM Rooms Cleaned"))
+			pmRoomsCleanedTotal = toDouble(readGrid->Cells[indexOn][columnIndex]);
 	}
 	//fill rest of totals besides productivity (i.e. roles, overtime, totla labor hours, total labor cost)
 	int modThree = 0;
+	double amRoomAttendantsTotal = 0;
+	double pmRoomAttendantsTotal = 0;
+	double laundryAttendantTotal = 0;
 	for (columnIndex; columnIndex < readGrid->RowCount - 7; ++columnIndex)
 	{
 		for (int j = 2; j < 9; ++j)
@@ -496,7 +510,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen)
 			//fill grid with computed value, if counter multiple of 3 then treat as percent
 			if (SameText(readGrid->Cells[1][columnIndex], "Overtime Premium Cost") || SameText(readGrid->Cells[1][columnIndex], "Overtime Cost"))
 				readGrid->Cells[indexOn][columnIndex] = blank + "$" + totalCounter;
-			else if (SameText(readGrid->Cells[1][columnIndex], "Actual Cost") || SameText(readGrid->Cells[1][columnIndex], "Standard Cost")
+			else if (SameText(readGrid->Cells[1][columnIndex], "Actual Cost") || SameText(readGrid->Cells[1][columnIndex], "Standard Cost"))
 				readGrid->Cells[indexOn][columnIndex] = blank + "$" + commas(IntToStr(nearestDollar(totalCounter)));
 			else if (modThree % 3 == 0)
 				if (readGrid->Cells[indexOn][columnIndex-2] != 0)
@@ -507,8 +521,61 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen)
 				readGrid->Cells[indexOn][columnIndex] = totalCounter;
 		}
 
+		//get some values for productivity calculations at bottom
+		if (SameText(readGrid->Cells[0][columnIndex], "AM Room Attendants"))
+			amRoomAttendantsTotal = toDouble(readGrid->Cells[indexOn][columnIndex-1]);
+		else if (SameText(readGrid->Cells[0][columnIndex], "PM Room Attendants"))
+			pmRoomAttendantsTotal = toDouble(readGrid->Cells[indexOn][columnIndex-1]);
+		else if (SameText(readGrid->Cells[0][columnIndex], "Laundry Attendant"))
+			laundryAttendantTotal = toDouble(readGrid->Cells[indexOn][columnIndex-1]);
+
 		totalCounter = 0;
 	}
+	//increase columnIndex for productivity totals
+	++columnIndex;
+
+	//fill productivity for hours variance
+	if (readGrid->Cells[indexOn][columnIndex - 8] == 0)
+		readGrid->Cells[indexOn][columnIndex++] = 0;
+	else
+		readGrid->Cells[indexOn][columnIndex++] = readGrid->Cells[indexOn][columnIndex-8] - readGrid->Cells[indexOn][columnIndex-7];
+
+	//fill productivity for cost variance
+	if (readGrid->Cells[indexOn][columnIndex - 8] == 0)
+		readGrid->Cells[indexOn][columnIndex++] = "$0";
+	else
+		readGrid->Cells[indexOn][columnIndex++] = commas(IntToStr(nearestDollar(toDouble(readGrid->Cells[indexOn][columnIndex-5]) - toDouble(readGrid->Cells[indexOn][columnIndex-4]))));
+
+	//fill productivity for man minutes per room cleaned
+	if (readGrid->Cells[indexOn][columnIndex - 10] == 0)
+		readGrid->Cells[indexOn][columnIndex++] = 0;
+	else
+		readGrid->Cells[indexOn][columnIndex++] = roundTwo((readGrid->Cells[indexOn][columnIndex-10] * 60) / totalRoomsCleanedTotal);
+
+	//fill productivity for rooms cleaned per AM gra
+	if (amRoomAttendantsTotal == 0)
+		readGrid->Cells[indexOn][columnIndex++] = 0;
+	else
+		readGrid->Cells[indexOn][columnIndex++] = roundTwo(amRoomsCleanedTotal / (amRoomAttendantsTotal / 8.0));
+
+	//fill productivity for rooms cleaned per PM gra
+	if (pmRoomAttendantsTotal == 0)
+		readGrid->Cells[indexOn][columnIndex++] = 0;
+	else
+		readGrid->Cells[indexOn][columnIndex++] = roundTwo(pmRoomsCleanedTotal / (pmRoomAttendantsTotal / 8.0));
+
+	//fill productivity for rooms per laundry attendant
+	if (laundryAttendantTotal == 0)
+		readGrid->Cells[indexOn][columnIndex++] = 0;
+	else
+		readGrid->Cells[indexOn][columnIndex++] = roundTwo(totalRoomsCleanedTotal / (laundryAttendantTotal / 7.5));
+
+	//fill cells in top left with extra statistics
+	readGrid->Cells[0][0] = "$12.96 Budget";
+	readGrid->Cells[0][2] = blank +  + " Over/Under per rooom";
+	readGrid->Cells[0][1] = blank +  + " Over/Under per rooom";
+	readGrid->Cells[0][3] = "$ 12.96 Budget";
+	readGrid->Cells[0][4] = "$ 12.96 Budget";
 
 	//make grid visible to user
   	readGrid->Visible = true;
