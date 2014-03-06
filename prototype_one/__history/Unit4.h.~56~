@@ -15,9 +15,8 @@
 #include <vector>
 #include <iostream>
 #include <math.h>
-#include <locale>
-#include <iomanip>
 #include <sstream>
+#include <string>
 #include <System.Classes.hpp>
 #include <FMX.Controls.hpp>
 #include <FMX.Forms.hpp>
@@ -71,13 +70,18 @@ private:	// User declarations
 	int basicState; //0=roles,1=view,2=week,3=display
 	vector<String> roleVector;
 	String viewType;
+	String privateDayChosenStart;
+	String privateDayChosenEnd;
 public:		// User declarations
 	__fastcall TForm4(TComponent* Owner);
 	void __fastcall populateGrid(vector<String>, String);
+	void __fastcall populateGrid(vector<String>, int, String, String, String);
 	float __fastcall makePercent(float);
 	float __fastcall roundTwo(float value);
 	int __fastcall nearestDollar(float value);
-	template<class T> String __fastcall FormatWithCommas(T value);
+	string __fastcall IntToStr(long int n);
+	String __fastcall commas(string num);
+	double __fastcall toDouble(String);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm4 *Form4;

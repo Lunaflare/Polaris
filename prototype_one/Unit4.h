@@ -56,6 +56,8 @@ __published:	// IDE-managed Components
 	TStringColumn *StringColumn8;
 	TStringColumn *StringColumn9;
 	TStringColumn *StringColumn10;
+	TRadioButton *arbitraryRadio;
+	TCalendar *rangeEndCalendar;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton4Click(TObject *Sender);
@@ -70,6 +72,9 @@ private:	// User declarations
 	int basicState; //0=roles,1=view,2=week,3=display
 	vector<String> roleVector;
 	String viewType;
+	String privateDayChosenStart;
+	String privateDayChosenEnd;
+	bool secondTimeArbitrary;
 public:		// User declarations
 	__fastcall TForm4(TComponent* Owner);
 	void __fastcall populateGrid(vector<String>, String);

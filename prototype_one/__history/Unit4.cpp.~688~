@@ -158,7 +158,14 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 	}
 	else if (SameText(type, "year"))
 	{
-      	Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE MONTH(Date) = '" + monthChosen + "' GROUP BY Day_Of_Week;";
+		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE YEAR(Date) = '" + monthChosen + "' GROUP BY Day_Of_Week;";
+		Form3->SQLQuery2->Open();
+		Form3->SQLQuery2->First();
+	}
+	else if (SameText(type, "week"))
+	{
+		//Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE Date >= '" + rangeStart + "' AND Date <= '" + rangeEnd + "' GROUP BY Day_Of_Week;";
+		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE Date BETWEEN '" + rangeStart + "' AND '" + rangeEnd + "' GROUP BY Day_Of_Week;";
 		Form3->SQLQuery2->Open();
 		Form3->SQLQuery2->First();
     }
@@ -483,8 +490,13 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 	}
 	else if (SameText(type, "year"))
 	{
-		//make the header the year (monthChosen actuall stores the year in this case
+		//make the header the year (monthChosen actuall stores the year in this case)
 		readGrid->ColumnByIndex(indexOn)->Header = monthChosen;
+	}
+	else if (SameText(type, "week"))
+	{
+		//make the header the date range
+        readGrid->ColumnByIndex(indexOn)->Header = privateDayChosenStart + " - " + privateDayChosenEnd;
 	}
 
 	//fill with top portion (non roles) with totals
@@ -1044,11 +1056,14 @@ return LResult;
 //hides Form2 from view when this form is shown
 void __fastcall TForm4::FormShow(TObject *Sender)
 {
+	//set secondTimeArbitray initiall to false
+    secondTimeArbitrary = false;
+
 	//hide welcome form
 	Form2->Hide();
 
 	//things the same for both basic and advanced
-    viewType = "Week";
+	viewType = "Week";
 
     //get the hotelID and query hotel_ref to find out which table to input to and which table to read from
 	String currentHotelID = Form1->getHotelID();
@@ -1120,6 +1135,7 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	selectAllButton->Visible = false;
 	dayRadio->Visible = false;
 	weekRadio->Visible = false;
+	arbitraryRadio->Visible = false;
 	monthRadio->Visible = false;
 	yearRadio->Visible = false;
 	dayRadio->IsChecked = false;
@@ -1132,6 +1148,7 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	monthPopupBox->ItemIndex = 0;
 	yearPopupBox->ItemIndex = 0;
 	readGrid->Visible = false;
+	secondTimeArbitrary = false;
 }
 
 //---------------------------------------------------------------------------
@@ -1158,52 +1175,89 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			//handle signature things for view filter
 			dayRadio->Visible = true;
 			weekRadio->Visible = true;
+			arbitraryRadio->Visible = true;
 			monthRadio->Visible = true;
 			yearRadio->Visible = true;
+
 			break;
 		//week filter
 		case 1:
 			//hide things from view filter
 			dayRadio->Visible = false;
 			weekRadio->Visible = false;
+			arbitraryRadio->Visible = false;
 			monthRadio->Visible = false;
 			yearRadio->Visible = false;
 
-			//store things from view filter
-			if (dayRadio->IsChecked)
-				viewType = "Day";
-			else if (weekRadio->IsChecked)
-				viewType = "Week";
-			else if (monthRadio->IsChecked)
-				viewType = "Month";
-			else
-				viewType = "Year";
-
-			//increase basicState and display filterLabel appropriately
-			basicState++;
-			filtersLabel->Text = "Which " + viewType + "?";
-
-			//depending on viewType, allow user to choose day, week, month or year respectively
-			if (viewType == "Day")
+			if (!secondTimeArbitrary)
 			{
-				//show calendar and allow user to choose a day
-				dayCalendar->Visible = true;
-			}
-			else if (viewType == "Week")
-			{
-				//show calendar with week numbers on side
-				dayCalendar->Visible = true;
-			}
-			else if (viewType == "Month")
-			{
-				//show monthPopupBox with months as items
-				monthPopupBox->Visible = true;
+				//store things from view filter
+				if (dayRadio->IsChecked)
+					viewType = "Day";
+				else if (weekRadio->IsChecked)
+					viewType = "Week";
+				else if (arbitraryRadio->IsChecked)
+					viewType = "Arbitrary";
+				else if (monthRadio->IsChecked)
+					viewType = "Month";
+				else
+					viewType = "Year";
 			}
 			else
+				viewType = "Arbitrary";
+
+			//if arbitray date range, follows seperate pattern
+			if (SameText(viewType, "Arbitrary"))
 			{
-				//show yearPopupBox with years as items
-				yearPopupBox->Visible = true;
-            }
+				if (!secondTimeArbitrary)
+				{
+					//display filterLabel appropriately
+					filtersLabel->Text = L"Choose a start date for the range:";
+					secondTimeArbitrary = true;
+
+					//show calendar and allow user to choose a start day for the range
+					dayCalendar->Visible = true;
+				}
+				else
+				{
+					//increase basicState and display filterLabel appropriately
+					basicState++;
+					secondTimeArbitrary = false;
+					filtersLabel->Text = L"Choose an end date for the range:";
+
+					//show calendar and allow user to choose an end day for the range
+					rangeEndCalendar->Visible = true;
+				}
+			}
+			//follows same pattern for all others
+			else
+			{
+				//increase basicState and display filterLabel appropriately
+				basicState++;
+				filtersLabel->Text = "Which " + viewType + "?";
+
+				//depending on viewType, allow user to choose day, week, month or year respectively
+				if (viewType == "Day")
+				{
+					//show calendar and allow user to choose a day
+					dayCalendar->Visible = true;
+				}
+				else if (viewType == "Week")
+				{
+					//show calendar with week numbers on side
+					dayCalendar->Visible = true;
+				}
+				else if (viewType == "Month")
+				{
+					//show monthPopupBox with months as items
+					monthPopupBox->Visible = true;
+				}
+				else
+				{
+					//show yearPopupBox with years as items
+					yearPopupBox->Visible = true;
+				}
+			}
 
 			break;
 		//basic show
@@ -1214,11 +1268,14 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			backImageButton2->Visible = false;
 			nextImageButton2->Visible = false;
 			dayCalendar->Visible = false;
+			rangeEndCalendar->Visible = false;
 			monthPopupBox->Visible = false;
 			yearPopupBox->Visible = false;
 
 			//needed to compile
 			String dbDayChosen = "";
+			String dbDayChosenStart = "";
+			String dbDayChosenEnd = "";
 
 			//get whatever data was chosen by user (i.e. day, week, month or year)
 			if (viewType == "Day")
@@ -1227,43 +1284,49 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				TDateTime dayChosen = dayCalendar->Date;
 				dbDayChosen = StrToDate(dayChosen).FormatString(L"yyyy-mm-dd");
 
-				//testing
-				filtersLabel->Text = dbDayChosen;
-				filtersLabel->Visible = true;
-
 				//call display function
 				populateGrid(roleVector, dbDayChosen);
 			}
 			else if (viewType == "Week")
 			{
+				//get the date and change to a string
+				TDateTime dayChosenStart = dayCalendar->Date;
+				TDateTime dayChosenEnd = dayCalendar->Date;
+
 				//get the week selected by the day selected from the calendar
-				TDateTime dayChosen = dayCalendar->Date;
-				dbDayChosen = StrToDate(dayChosen).FormatString(L"yyyy-mm-dd");
-				int weekNum = WeekOfTheYear(dayChosen);
+				while (DayOfWeek(dayChosenStart) != 7)
+					dayChosenStart--;
+				while (DayOfWeek(dayChosenEnd) != 1)
+					dayChosenEnd++;
 
-				//decode date to get year, month and day values
-				unsigned short Year, Month, Day;
-				dayChosen.DecodeDate(&Year, &Month, &Day);
+				//convert to strings to pass into populateGrid function
+				dbDayChosenStart = StrToDate(dayChosenStart).FormatString(L"yyyy-mm-dd");
+				dbDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"yyyy-mm-dd");
+				privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
+				privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
 
-				//increase year for special case of week num being 1 when month is december
-				if (weekNum == 1 && Month == 12)
-				{
-					Year++;
-				}
-
-				//testing
-				String dummy = "";
-				filtersLabel->Text = dummy + Year + " " + weekNum;
-				filtersLabel->Visible = true;
+				//call display function
+				populateGrid(roleVector, 0, dbDayChosenStart, dbDayChosenEnd, "week");
 			}
+			else if (viewType == "Arbitrary")
+			{
+				//get the date and change to a string
+				TDateTime dayChosenStart = dayCalendar->Date;
+				TDateTime dayChosenEnd = rangeEndCalendar->Date;
+
+				//convert to strings to pass into populateGrid function
+				dbDayChosenStart = StrToDate(dayChosenStart).FormatString(L"yyyy-mm-dd");
+				dbDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"yyyy-mm-dd");
+				privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
+				privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
+
+				//call display function (should work same with week as with arbitrary)
+				populateGrid(roleVector, 0, dbDayChosenStart, dbDayChosenEnd, "week");
+            }
 			else if (viewType == "Month")
 			{
 				//get the month selected from the drop down (value 1 through 12)
 				int currentMonthIndex = monthPopupBox->ItemIndex + 1;
-
-				//testing
-				filtersLabel->Text = currentMonthIndex;
-				filtersLabel->Visible = true;
 
 				//call display function
 				populateGrid(roleVector, currentMonthIndex, "null", "null", "month");
@@ -1285,8 +1348,6 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			//hide things from testing
 			filtersLabel->Visible = false;
 
-			//call and give parameters (roleVector, viewBy, day/week/month/year) to display desired data
-
 			break;
 	}
 }
@@ -1306,6 +1367,7 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
         	//hide things from view filter
 			dayRadio->Visible = false;
 			weekRadio->Visible = false;
+			arbitraryRadio->Visible = false;
 			monthRadio->Visible = false;
 			yearRadio->Visible = false;
 
@@ -1323,21 +1385,54 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 			break;
 		case 2:
 			// view filter
-			basicState--;
-			filtersLabel->Text = "View By:";
-			selectAllButton->Visible = false;
-			roleListBox->Visible = false;
-			backImageButton2->Visible = true;
-			dayCalendar->Visible = false;
-			dayCalendar->WeekNumbers = false;
-			monthPopupBox->Visible = false;
-			yearPopupBox->Visible = false;
+			if (SameText(viewType, "Arbitrary") && secondTimeArbitrary)
+			{
+				//must be where choosing start date
+				//basicState--;
+				filtersLabel->Text = "View By:";
+				selectAllButton->Visible = false;
+				roleListBox->Visible = false;
+				backImageButton2->Visible = true;
+				dayCalendar->Visible = false;
+				rangeEndCalendar->Visible = false;
+				dayCalendar->WeekNumbers = false;
+				monthPopupBox->Visible = false;
+				yearPopupBox->Visible = false;
 
-            //handle signature things for view filter
-			dayRadio->Visible = true;
-			weekRadio->Visible = true;
-			monthRadio->Visible = true;
-			yearRadio->Visible = true;
+				//handle signature things for view filter
+				dayRadio->Visible = true;
+				weekRadio->Visible = true;
+				arbitraryRadio->Visible = true;
+				monthRadio->Visible = true;
+				yearRadio->Visible = true;
+			}
+			else if (SameText(viewType, "Arbitrary") && !secondTimeArbitrary)
+			{
+				//must be where choosing end date
+				secondTimeArbitrary = false;
+				basicState--;
+			}
+			else
+			{
+				basicState--;
+				filtersLabel->Text = "View By:";
+				selectAllButton->Visible = false;
+				roleListBox->Visible = false;
+				backImageButton2->Visible = true;
+				dayCalendar->Visible = false;
+				rangeEndCalendar->Visible = false;
+				dayCalendar->WeekNumbers = false;
+				monthPopupBox->Visible = false;
+				yearPopupBox->Visible = false;
+
+				//handle signature things for view filter
+				dayRadio->Visible = true;
+				weekRadio->Visible = true;
+				arbitraryRadio->Visible = true;
+				monthRadio->Visible = true;
+				yearRadio->Visible = true;
+			}
+
 			break;
 	}
 }
