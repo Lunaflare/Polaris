@@ -76,8 +76,8 @@ double __fastcall TForm4::toDouble(String gridString)
 //populate grid for when viewing by month, week, year, or arbitrary date range
 void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, String rangeStart, String rangeEnd, String type)
 {
-	//set rowCount to reflect the number of roles we will be adding
-	readGrid->RowCount = (readGrid->RowCount + 5 * rVector.size()) - 3;
+	//set rowCount to reflect the number of roles we will be adding (just added end add need to get the number of roles dynamically)
+	readGrid->RowCount = ((readGrid->RowCount + 5 * rVector.size()) - 3) + (11 - rVector.size());
 
 	String hoursPaid = "";
 	String standardHours = "";
@@ -637,7 +637,8 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 {
 	//set rowCount to reflect the number of roles we will be adding
-	readGrid->RowCount = (readGrid->RowCount + 5 * rVector.size()) - 2;
+	//readGrid->RowCount = (readGrid->RowCount + 5 * rVector.size()) - 2;
+	readGrid->RowCount = ((readGrid->RowCount + 5 * rVector.size()) - 2) + (11 - rVector.size());
 
 	String hoursPaid = "";
 	String standardHours = "";
@@ -1140,6 +1141,7 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	yearRadio->Visible = false;
 	dayRadio->IsChecked = false;
 	weekRadio->IsChecked = false;
+	arbitraryRadio->IsChecked = false;
 	monthRadio->IsChecked = false;
 	yearRadio->IsChecked = false;
 	selectAllButton->Text = "Select All";
@@ -1149,6 +1151,14 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	yearPopupBox->ItemIndex = 0;
 	readGrid->Visible = false;
 	secondTimeArbitrary = false;
+	dayCalendar->Visible = false;
+	rangeEndCalendar->Visible = false;
+
+	//clear readGrid and set rowCount back to bare minimum (19)
+	for (int i = 0; i < 10; ++i)
+		for (int j = 0; j < readGrid->RowCount; ++j)
+			readGrid->Cells[i][j] = "";
+	readGrid->RowCount = 19;
 }
 
 //---------------------------------------------------------------------------
@@ -1226,6 +1236,7 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 					filtersLabel->Text = L"Choose an end date for the range:";
 
 					//show calendar and allow user to choose an end day for the range
+					dayCalendar->Visible = false;
 					rangeEndCalendar->Visible = true;
 				}
 			}
@@ -1386,6 +1397,7 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 
 				//special case set viewType to blank to avoid issues
 				viewType = "";
+				secondTimeArbitrary = false;
 			}
 			else
 			{
@@ -1415,10 +1427,11 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 			if (SameText(viewType, "Arbitrary") && !secondTimeArbitrary)
 			{
 				//must be where choosing end date
-				secondTimeArbitrary = false;
+				secondTimeArbitrary = true;
 				basicState--;
-				//dayCalendar->Visible = false;
-				//rangeEndCalendar->Visible = false;
+				filtersLabel->Text = L"Choose a start date for the range:";
+				rangeEndCalendar->Visible = false;
+				dayCalendar->Visible = true;
 			}
 			else
 			{

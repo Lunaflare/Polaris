@@ -76,8 +76,8 @@ double __fastcall TForm4::toDouble(String gridString)
 //populate grid for when viewing by month, week, year, or arbitrary date range
 void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, String rangeStart, String rangeEnd, String type)
 {
-	//set rowCount to reflect the number of roles we will be adding
-	readGrid->RowCount = (readGrid->RowCount + 5 * rVector.size()) - 3;
+	//set rowCount to reflect the number of roles we will be adding (just added end add need to get the number of roles dynamically)
+	readGrid->RowCount = ((readGrid->RowCount + 5 * rVector.size()) - 3) + (11 - rVector.size());
 
 	String hoursPaid = "";
 	String standardHours = "";
@@ -637,7 +637,8 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 {
 	//set rowCount to reflect the number of roles we will be adding
-	readGrid->RowCount = (readGrid->RowCount + 5 * rVector.size()) - 2;
+	//readGrid->RowCount = (readGrid->RowCount + 5 * rVector.size()) - 2;
+	readGrid->RowCount = ((readGrid->RowCount + 5 * rVector.size()) - 2) + (11 - rVector.size());
 
 	String hoursPaid = "";
 	String standardHours = "";
@@ -789,6 +790,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 	double hoursVarianceTwo = 0;
 	double costVarianceOne = 0;
 	double costVarianceTwo = 0;
+	double actualCostTotal = 0;
 
 	while (!Form3->SQLQuery2->Eof)
 	{
@@ -798,6 +800,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 		//continue populating items
 		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[0]->AsString;
 		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[2]->AsString;
+		double offsetRoomsOccupiedTotal = Form3->SQLQuery2->Fields->Fields[2]->AsFloat;
 		readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 310.0) + " %";
 
 		//fill with rest of non role type stuff
@@ -888,6 +891,9 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 					else
 						readGrid->Cells[indexOn][columnIndex++] = blank + "$" + commas(IntToStr(nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat)));
 				}
+
+				if (SameText(readGrid->Cells[1][columnIndex-1], "Actual Cost"))
+					actualCostTotal = toDouble(readGrid->Cells[indexOn][columnIndex-1]);
 			}
 
 			//skip spaces when appropriate
@@ -967,6 +973,22 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 	else
 		productivityLaundry = roundTwo(((double) totalRoomsCleaned) / productivityLaundry);
 	readGrid->Cells[productivityColumn][productivityStartIndex++] = productivityLaundry;
+
+    //fill cells in top left with extra statistics
+	readGrid->Cells[0][0] = "$12.96 Budget";
+	if (actualCostTotal < 0)
+		readGrid->Cells[0][2] = blank + "$" + roundTwo((actualCostTotal * -1) / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+	else
+		readGrid->Cells[0][2] = blank + "$" + roundTwo(actualCostTotal / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+	if (toDouble(readGrid->Cells[0][2]) < 0)
+		readGrid->Cells[0][1] = blank + "$" + roundTwo((toDouble(readGrid->Cells[0][2])*-1) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
+	else
+		readGrid->Cells[0][1] = blank + "$" + roundTwo(toDouble(readGrid->Cells[0][2]) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
+	readGrid->Cells[0][3] = "$76,995 Accounting";
+	if (toDouble(readGrid->Cells[0][3]) < 0)
+		readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar((toDouble(readGrid->Cells[0][3])*-1) - actualCostTotal))) + " Variance";
+	else
+		readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar(toDouble(readGrid->Cells[0][3]) - actualCostTotal))) + " Variance";
 
   	readGrid->Visible = true;
 }
@@ -1140,6 +1162,7 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	yearRadio->Visible = false;
 	dayRadio->IsChecked = false;
 	weekRadio->IsChecked = false;
+	arbitraryRadio->IsChecked = false;
 	monthRadio->IsChecked = false;
 	yearRadio->IsChecked = false;
 	selectAllButton->Text = "Select All";
@@ -1149,6 +1172,14 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	yearPopupBox->ItemIndex = 0;
 	readGrid->Visible = false;
 	secondTimeArbitrary = false;
+	dayCalendar->Visible = false;
+	rangeEndCalendar->Visible = false;
+
+	//clear readGrid and set rowCount back to bare minimum (19)
+	for (int i = 0; i < 10; ++i)
+		for (int j = 0; j < readGrid->RowCount; ++j)
+			readGrid->Cells[i][j] = "";
+	readGrid->RowCount = 19;
 }
 
 //---------------------------------------------------------------------------
@@ -1226,6 +1257,7 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 					filtersLabel->Text = L"Choose an end date for the range:";
 
 					//show calendar and allow user to choose an end day for the range
+					dayCalendar->Visible = false;
 					rangeEndCalendar->Visible = true;
 				}
 			}
@@ -1364,31 +1396,9 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 	switch (basicState)
 	{
 		case 1:
-        	//hide things from view filter
-			dayRadio->Visible = false;
-			weekRadio->Visible = false;
-			arbitraryRadio->Visible = false;
-			monthRadio->Visible = false;
-			yearRadio->Visible = false;
-
-			//role filter
-			basicState--;
-			filtersLabel->Text = "Select Roles:";
-
-			//display first step basic read form items
-			nextImageButton2->Visible = true;
-
-			//show roleListBox once populated with roles
-			backImageButton2->Visible = false;
-			selectAllButton->Visible = true;
-			roleListBox->Visible = true;
-			break;
-		case 2:
-			// view filter
-			if (SameText(viewType, "Arbitrary") && secondTimeArbitrary)
+			if (SameText(viewType, "Arbitrary"))
 			{
-				//must be where choosing start date
-				basicState--;
+				//special case, is for start date
 				filtersLabel->Text = "View By:";
 				selectAllButton->Visible = false;
 				roleListBox->Visible = false;
@@ -1405,12 +1415,44 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 				arbitraryRadio->Visible = true;
 				monthRadio->Visible = true;
 				yearRadio->Visible = true;
+
+				//special case set viewType to blank to avoid issues
+				viewType = "";
+				secondTimeArbitrary = false;
 			}
+			else
+			{
+				//hide things from view filter
+				dayRadio->Visible = false;
+				weekRadio->Visible = false;
+				arbitraryRadio->Visible = false;
+				monthRadio->Visible = false;
+				yearRadio->Visible = false;
+
+				//role filter
+				basicState--;
+				filtersLabel->Text = "Select Roles:";
+
+				//display first step basic read form items
+				nextImageButton2->Visible = true;
+
+				//show roleListBox once populated with roles
+				backImageButton2->Visible = false;
+				selectAllButton->Visible = true;
+				roleListBox->Visible = true;
+			}
+
+			break;
+		case 2:
+			// view filter
 			if (SameText(viewType, "Arbitrary") && !secondTimeArbitrary)
 			{
 				//must be where choosing end date
-				secondTimeArbitrary = false;
+				secondTimeArbitrary = true;
 				basicState--;
+				filtersLabel->Text = L"Choose a start date for the range:";
+				rangeEndCalendar->Visible = false;
+				dayCalendar->Visible = true;
 			}
 			else
 			{
