@@ -186,6 +186,43 @@ void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
 //go through column headings as desired by the user
 void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 {
+
+		//check for blank input
+		if (SameText(dbFieldEdit->Text,""))
+		{
+			errorLabel->Visible=true;
+			return;
+		}
+
+		//check to see if string contains only digits and decimal
+	string inputString=AnsiString(dbFieldEdit->Text).c_str();
+	for (int i = 0; i < inputString.length(); i++)
+	{
+				//check to see if the character is 0-9 or a decimal
+			//if((inputString[i]<48 || inputString[i]>57) && inputString[i]!=46)
+			if(inputString[i]<48 || inputString[i]>57)
+			{
+				if(inputString[i]==46)
+				{
+					if(inputString[i+1]<48 || inputString[i+1]>57)
+					{
+                        dbFieldEdit->Text="";
+						errorLabel->Visible=true;
+						return;
+					}
+				}
+				else
+				{
+					dbFieldEdit->Text="";
+					errorLabel->Visible=true;
+					return;
+				}
+
+			}
+	}
+
+	//make sure the error label does not appear
+	errorLabel->Visible=false;
 	if (inputObject.currentIndex == 0 && inputObject.size == 0)
 	{
 		//run when displayObject is empty
@@ -368,6 +405,9 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 //go to previous item in struct, show in label field
 void __fastcall TForm3::backImageButtonClick(TObject *Sender)
 {
+	//make sure the error label does not appear
+	errorLabel->Visible=false;
+
 	//for when grid displayed and back button pressed
 	if (displayGrid->Visible)
 	{
@@ -394,6 +434,7 @@ void __fastcall TForm3::backImageButtonClick(TObject *Sender)
 //ask user if sure, yes == submit and no == do nothing
 void __fastcall TForm3::submitButtonClick(TObject *Sender)
 {
+
 	int msgboxID = MessageBox(
 		NULL,
 		L"Would you really like to submit?",
@@ -661,6 +702,8 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 		Image4->Visible=false;
 		inputLabelImage->Visible=false;
 		Image3->Visible=false;
+		//make sure the error label does not appear
+	errorLabel->Visible=false;
 	}
 	else
 	{
@@ -902,6 +945,8 @@ void __fastcall TForm3::homeImageButton5Click(TObject *Sender)
 	Image1->Visible=false;
 	inputLabelImage->Visible=false;
 	Image3->Visible=false;
+	//make sure the error label does not appear
+	errorLabel->Visible=false;
 
 	//set calendar choice back to current date
 	calendar->Date = Now();
