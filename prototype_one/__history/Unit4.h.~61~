@@ -56,6 +56,8 @@ __published:	// IDE-managed Components
 	TStringColumn *StringColumn8;
 	TStringColumn *StringColumn9;
 	TStringColumn *StringColumn10;
+	TRadioButton *arbitraryRadio;
+	TCalendar *rangeEndCalendar;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton4Click(TObject *Sender);
@@ -70,16 +72,19 @@ private:	// User declarations
 	int basicState; //0=roles,1=view,2=week,3=display
 	vector<String> roleVector;
 	String viewType;
+	String privateDayChosenStart;
+	String privateDayChosenEnd;
+	bool secondTimeArbitrary;
 public:		// User declarations
 	__fastcall TForm4(TComponent* Owner);
 	void __fastcall populateGrid(vector<String>, String);
-	void __fastcall populateGrid(vector<String>, int);
+	void __fastcall populateGrid(vector<String>, int, String, String, String);
 	float __fastcall makePercent(float);
 	float __fastcall roundTwo(float value);
 	int __fastcall nearestDollar(float value);
 	string __fastcall IntToStr(long int n);
 	String __fastcall commas(string num);
-	int __fastcall roundTwo(float value);
+	double __fastcall toDouble(String);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm4 *Form4;

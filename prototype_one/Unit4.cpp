@@ -162,7 +162,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 	//construct actual query
 	if (SameText(type, "month"))
 	{
-		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE MONTH(Date) = '" + monthChosen + "' GROUP BY Day_Of_Week;";
+		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE MONTH(Date) = '" + monthChosen + " AND YEAR(Date) = '" + monthYearSelected + "' GROUP BY Day_Of_Week;";
 		Form3->SQLQuery2->Open();
 		Form3->SQLQuery2->First();
 	}
@@ -1281,6 +1281,7 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	yearRadio->IsChecked = false;
 	selectAllButton->Text = "Select All";
 	roleListBox->Items->Clear();
+	roleListBox->Visible = false;
 	roleVector.clear();
 	monthPopupBox->ItemIndex = 0;
 	yearPopupBox->ItemIndex = 0;
@@ -1399,6 +1400,7 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				{
 					//show monthPopupBox with months as items
 					monthPopupBox->Visible = true;
+					yearPopupBox->Visible = true;
 				}
 				else
 				{
@@ -1482,6 +1484,11 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			{
 				//get the month selected from the drop down (value 1 through 12)
 				int currentMonthIndex = monthPopupBox->ItemIndex + 1;
+
+				//get the year selected from the drop down
+				int currentYearIndex = yearPopupBox->ItemIndex;
+				String currentYear = yearPopupBox->Items->operator [](currentYearIndex);
+                monthYearSelected = ((int) toDouble(currentYear));
 
 				//call display function
 				populateGrid(roleVector, currentMonthIndex, "null", "null", "month");

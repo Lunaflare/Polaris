@@ -75,6 +75,7 @@ private:	// User declarations
 	String privateDayChosenStart;
 	String privateDayChosenEnd;
 	bool secondTimeArbitrary;
+	int monthYearSelected;
 public:		// User declarations
 	__fastcall TForm4(TComponent* Owner);
 	void __fastcall populateGrid(vector<String>, String);
