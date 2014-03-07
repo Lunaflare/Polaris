@@ -21,13 +21,19 @@ __fastcall TForm4::TForm4(TComponent* Owner)
 //calculate what a value is as a percent to one decimal point
 float __fastcall TForm4::makePercent(float value)
 {
-	return floor(value * 100.0 * 10.0 + 0.5)/10.0;
+	/*if (value < 1)
+		return value;
+	else*/
+		return floor(value * 100.0 * 10.0 + 0.5)/10.0;
 }
 
 //round a decimal value to 2 places
 float __fastcall TForm4::roundTwo(float value)
 {
-	return floor(value * 100.0 + 0.5)/100.0;
+	/*if (value < 1)
+		return value;
+	else*/
+		return floor(value * 100.0 + 0.5)/100.0;
 }
 
 int __fastcall TForm4::nearestDollar(float value)
@@ -294,7 +300,6 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 						readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat / Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
 					else
                         readGrid->Cells[indexOn][columnIndex++] = "0%";
-					//readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
 				}
 				else if (j == 1)
 				{
@@ -349,7 +354,13 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
                         hoursVarianceTwo = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
 
 					if (j == 2)
-						readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+					{
+						if (Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat != 0)
+							readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat / Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
+						else
+							readGrid->Cells[indexOn][columnIndex++] = "0%";
+						//readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+					}
 					else
 						readGrid->Cells[indexOn][columnIndex++] = nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
 				}
@@ -362,7 +373,13 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 						costVarianceTwo = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
 
 					if (j == 2)
-						readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+					{
+						if (Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat != 0)
+							readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat / Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
+						else
+							readGrid->Cells[indexOn][columnIndex++] = "0%";
+						//readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+					}
 					else
 						readGrid->Cells[indexOn][columnIndex++] = blank + "$" + commas(IntToStr(nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat)));
 				}
@@ -407,6 +424,13 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		queryIndex = 9;
 		columnIndex = 0;
 		Form3->SQLQuery2->Next();
+
+		//put some counters back to zero
+		/*manMinutesRoomsCleaned
+		roomsCleanedPM
+		roomsCleanedAM
+		totalRoomsCleaned
+		productivityLaundry*/
 	}
 
 	//get what the productivity column is (probably ok to stay hardcoded)

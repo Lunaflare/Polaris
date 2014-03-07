@@ -21,13 +21,19 @@ __fastcall TForm4::TForm4(TComponent* Owner)
 //calculate what a value is as a percent to one decimal point
 float __fastcall TForm4::makePercent(float value)
 {
-	return floor(value * 100.0 * 10.0 + 0.5)/10.0;
+	/*if (value < 1)
+		return value;
+	else*/
+		return floor(value * 100.0 * 10.0 + 0.5)/10.0;
 }
 
 //round a decimal value to 2 places
 float __fastcall TForm4::roundTwo(float value)
 {
-	return floor(value * 100.0 + 0.5)/100.0;
+	/*if (value < 1)
+		return value;
+	else*/
+		return floor(value * 100.0 + 0.5)/100.0;
 }
 
 int __fastcall TForm4::nearestDollar(float value)
@@ -117,11 +123,11 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 
 		//check the index for productivity goal
 		if (SameText(standardHours, "AM_Room_Attendants_Standard_Hours"))
-			productivityAMIndex = 8 + 3 * i + 2;
+			productivityAMIndex = 8 + 3 * i + 3;
 		else if (SameText(standardHours, "PM_Room_Attendants_Standard_Hours"))
-			productivityPMIndex = 8 + 3 * i + 2;
+			productivityPMIndex = 8 + 3 * i + 3;
 		else if (SameText(standardHours, "Laundry_Attendant_Standard_Hours"))
-			productivityLaundryIndex = 8 + 3 * i + 2;
+			productivityLaundryIndex = 8 + 3 * i + 3;
 
 		//append necessary strings to query
 		select += (", SUM(" + hoursPaid + "), SUM(" + standardHours + "), SUM(" + percentPerformance + ")");
@@ -418,6 +424,13 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		queryIndex = 9;
 		columnIndex = 0;
 		Form3->SQLQuery2->Next();
+
+		//put some counters back to zero
+		/*manMinutesRoomsCleaned
+		roomsCleanedPM
+		roomsCleanedAM
+		totalRoomsCleaned
+		productivityLaundry*/
 	}
 
 	//get what the productivity column is (probably ok to stay hardcoded)

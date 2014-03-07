@@ -21,16 +21,19 @@ __fastcall TForm4::TForm4(TComponent* Owner)
 //calculate what a value is as a percent to one decimal point
 float __fastcall TForm4::makePercent(float value)
 {
-	if (value < 1)
+	/*if (value < 1)
 		return value;
-	else
+	else*/
 		return floor(value * 100.0 * 10.0 + 0.5)/10.0;
 }
 
 //round a decimal value to 2 places
 float __fastcall TForm4::roundTwo(float value)
 {
-	return floor(value * 100.0 + 0.5)/100.0;
+	/*if (value < 1)
+		return value;
+	else*/
+		return floor(value * 100.0 + 0.5)/100.0;
 }
 
 int __fastcall TForm4::nearestDollar(float value)
