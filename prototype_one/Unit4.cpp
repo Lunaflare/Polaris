@@ -1131,10 +1131,48 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		selectAllButton->Visible = true;
 		roleListBox->Visible = true;
 	}
-	//otherwise display advanced read form
+	//otherwise display advanced read form (need to populate role vector also)
 	else
 	{
+		//simply call populateGrid function passing in today's week and running as week type
 
+		//fill roleVector with all the roles currently possible
+		Form3->SQLQuery2->SQL->Text = "SELECT Bare_Role_Name FROM baldwins_hotel_data.role_table WHERE hotelID = '"+currentHotelID+"';";
+		Form3->SQLQuery2->Open();
+		Form3->SQLQuery2->First();
+		while (!Form3->SQLQuery2->Eof)
+		{
+			roleVector.push_back(Form3->SQLQuery2->Fields->Fields[0]->AsString);
+			Form3->SQLQuery2->Next();
+		}
+
+        //get the date and change to a string
+		TDateTime dayChosenStart = dayCalendar->Date;
+		TDateTime dayChosenEnd = dayCalendar->Date;
+		String dbDayChosenStart = "";
+		String dbDayChosenEnd = "";
+
+		//get the week selected by the day selected from the calendar
+		while (DayOfWeek(dayChosenStart) != 7)
+			dayChosenStart--;
+		if (DayOfWeek(dayChosenEnd) == 7)
+		{
+			dayChosenEnd++;
+			dayChosenEnd++;
+		}
+		else if (DayOfWeek(dayChosenEnd) == 1)
+			dayChosenEnd++;
+		while (DayOfWeek(dayChosenEnd) != 1)
+			dayChosenEnd++;
+
+		//convert to strings to pass into populateGrid function
+		dbDayChosenStart = dayChosenStart.FormatString(L"yyyy-mm-dd");
+		dbDayChosenEnd = dayChosenEnd.FormatString(L"yyyy-mm-dd");
+		privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
+		privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
+
+		//call display function
+		populateGrid(roleVector, 0, dbDayChosenStart, dbDayChosenEnd, "week");
     }
 }
 //---------------------------------------------------------------------------
@@ -1154,6 +1192,7 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 
 	//make items not visible again so in good shape upon reentry
 	nextImageButton2->Visible = false;
+	backImageButton2->Visible = false;
 	filtersLabel->Visible = false;
 	selectAllButton->Visible = false;
 	dayRadio->Visible = false;
@@ -1175,6 +1214,8 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	secondTimeArbitrary = false;
 	dayCalendar->Visible = false;
 	rangeEndCalendar->Visible = false;
+	dayCalendar->Date = Now();
+	rangeEndCalendar->Date = Now();
 
 	//clear readGrid and set rowCount back to bare minimum (19)
 	for (int i = 0; i < 10; ++i)
@@ -1329,6 +1370,13 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				//get the week selected by the day selected from the calendar
 				while (DayOfWeek(dayChosenStart) != 7)
 					dayChosenStart--;
+				if (DayOfWeek(dayChosenEnd) == 7)
+				{
+					dayChosenEnd++;
+					dayChosenEnd++;
+				}
+				else if (DayOfWeek(dayChosenEnd) == 1)
+					dayChosenEnd++;
 				while (DayOfWeek(dayChosenEnd) != 1)
 					dayChosenEnd++;
 

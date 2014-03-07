@@ -791,6 +791,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 	double costVarianceOne = 0;
 	double costVarianceTwo = 0;
 	double actualCostTotal = 0;
+	double offsetRoomsOccupiedTotal = 0;
 
 	while (!Form3->SQLQuery2->Eof)
 	{
@@ -800,7 +801,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 		//continue populating items
 		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[0]->AsString;
 		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[2]->AsString;
-		double offsetRoomsOccupiedTotal = Form3->SQLQuery2->Fields->Fields[2]->AsFloat;
+		offsetRoomsOccupiedTotal = Form3->SQLQuery2->Fields->Fields[2]->AsFloat;
 		readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 310.0) + " %";
 
 		//fill with rest of non role type stuff
@@ -1130,10 +1131,30 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		selectAllButton->Visible = true;
 		roleListBox->Visible = true;
 	}
-	//otherwise display advanced read form
+	//otherwise display advanced read form (need to populate role vector also)
 	else
 	{
+		//simply call populateGrid function passing in today's week and running as week type
+        //get the date and change to a string
+		TDateTime dayChosenStart = dayCalendar->Date;
+		TDateTime dayChosenEnd = Now();
+		String dbDayChosenStart = "";
+		String dbDayChosenEnd = "";
 
+		//get the week selected by the day selected from the calendar
+		while (DayOfWeek(dayChosenStart) != 7)
+			dayChosenStart--;
+		while (DayOfWeek(dayChosenEnd) != 1)
+			dayChosenEnd++;
+
+		//convert to strings to pass into populateGrid function
+		dbDayChosenStart = dayChosenStart.FormatString(L"yyyy-mm-dd");
+		dbDayChosenEnd = dayChosenEnd.FormatString(L"yyyy-mm-dd");
+		privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
+		privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
+
+		//call display function
+		populateGrid(roleVector, 0, dbDayChosenStart, dbDayChosenEnd, "week");
     }
 }
 //---------------------------------------------------------------------------

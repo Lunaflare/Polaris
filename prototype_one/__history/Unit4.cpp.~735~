@@ -242,7 +242,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 	double hoursVarianceTwo = 0;
 	double costVarianceOne = 0;
 	double costVarianceTwo = 0;
-    /*
+
 	while (!Form3->SQLQuery2->Eof)
 	{
 		//set indexOn so that week days appear in correct order (may need to do something in case a specific week day is not returned)
@@ -628,7 +628,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar((toDouble(readGrid->Cells[0][3])*-1) - actualCostTotal))) + " Variance";
 	else
 		readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar(toDouble(readGrid->Cells[0][3]) - actualCostTotal))) + " Variance";
-    */
+
 	//make grid visible to user
   	readGrid->Visible = true;
 }
@@ -638,7 +638,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 {
 	//set rowCount to reflect the number of roles we will be adding
 	//readGrid->RowCount = (readGrid->RowCount + 5 * rVector.size()) - 2;
-	readGrid->RowCount = ((readGrid->RowCount + 5 * rVector.size()) - 3) + (11 - rVector.size());
+	readGrid->RowCount = ((readGrid->RowCount + 5 * rVector.size()) - 2) + (11 - rVector.size());
 
 	String hoursPaid = "";
 	String standardHours = "";
@@ -790,6 +790,8 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 	double hoursVarianceTwo = 0;
 	double costVarianceOne = 0;
 	double costVarianceTwo = 0;
+	double actualCostTotal = 0;
+	double offsetRoomsOccupiedTotal = 0;
 
 	while (!Form3->SQLQuery2->Eof)
 	{
@@ -799,6 +801,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 		//continue populating items
 		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[0]->AsString;
 		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[2]->AsString;
+		offsetRoomsOccupiedTotal = Form3->SQLQuery2->Fields->Fields[2]->AsFloat;
 		readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 310.0) + " %";
 
 		//fill with rest of non role type stuff
@@ -889,6 +892,9 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 					else
 						readGrid->Cells[indexOn][columnIndex++] = blank + "$" + commas(IntToStr(nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat)));
 				}
+
+				if (SameText(readGrid->Cells[1][columnIndex-1], "Actual Cost"))
+					actualCostTotal = toDouble(readGrid->Cells[indexOn][columnIndex-1]);
 			}
 
 			//skip spaces when appropriate
@@ -968,6 +974,22 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 	else
 		productivityLaundry = roundTwo(((double) totalRoomsCleaned) / productivityLaundry);
 	readGrid->Cells[productivityColumn][productivityStartIndex++] = productivityLaundry;
+
+    //fill cells in top left with extra statistics
+	readGrid->Cells[0][0] = "$12.96 Budget";
+	if (actualCostTotal < 0)
+		readGrid->Cells[0][2] = blank + "$" + roundTwo((actualCostTotal * -1) / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+	else
+		readGrid->Cells[0][2] = blank + "$" + roundTwo(actualCostTotal / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+	if (toDouble(readGrid->Cells[0][2]) < 0)
+		readGrid->Cells[0][1] = blank + "$" + roundTwo((toDouble(readGrid->Cells[0][2])*-1) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
+	else
+		readGrid->Cells[0][1] = blank + "$" + roundTwo(toDouble(readGrid->Cells[0][2]) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
+	readGrid->Cells[0][3] = "$76,995 Accounting";
+	if (toDouble(readGrid->Cells[0][3]) < 0)
+		readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar((toDouble(readGrid->Cells[0][3])*-1) - actualCostTotal))) + " Variance";
+	else
+		readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar(toDouble(readGrid->Cells[0][3]) - actualCostTotal))) + " Variance";
 
   	readGrid->Visible = true;
 }
@@ -1109,10 +1131,30 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		selectAllButton->Visible = true;
 		roleListBox->Visible = true;
 	}
-	//otherwise display advanced read form
+	//otherwise display advanced read form (need to populate role vector also)
 	else
 	{
+		//simply call populateGrid function passing in today's week and running as week type
+        //get the date and change to a string
+		TDateTime dayChosenStart = dayCalendar->Date;
+		TDateTime dayChosenEnd = dayCalendar->Date;
+		String dbDayChosenStart = "";
+		String dbDayChosenEnd = "";
 
+		//get the week selected by the day selected from the calendar
+		while (DayOfWeek(dayChosenStart) != 7)
+			dayChosenStart--;
+		while (DayOfWeek(dayChosenEnd) != 1)
+			dayChosenEnd++;
+
+		//convert to strings to pass into populateGrid function
+		dbDayChosenStart = dayChosenStart.FormatString(L"yyyy-mm-dd");
+		dbDayChosenEnd = dayChosenEnd.FormatString(L"yyyy-mm-dd");
+		privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
+		privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
+
+		//call display function
+		populateGrid(roleVector, 0, dbDayChosenStart, dbDayChosenEnd, "week");
     }
 }
 //---------------------------------------------------------------------------
@@ -1153,6 +1195,13 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	secondTimeArbitrary = false;
 	dayCalendar->Visible = false;
 	rangeEndCalendar->Visible = false;
+	dayCalendar->Date = Now();
+	rangeEndCalendar->Date = Now();
+
+	//clear readGrid and set rowCount back to bare minimum (19)
+	for (int i = 0; i < 10; ++i)
+		for (int j = 0; j < readGrid->RowCount; ++j)
+			readGrid->Cells[i][j] = "";
 	readGrid->RowCount = 19;
 }
 
