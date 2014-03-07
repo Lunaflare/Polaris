@@ -27,13 +27,8 @@
 	-right now I am using a static number for this
 	-in db create table holding things we have in read table that are not roles
 .round to exact same number of decimal points in read as in excel?
-.add another way to view data in read that is a range of dates
-	-maybe not use week numbers at all any more for various reasons that I, Alex, can explain
-.certain roles should not be excluded from the filter in read
 .in month of read also need to pick a year
 	*or do we assume month and week are always the current year?
 .sometimes in read get error (floating point)
 .on calander if only change one of top drop down filters and don't actually click a date...doesn't select a new date
-.when calculate number of rows for grids need to do this dynamically as to what total possible number of roles is
-.read add extra calculations for daily to top left of grid (copy and paste?)
 .make occupancy percent calculations more effecient (less db queries)
