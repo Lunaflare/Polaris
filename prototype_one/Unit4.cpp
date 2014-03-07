@@ -276,7 +276,27 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		//continue populating items
 		//readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[0]->AsString;
 		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[2]->AsString;
-		readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 310.0) + " %";
+
+		//compute occupancy percent (involves querying db)
+		if (SameText(type, "month"))
+		{
+			Form3->SQLQuery3->SQL->Text = "SELECT COUNT(Date) FROM baldwins_hotel_data." + readTable + " WHERE MONTH(Date) = '" + monthChosen + "' AND Day_Of_Week = '" + Form3->SQLQuery2->Fields->Fields[1]->AsString + "';";
+			Form3->SQLQuery3->Open();
+			Form3->SQLQuery3->First();
+		}
+		else if (SameText(type, "year"))
+		{
+			Form3->SQLQuery3->SQL->Text = "SELECT COUNT(Date) FROM baldwins_hotel_data." + readTable + " WHERE YEAR(Date) = '" + monthChosen + "' AND Day_Of_Week = '" + Form3->SQLQuery2->Fields->Fields[1]->AsString + "';";
+			Form3->SQLQuery3->Open();
+			Form3->SQLQuery3->First();
+		}
+		else if (SameText(type, "week"))
+		{
+			Form3->SQLQuery3->SQL->Text = "SELECT COUNT(Date) FROM baldwins_hotel_data." + readTable + " WHERE Date BETWEEN '" + rangeStart + "' AND '" + rangeEnd + "' AND Day_Of_Week = '" + Form3->SQLQuery2->Fields->Fields[1]->AsString + "';";
+			Form3->SQLQuery3->Open();
+			Form3->SQLQuery3->First();
+		}
+		readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / (310.0 * Form3->SQLQuery3->Fields->Fields[0]->AsFloat)) + " %";
 
 		//fill with rest of non role type stuff
 		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[3]->AsString;
@@ -623,7 +643,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 	if (readGrid->Cells[indexOn][columnIndex - 8] == 0)
 		readGrid->Cells[indexOn][columnIndex++] = "$0";
 	else
-		readGrid->Cells[indexOn][columnIndex++] = commas(IntToStr(nearestDollar(toDouble(readGrid->Cells[indexOn][columnIndex-5]) - toDouble(readGrid->Cells[indexOn][columnIndex-4]))));
+		readGrid->Cells[indexOn][columnIndex++] = blank + "$" + commas(IntToStr(nearestDollar(toDouble(readGrid->Cells[indexOn][columnIndex-5]) - toDouble(readGrid->Cells[indexOn][columnIndex-4]))));
 
 	//fill productivity for man minutes per room cleaned
 	if (readGrid->Cells[indexOn][columnIndex - 10] == 0)
@@ -1162,6 +1182,24 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 			Form3->SQLQuery2->Next();
 		}
 
+		//make mandatory items' checkbox not enabled
+		for (int i = 0; i < roleListBox->Items->Count; ++i)
+			if (SameText(roleListBox->ItemByIndex(i)->Text, "AM Room Attendants"))
+			{
+				roleListBox->ItemByIndex(i)->IsChecked = true;
+				roleListBox->ItemByIndex(i)->Enabled = false;
+			}
+			else if (SameText(roleListBox->ItemByIndex(i)->Text, "PM Room Attendants"))
+			{
+				roleListBox->ItemByIndex(i)->IsChecked = true;
+				roleListBox->ItemByIndex(i)->Enabled = false;
+			}
+			else if (SameText(roleListBox->ItemByIndex(i)->Text, "Laundry Attendant"))
+			{
+				roleListBox->ItemByIndex(i)->IsChecked = true;
+				roleListBox->ItemByIndex(i)->Enabled = false;
+			}
+
 		//show roleListBox once populated with roles
 		selectAllButton->Text = "Select All";
 		selectAllButton->Visible = true;
@@ -1573,7 +1611,8 @@ void __fastcall TForm4::selectAllButtonClick(TObject *Sender)
 	{
 		//check all items
 		for (int i = 0; i < roleListBox->Items->Count; ++i)
-			roleListBox->ItemByIndex(i)->IsChecked = true;
+			if (roleListBox->ItemByIndex(i)->Enabled == true)
+				roleListBox->ItemByIndex(i)->IsChecked = true;
 
 		selectAllButton->Text = "Select None";
 	}
@@ -1581,7 +1620,8 @@ void __fastcall TForm4::selectAllButtonClick(TObject *Sender)
 	{
 		//check none of the items
 		for (int i = 0; i < roleListBox->Items->Count; ++i)
-			roleListBox->ItemByIndex(i)->IsChecked = false;
+			if (roleListBox->ItemByIndex(i)->Enabled == true)
+				roleListBox->ItemByIndex(i)->IsChecked = false;
 
 		selectAllButton->Text = "Select All";
 	}

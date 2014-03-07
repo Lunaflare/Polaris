@@ -36,3 +36,4 @@
 .on calander if only change one of top drop down filters and don't actually click a date...doesn't select a new date
 .when calculate number of rows for grids need to do this dynamically as to what total possible number of roles is
 .read add extra calculations for daily to top left of grid (copy and paste?)
+.make occupancy percent calculations more effecient (less db queries)
