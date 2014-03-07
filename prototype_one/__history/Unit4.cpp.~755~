@@ -21,13 +21,19 @@ __fastcall TForm4::TForm4(TComponent* Owner)
 //calculate what a value is as a percent to one decimal point
 float __fastcall TForm4::makePercent(float value)
 {
-	return floor(value * 100.0 * 10.0 + 0.5)/10.0;
+	/*if (value < 1)
+		return value;
+	else*/
+		return floor(value * 100.0 * 10.0 + 0.5)/10.0;
 }
 
 //round a decimal value to 2 places
 float __fastcall TForm4::roundTwo(float value)
 {
-	return floor(value * 100.0 + 0.5)/100.0;
+	/*if (value < 1)
+		return value;
+	else*/
+		return floor(value * 100.0 + 0.5)/100.0;
 }
 
 int __fastcall TForm4::nearestDollar(float value)
@@ -76,6 +82,10 @@ double __fastcall TForm4::toDouble(String gridString)
 //populate grid for when viewing by month, week, year, or arbitrary date range
 void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, String rangeStart, String rangeEnd, String type)
 {
+	//hide columns that will not be used
+	for (int i = readGrid->ColumnCount - 1; i > 2; --i)
+		readGrid->ColumnByIndex(i)->Visible = true;
+
 	//set rowCount to reflect the number of roles we will be adding (just added end add need to get the number of roles dynamically)
 	readGrid->RowCount = ((readGrid->RowCount + 5 * rVector.size()) - 3) + (11 - rVector.size());
 
@@ -164,7 +174,6 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 	}
 	else if (SameText(type, "week"))
 	{
-		//Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE Date >= '" + rangeStart + "' AND Date <= '" + rangeEnd + "' GROUP BY Day_Of_Week;";
 		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE Date BETWEEN '" + rangeStart + "' AND '" + rangeEnd + "' GROUP BY Day_Of_Week;";
 		Form3->SQLQuery2->Open();
 		Form3->SQLQuery2->First();
@@ -286,7 +295,12 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 			{
 				//if j == 2, these should be percents
 				if (j == 2)
-					readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+				{
+					if (Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat != 0)
+						readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat / Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
+					else
+                        readGrid->Cells[indexOn][columnIndex++] = "0%";
+				}
 				else if (j == 1)
 				{
 					//compute productivity man hours
@@ -340,7 +354,13 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
                         hoursVarianceTwo = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
 
 					if (j == 2)
-						readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+					{
+						if (Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat != 0)
+							readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat / Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
+						else
+							readGrid->Cells[indexOn][columnIndex++] = "0%";
+						//readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+					}
 					else
 						readGrid->Cells[indexOn][columnIndex++] = nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
 				}
@@ -353,7 +373,13 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 						costVarianceTwo = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
 
 					if (j == 2)
-						readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+					{
+						if (Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat != 0)
+							readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat / Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
+						else
+							readGrid->Cells[indexOn][columnIndex++] = "0%";
+						//readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+					}
 					else
 						readGrid->Cells[indexOn][columnIndex++] = blank + "$" + commas(IntToStr(nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat)));
 				}
@@ -398,6 +424,13 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		queryIndex = 9;
 		columnIndex = 0;
 		Form3->SQLQuery2->Next();
+
+		//put some counters back to zero
+		/*manMinutesRoomsCleaned
+		roomsCleanedPM
+		roomsCleanedAM
+		totalRoomsCleaned
+		productivityLaundry*/
 	}
 
 	//get what the productivity column is (probably ok to stay hardcoded)
@@ -1135,15 +1168,33 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 	else
 	{
 		//simply call populateGrid function passing in today's week and running as week type
+
+		//fill roleVector with all the roles currently possible
+		Form3->SQLQuery2->SQL->Text = "SELECT Bare_Role_Name FROM baldwins_hotel_data.role_table WHERE hotelID = '"+currentHotelID+"';";
+		Form3->SQLQuery2->Open();
+		Form3->SQLQuery2->First();
+		while (!Form3->SQLQuery2->Eof)
+		{
+			roleVector.push_back(Form3->SQLQuery2->Fields->Fields[0]->AsString);
+			Form3->SQLQuery2->Next();
+		}
+
         //get the date and change to a string
 		TDateTime dayChosenStart = dayCalendar->Date;
-		TDateTime dayChosenEnd = Now();
+		TDateTime dayChosenEnd = dayCalendar->Date;
 		String dbDayChosenStart = "";
 		String dbDayChosenEnd = "";
 
 		//get the week selected by the day selected from the calendar
 		while (DayOfWeek(dayChosenStart) != 7)
 			dayChosenStart--;
+		if (DayOfWeek(dayChosenEnd) == 7)
+		{
+			dayChosenEnd++;
+			dayChosenEnd++;
+		}
+		else if (DayOfWeek(dayChosenEnd) == 1)
+			dayChosenEnd++;
 		while (DayOfWeek(dayChosenEnd) != 1)
 			dayChosenEnd++;
 
@@ -1174,6 +1225,7 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 
 	//make items not visible again so in good shape upon reentry
 	nextImageButton2->Visible = false;
+	backImageButton2->Visible = false;
 	filtersLabel->Visible = false;
 	selectAllButton->Visible = false;
 	dayRadio->Visible = false;
@@ -1195,6 +1247,8 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	secondTimeArbitrary = false;
 	dayCalendar->Visible = false;
 	rangeEndCalendar->Visible = false;
+	dayCalendar->Date = Now();
+	rangeEndCalendar->Date = Now();
 
 	//clear readGrid and set rowCount back to bare minimum (19)
 	for (int i = 0; i < 10; ++i)
@@ -1349,6 +1403,13 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				//get the week selected by the day selected from the calendar
 				while (DayOfWeek(dayChosenStart) != 7)
 					dayChosenStart--;
+				if (DayOfWeek(dayChosenEnd) == 7)
+				{
+					dayChosenEnd++;
+					dayChosenEnd++;
+				}
+				else if (DayOfWeek(dayChosenEnd) == 1)
+					dayChosenEnd++;
 				while (DayOfWeek(dayChosenEnd) != 1)
 					dayChosenEnd++;
 
