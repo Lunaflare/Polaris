@@ -280,23 +280,21 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		//compute occupancy percent (involves querying db)
 		if (SameText(type, "month"))
 		{
-			Form3->SQLQuery3->SQL->Text = "SELECT COUNT(Date) FROM baldwins_hotel_data." + readTable + " WHERE MONTH(Date) = '" + monthChosen + "' AND Day_Of_Week = '" + Form3->SQLQuery2->Fields->Fields[1]->AsString + "';";
-			Form3->SQLQuery3->Open();
-			Form3->SQLQuery3->First();
+			readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 1240.0) + " %";
 		}
 		else if (SameText(type, "year"))
 		{
-			Form3->SQLQuery3->SQL->Text = "SELECT COUNT(Date) FROM baldwins_hotel_data." + readTable + " WHERE YEAR(Date) = '" + monthChosen + "' AND Day_Of_Week = '" + Form3->SQLQuery2->Fields->Fields[1]->AsString + "';";
-			Form3->SQLQuery3->Open();
-			Form3->SQLQuery3->First();
+			readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 14880.0) + " %";
+		}
+		else if (SameText(type, "week") && monthChosen == -1)
+		{
+			//arbitrary range
+			readGrid->Cells[indexOn][columnIndex++] = "N/A";
 		}
 		else if (SameText(type, "week"))
 		{
-			Form3->SQLQuery3->SQL->Text = "SELECT COUNT(Date) FROM baldwins_hotel_data." + readTable + " WHERE Date BETWEEN '" + rangeStart + "' AND '" + rangeEnd + "' AND Day_Of_Week = '" + Form3->SQLQuery2->Fields->Fields[1]->AsString + "';";
-			Form3->SQLQuery3->Open();
-			Form3->SQLQuery3->First();
+			readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 310.0) + " %";
 		}
-		readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / (310.0 * Form3->SQLQuery3->Fields->Fields[0]->AsFloat)) + " %";
 
 		//fill with rest of non role type stuff
 		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[3]->AsString;
@@ -447,13 +445,6 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		queryIndex = 9;
 		columnIndex = 0;
 		Form3->SQLQuery2->Next();
-
-		//put some counters back to zero
-		/*manMinutesRoomsCleaned
-		roomsCleanedPM
-		roomsCleanedAM
-		totalRoomsCleaned
-		productivityLaundry*/
 	}
 
 	//get what the productivity column is (probably ok to stay hardcoded)
@@ -567,11 +558,33 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		for (int j = 2; j < 9; ++j)
 			totalCounter += toDouble(readGrid->Cells[j][columnIndex]);
 
+		//compute occupancy percent
 		if (columnIndex == 0)
-			occupancyPercent = totalCounter / 8680.0;
+		{
+			if (SameText(type, "month"))
+			{
+				occupancyPercent = totalCounter / 8680.0;
+			}
+			else if (SameText(type, "year"))
+			{
+				occupancyPercent = totalCounter / 104160.0;
+            }
+			else if (SameText(type, "week") && monthChosen == -1)
+			{
+				//arbitrary range
+				occupancyPercent = -1;
+			}
+			else if (SameText(type, "week"))
+			{
+				occupancyPercent = totalCounter / 2170.0;
+			}
+		}
 
 		if (columnIndex == 1)
-			readGrid->Cells[indexOn][columnIndex] = blank + makePercent(occupancyPercent) + "%";
+			if (occupancyPercent != -1)
+				readGrid->Cells[indexOn][columnIndex] = blank + makePercent(occupancyPercent) + "%";
+			else
+				readGrid->Cells[indexOn][columnIndex] = "N/A";
 		else
 			readGrid->Cells[indexOn][columnIndex] = totalCounter;
 		totalCounter = 0;
@@ -1464,7 +1477,7 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
 
 				//call display function (should work same with week as with arbitrary)
-				populateGrid(roleVector, 0, dbDayChosenStart, dbDayChosenEnd, "week");
+				populateGrid(roleVector, -1, dbDayChosenStart, dbDayChosenEnd, "week");
             }
 			else if (viewType == "Month")
 			{
