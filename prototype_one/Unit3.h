@@ -132,6 +132,8 @@ __published:	// IDE-managed Components
 	TImage *useArrowsImage;
 	TFloatAnimation *FloatAnimation9;
 	TLabel *errorLabel;
+	TImage *errorImage;
+	TFloatAnimation *opacityFadeIn;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton3Click(TObject *Sender);
