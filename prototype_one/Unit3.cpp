@@ -617,8 +617,8 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 			//compute values used below this while loop in actual update query
 			totalLaborHoursHoursPaid += actual;
 			totalLaborHoursStandardHours += labor;
-			totalLaborCostHoursPaid += (actual * roleWages);
-			totalLaborCostStandardHours += (labor * roleWages);
+			totalLaborCostHoursPaid = totalLaborCostHoursPaid + (actual * roleWages);
+			totalLaborCostStandardHours = totalLaborCostStandardHours + (labor * roleWages);
 
 			//reset strings and doubles to empty for next iteration
 			roleName = "";
@@ -682,6 +682,7 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 			totalLaborCostPercentPerformance = totalLaborCostStandardHours / totalLaborCostHoursPaid;
 		else
 			totalLaborCostPercentPerformance = 0;
+		totalLaborCostHoursPaid += overtimePercentPerformance;
 		String spaceTaker = "";
 		update += (spaceTaker + "Overtime_Hours_Paid = '" + overtimeHoursPaid + "', " + "Overtime_Standard_Hours = '" + overtimeStandardHours + "', " + "Overtime_Percent_Performance = '" + overtimePercentPerformance + "', ");
 		update += (spaceTaker + "Total_Labor_Hours_Hours_Paid = '" + totalLaborHoursHoursPaid + "', " + "Total_Labor_Hours_Standard_Hours = '" + totalLaborHoursStandardHours + "', " + "Total_Labor_Hours_Percent_Performance = '" + totalLaborHoursPercentPerformance + "', ");

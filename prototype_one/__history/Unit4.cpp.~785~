@@ -162,7 +162,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 	//construct actual query
 	if (SameText(type, "month"))
 	{
-		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE MONTH(Date) = '" + monthChosen + "' GROUP BY Day_Of_Week;";
+		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE MONTH(Date) = '" + monthChosen + "' AND YEAR(Date) = '" + monthYearSelected + "' GROUP BY Day_Of_Week;";
 		Form3->SQLQuery2->Open();
 		Form3->SQLQuery2->First();
 	}
@@ -1184,11 +1184,21 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 
 		//make mandatory items' checkbox not enabled
 		for (int i = 0; i < roleListBox->Items->Count; ++i)
-			if (SameText(roleListBox->ItemByIndex(i)->Text, "AM Rooms Cleaned"))
+			if (SameText(roleListBox->ItemByIndex(i)->Text, "AM Room Attendants"))
 			{
 				roleListBox->ItemByIndex(i)->IsChecked = true;
 				roleListBox->ItemByIndex(i)->Enabled = false;
-            }
+			}
+			else if (SameText(roleListBox->ItemByIndex(i)->Text, "PM Room Attendants"))
+			{
+				roleListBox->ItemByIndex(i)->IsChecked = true;
+				roleListBox->ItemByIndex(i)->Enabled = false;
+			}
+			else if (SameText(roleListBox->ItemByIndex(i)->Text, "Laundry Attendant"))
+			{
+				roleListBox->ItemByIndex(i)->IsChecked = true;
+				roleListBox->ItemByIndex(i)->Enabled = false;
+			}
 
 		//show roleListBox once populated with roles
 		selectAllButton->Text = "Select All";
@@ -1271,6 +1281,7 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	yearRadio->IsChecked = false;
 	selectAllButton->Text = "Select All";
 	roleListBox->Items->Clear();
+	roleListBox->Visible = false;
 	roleVector.clear();
 	monthPopupBox->ItemIndex = 0;
 	yearPopupBox->ItemIndex = 0;
@@ -1389,6 +1400,7 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				{
 					//show monthPopupBox with months as items
 					monthPopupBox->Visible = true;
+					yearPopupBox->Visible = true;
 				}
 				else
 				{
@@ -1434,14 +1446,14 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				//get the week selected by the day selected from the calendar
 				while (DayOfWeek(dayChosenStart) != 7)
 					dayChosenStart--;
-				if (DayOfWeek(dayChosenEnd) == 7)
+				if (DayOfWeek(dayChosenEnd) == 5)
 				{
 					dayChosenEnd++;
 					dayChosenEnd++;
 				}
-				else if (DayOfWeek(dayChosenEnd) == 1)
+				else if (DayOfWeek(dayChosenEnd) == 6)
 					dayChosenEnd++;
-				while (DayOfWeek(dayChosenEnd) != 1)
+				while (DayOfWeek(dayChosenEnd) != 6)
 					dayChosenEnd++;
 
 				//convert to strings to pass into populateGrid function
@@ -1472,6 +1484,11 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			{
 				//get the month selected from the drop down (value 1 through 12)
 				int currentMonthIndex = monthPopupBox->ItemIndex + 1;
+
+				//get the year selected from the drop down
+				int currentYearIndex = yearPopupBox->ItemIndex;
+				String currentYear = yearPopupBox->Items->operator [](currentYearIndex);
+                monthYearSelected = ((int) toDouble(currentYear));
 
 				//call display function
 				populateGrid(roleVector, currentMonthIndex, "null", "null", "month");
@@ -1601,7 +1618,8 @@ void __fastcall TForm4::selectAllButtonClick(TObject *Sender)
 	{
 		//check all items
 		for (int i = 0; i < roleListBox->Items->Count; ++i)
-			roleListBox->ItemByIndex(i)->IsChecked = true;
+			if (roleListBox->ItemByIndex(i)->Enabled == true)
+				roleListBox->ItemByIndex(i)->IsChecked = true;
 
 		selectAllButton->Text = "Select None";
 	}
@@ -1609,7 +1627,8 @@ void __fastcall TForm4::selectAllButtonClick(TObject *Sender)
 	{
 		//check none of the items
 		for (int i = 0; i < roleListBox->Items->Count; ++i)
-			roleListBox->ItemByIndex(i)->IsChecked = false;
+			if (roleListBox->ItemByIndex(i)->Enabled == true)
+				roleListBox->ItemByIndex(i)->IsChecked = false;
 
 		selectAllButton->Text = "Select All";
 	}

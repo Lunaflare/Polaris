@@ -32,3 +32,7 @@
 .sometimes in read get error (floating point)
 .on calander if only change one of top drop down filters and don't actually click a date...doesn't select a new date
 .make occupancy percent calculations more effecient (less db queries)
+.changed in role table managers role wages from 21.47 to 23.55 to match how is in 2013 newer labor stds
+.changed hotel_ref avg pay per hour from 14.23 to 15.86 and overtime per hour from 21.34 to 23.79
+.rooms occupied percent not correct for week (need to also adjust query here for month to include new year parameter)
+.labor cost calculation should also add overtime premium cost
