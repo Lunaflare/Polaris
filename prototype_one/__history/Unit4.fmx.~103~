@@ -53,7 +53,7 @@ object Form4: TForm4
     Position.Y = 16.000000000000000000
     StyleLookup = 'gridstyle'
     Visible = False
-    Width = 969.000000000000000000
+    Width = 977.000000000000000000
     ReadOnly = True
     RowCount = 19
     RowHeight = 21.000000000000000000
@@ -12727,6 +12727,7 @@ object Form4: TForm4
       Text = 'Day'
       Visible = False
       Width = 120.000000000000000000
+      OnClick = dayRadioClick
     end
     object weekRadio: TRadioButton
       DisableFocusEffect = False
@@ -12736,6 +12737,7 @@ object Form4: TForm4
       Text = 'Week'
       Visible = False
       Width = 120.000000000000000000
+      OnClick = weekRadioClick
     end
     object arbitraryRadio: TRadioButton
       DisableFocusEffect = False
@@ -12745,6 +12747,7 @@ object Form4: TForm4
       Text = 'Arbitrary Range'
       Visible = False
       Width = 120.000000000000000000
+      OnClick = arbitraryRadioClick
     end
     object monthRadio: TRadioButton
       DisableFocusEffect = False
@@ -12754,6 +12757,7 @@ object Form4: TForm4
       Text = 'Month'
       Visible = False
       Width = 120.000000000000000000
+      OnClick = monthRadioClick
     end
     object yearRadio: TRadioButton
       DisableFocusEffect = False
@@ -12763,6 +12767,31 @@ object Form4: TForm4
       Text = 'Year'
       Visible = False
       Width = 120.000000000000000000
+      OnClick = yearRadioClick
+    end
+  end
+  object rangeTabContainger: TTabControl
+    Height = 200.000000000000000000
+    Position.X = 20.000000000000000000
+    Position.Y = 430.000000000000000000
+    TabIndex = 0
+    Visible = False
+    Width = 200.000000000000000000
+    object dayCalendarTab: TTabItem
+      WordWrap = False
+      Height = 24.000000000000000000
+      IsSelected = True
+      Position.X = 1.000000000000000000
+      Text = 'start'
+      Width = 43.000000000000000000
+    end
+    object rangeEndCalendarTab: TTabItem
+      WordWrap = False
+      Height = 24.000000000000000000
+      IsSelected = False
+      Position.X = 44.000000000000000000
+      Text = 'end'
+      Width = 39.000000000000000000
     end
   end
 end

@@ -11,6 +11,7 @@
 #include <FMX.ExtCtrls.hpp>
 #include <FMX.Menus.hpp>
 #include <FMX.Grid.hpp>
+#include <FMX.TabControl.hpp>
 //---------------------------------------------------------------------------
 #include <vector>
 #include <iostream>
@@ -59,6 +60,12 @@ __published:	// IDE-managed Components
 	TRadioButton *arbitraryRadio;
 	TCalendar *rangeEndCalendar;
 	TGroupBox *radioGroupBox;
+	TTabControl *rangeTabContainer;
+	TTabItem *dayCalendarTab;
+	TTabItem *rangeEndCalendarTab;
+	TCalendar *filterStartCalendar;
+	TCalendar *filterEndCalendar;
+	TImage *updateImageButton;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton4Click(TObject *Sender);
@@ -66,7 +73,11 @@ __published:	// IDE-managed Components
 	void __fastcall backImageButton2Click(TObject *Sender);
 	void __fastcall selectAllButtonClick(TObject *Sender);
 	void __fastcall roleListBoxChangeCheck(TObject *Sender);
-	void __fastcall radioGroupBoxClick(TObject *Sender);
+	void __fastcall dayRadioClick(TObject *Sender);
+	void __fastcall weekRadioClick(TObject *Sender);
+	void __fastcall arbitraryRadioClick(TObject *Sender);
+	void __fastcall monthRadioClick(TObject *Sender);
+	void __fastcall yearRadioClick(TObject *Sender);
 private:	// User declarations
 	String inputTable;
 	String readTable;

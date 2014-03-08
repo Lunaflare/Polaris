@@ -58,6 +58,7 @@ __published:	// IDE-managed Components
 	TStringColumn *StringColumn10;
 	TRadioButton *arbitraryRadio;
 	TCalendar *rangeEndCalendar;
+	TGroupBox *radioGroupBox;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton4Click(TObject *Sender);
@@ -65,6 +66,7 @@ __published:	// IDE-managed Components
 	void __fastcall backImageButton2Click(TObject *Sender);
 	void __fastcall selectAllButtonClick(TObject *Sender);
 	void __fastcall roleListBoxChangeCheck(TObject *Sender);
+	void __fastcall radioGroupBoxClick(TObject *Sender);
 private:	// User declarations
 	String inputTable;
 	String readTable;
@@ -86,6 +88,7 @@ public:		// User declarations
 	string __fastcall IntToStr(long int n);
 	String __fastcall commas(string num);
 	double __fastcall toDouble(String);
+	void __fastcall displayFilters(String, int);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm4 *Form4;

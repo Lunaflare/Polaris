@@ -12712,11 +12712,12 @@ object Form4: TForm4
     Visible = False
     Width = 80.000000000000000000
   end
-  object GroupBox1: TGroupBox
+  object radioGroupBox: TGroupBox
     Height = 137.000000000000000000
-    Position.X = 32.000000000000000000
-    Position.Y = 232.000000000000000000
+    Position.X = 360.000000000000000000
+    Position.Y = 448.000000000000000000
     Text = 'Interval'
+    Visible = False
     Width = 153.000000000000000000
     object dayRadio: TRadioButton
       DisableFocusEffect = False
@@ -12726,6 +12727,7 @@ object Form4: TForm4
       Text = 'Day'
       Visible = False
       Width = 120.000000000000000000
+      OnClick = dayRadioClick
     end
     object weekRadio: TRadioButton
       DisableFocusEffect = False
@@ -12735,6 +12737,7 @@ object Form4: TForm4
       Text = 'Week'
       Visible = False
       Width = 120.000000000000000000
+      OnClick = weekRadioClick
     end
     object arbitraryRadio: TRadioButton
       DisableFocusEffect = False
@@ -12744,6 +12747,7 @@ object Form4: TForm4
       Text = 'Arbitrary Range'
       Visible = False
       Width = 120.000000000000000000
+      OnClick = arbitraryRadioClick
     end
     object monthRadio: TRadioButton
       DisableFocusEffect = False
@@ -12753,6 +12757,7 @@ object Form4: TForm4
       Text = 'Month'
       Visible = False
       Width = 120.000000000000000000
+      OnClick = monthRadioClick
     end
     object yearRadio: TRadioButton
       DisableFocusEffect = False
@@ -12762,6 +12767,7 @@ object Form4: TForm4
       Text = 'Year'
       Visible = False
       Width = 120.000000000000000000
+      OnClick = yearRadioClick
     end
   end
 end

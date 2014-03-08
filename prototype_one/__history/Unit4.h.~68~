@@ -57,6 +57,8 @@ __published:	// IDE-managed Components
 	TStringColumn *StringColumn9;
 	TStringColumn *StringColumn10;
 	TRadioButton *arbitraryRadio;
+	TCalendar *rangeEndCalendar;
+	TGroupBox *radioGroupBox;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton4Click(TObject *Sender);
@@ -64,6 +66,8 @@ __published:	// IDE-managed Components
 	void __fastcall backImageButton2Click(TObject *Sender);
 	void __fastcall selectAllButtonClick(TObject *Sender);
 	void __fastcall roleListBoxChangeCheck(TObject *Sender);
+	void __fastcall radioGroupBoxClick(TObject *Sender);
+	void __fastcall dayRadioClick(TObject *Sender);
 private:	// User declarations
 	String inputTable;
 	String readTable;
@@ -74,6 +78,7 @@ private:	// User declarations
 	String privateDayChosenStart;
 	String privateDayChosenEnd;
 	bool secondTimeArbitrary;
+	int monthYearSelected;
 public:		// User declarations
 	__fastcall TForm4(TComponent* Owner);
 	void __fastcall populateGrid(vector<String>, String);
@@ -84,6 +89,7 @@ public:		// User declarations
 	string __fastcall IntToStr(long int n);
 	String __fastcall commas(string num);
 	double __fastcall toDouble(String);
+	void __fastcall displayFilters(String, int);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm4 *Form4;

@@ -61,7 +61,26 @@ void __fastcall TForm4::displayFilters(String filterType, int arbitraryIdentifie
 	yearRadio->Position->Y = 400;*/
 
 	//show selectors depending on what radio button is currently
+	if (dayRadio->IsChecked)
+	{
 
+	}
+	else if (weekRadio->IsChecked)
+	{
+
+	}
+	else if (arbitraryRadio->IsChecked)
+	{
+
+	}
+	else if (monthRadio->IsChecked)
+	{
+
+	}
+	else if (yearRadio->IsChecked)
+	{
+
+	}
 
 	//make all filters visible
 	selectAllButton->Visible = true;
@@ -72,6 +91,7 @@ void __fastcall TForm4::displayFilters(String filterType, int arbitraryIdentifie
 	monthRadio->Visible = true;
 	yearRadio->Visible = true;
 	radioGroupBox->Visible = true;
+	updateImageButton->Visible = true;
 }
 
 //calculate what a value is as a percent to one decimal point
@@ -1721,16 +1741,113 @@ void __fastcall TForm4::roleListBoxChangeCheck(TObject *Sender)
 	else
 	{
 		selectAllButton->Text = "Select All";
-    }
+	}
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TForm4::radioGroupBoxClick(TObject *Sender)
+void __fastcall TForm4::dayRadioClick(TObject *Sender)
 {
-	//check which radio is selected only if grid is visible
-	if (!readGrid->Visible)
-		return;
+	//hide everything that could be made visible in other radio on clicks
+	rangeTabContainer->Visible = false;
+	monthPopupBox->Visible = false;
+	yearPopupBox->Visible = false;
 
+	if (!readGrid->IsVisible)
+		return;
+	else
+	{
+		int dayCalendarX = dayCalendar->Position->X;
+		int dayCalendarY = dayCalendar->Position->Y;
+		dayCalendar->Position->X = 20;
+		dayCalendar->Position->Y = 430;
+		dayCalendar->Scale->X = 1.25;
+		dayCalendar->Scale->Y = 1.25;
+		dayCalendar->Visible = true;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::weekRadioClick(TObject *Sender)
+{
+	//hide everything that could be made visible in other radio on clicks
+	rangeTabContainer->Visible = false;
+	monthPopupBox->Visible = false;
+	yearPopupBox->Visible = false;
+
+	if (!readGrid->IsVisible)
+		return;
+	else
+	{
+		int dayCalendarX = dayCalendar->Position->X;
+		int dayCalendarY = dayCalendar->Position->Y;
+		dayCalendar->Position->X = 20;
+		dayCalendar->Position->Y = 430;
+		dayCalendar->Scale->X = 1.25;
+		dayCalendar->Scale->Y = 1.25;
+		dayCalendar->Visible = true;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::arbitraryRadioClick(TObject *Sender)
+{
+	//hide everything that could be made visible in other radio on clicks
+	dayCalendar->Visible = false;
+	monthPopupBox->Visible = false;
+	yearPopupBox->Visible = false;
+
+	if (!readGrid->IsVisible)
+		return;
+	else
+	{
+		rangeTabContainer->Visible = true;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::monthRadioClick(TObject *Sender)
+{
+	//hide everything that could be made visible in other radio on clicks
+	dayCalendar->Visible = false;
+	rangeTabContainer->Visible = false;
+
+	if (!readGrid->IsVisible)
+		return;
+	else
+	{
+		int monthPopupBoxX = monthPopupBox->Position->X;
+		int monthPopupBoxY = monthPopupBox->Position->Y;
+		monthPopupBox->Position->X = 20;
+		monthPopupBox->Position->Y = 430;
+		monthPopupBox->Visible = true;
+
+		int yearPopupBoxX = yearPopupBox->Position->X;
+		int yearPopupBoxY = yearPopupBox->Position->Y;
+		yearPopupBox->Position->X = 120;
+		yearPopupBox->Position->Y = 430;
+		yearPopupBox->Visible = true;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::yearRadioClick(TObject *Sender)
+{
+	//hide everything that could be made visible in other radio on clicks
+	dayCalendar->Visible = false;
+	rangeTabContainer->Visible = false;
+	monthPopupBox->Visible = false;
+	yearPopupBox->Visible = false;
+
+	if (!readGrid->IsVisible)
+		return;
+	else
+	{
+		int yearPopupBoxX = yearPopupBox->Position->X;
+		int yearPopupBoxY = yearPopupBox->Position->Y;
+		yearPopupBox->Position->X = 20;
+		yearPopupBox->Position->Y = 430;
+		yearPopupBox->Visible = true;
+	}
 }
 //---------------------------------------------------------------------------
 

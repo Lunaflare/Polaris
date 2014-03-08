@@ -11,6 +11,29 @@ object Form4: TForm4
   FormFactor.Devices = [dkDesktop]
   OnClose = FormClose
   OnShow = FormShow
+  object dayCalendar: TCalendar
+    ClipChildren = False
+    Date = 41706.000000000000000000
+    EnableDragHighlight = False
+    Height = 164.000000000000000000
+    Position.X = 296.000000000000000000
+    Position.Y = 360.000000000000000000
+    Scale.X = 1.500000000000000000
+    Scale.Y = 1.500000000000000000
+    TodayDefault = True
+    Visible = False
+    Width = 182.000000000000000000
+  end
+  object roleListBox: TListBox
+    Touch.InteractiveGestures = [igPan]
+    Height = 217.000000000000000000
+    Position.X = 240.000000000000000000
+    Position.Y = 384.000000000000000000
+    Visible = False
+    Width = 225.000000000000000000
+    ShowCheckboxes = True
+    OnChangeCheck = roleListBoxChangeCheck
+  end
   object rangeEndCalendar: TCalendar
     ClipChildren = False
     Date = 41706.000000000000000000
@@ -12644,42 +12667,6 @@ object Form4: TForm4
     Width = 82.000000000000000000
     OnClick = backImageButton2Click
   end
-  object dayRadio: TRadioButton
-    DisableFocusEffect = False
-    Height = 19.000000000000000000
-    Position.X = 384.000000000000000000
-    Position.Y = 432.000000000000000000
-    Text = 'Day'
-    Visible = False
-    Width = 120.000000000000000000
-  end
-  object weekRadio: TRadioButton
-    DisableFocusEffect = False
-    Height = 19.000000000000000000
-    Position.X = 384.000000000000000000
-    Position.Y = 464.000000000000000000
-    Text = 'Week'
-    Visible = False
-    Width = 120.000000000000000000
-  end
-  object monthRadio: TRadioButton
-    DisableFocusEffect = False
-    Height = 19.000000000000000000
-    Position.X = 384.000000000000000000
-    Position.Y = 528.000000000000000000
-    Text = 'Month'
-    Visible = False
-    Width = 120.000000000000000000
-  end
-  object yearRadio: TRadioButton
-    DisableFocusEffect = False
-    Height = 19.000000000000000000
-    Position.X = 384.000000000000000000
-    Position.Y = 560.000000000000000000
-    Text = 'Year'
-    Visible = False
-    Width = 120.000000000000000000
-  end
   object selectAllButton: TButton
     DisableFocusEffect = False
     Height = 22.000000000000000000
@@ -12725,36 +12712,58 @@ object Form4: TForm4
     Visible = False
     Width = 80.000000000000000000
   end
-  object arbitraryRadio: TRadioButton
-    DisableFocusEffect = False
-    Height = 19.000000000000000000
-    Position.X = 384.000000000000000000
-    Position.Y = 496.000000000000000000
-    Text = 'Arbitrary Range'
+  object radioGroupBox: TGroupBox
+    Height = 137.000000000000000000
+    Position.X = 360.000000000000000000
+    Position.Y = 448.000000000000000000
+    Text = 'Interval'
     Visible = False
-    Width = 120.000000000000000000
-  end
-  object dayCalendar: TCalendar
-    ClipChildren = False
-    Date = 41706.000000000000000000
-    EnableDragHighlight = False
-    Height = 164.000000000000000000
-    Position.X = 296.000000000000000000
-    Position.Y = 360.000000000000000000
-    Scale.X = 1.500000000000000000
-    Scale.Y = 1.500000000000000000
-    TodayDefault = True
-    Visible = False
-    Width = 182.000000000000000000
-  end
-  object roleListBox: TListBox
-    Touch.InteractiveGestures = [igPan]
-    Height = 217.000000000000000000
-    Position.X = 240.000000000000000000
-    Position.Y = 384.000000000000000000
-    Visible = False
-    Width = 225.000000000000000000
-    ShowCheckboxes = True
-    OnChangeCheck = roleListBoxChangeCheck
+    Width = 153.000000000000000000
+    object dayRadio: TRadioButton
+      DisableFocusEffect = False
+      Height = 19.000000000000000000
+      Position.X = 8.000000000000000000
+      Position.Y = 17.000000000000000000
+      Text = 'Day'
+      Visible = False
+      Width = 120.000000000000000000
+      OnClick = dayRadioClick
+    end
+    object weekRadio: TRadioButton
+      DisableFocusEffect = False
+      Height = 19.000000000000000000
+      Position.X = 8.000000000000000000
+      Position.Y = 40.000000000000000000
+      Text = 'Week'
+      Visible = False
+      Width = 120.000000000000000000
+    end
+    object arbitraryRadio: TRadioButton
+      DisableFocusEffect = False
+      Height = 19.000000000000000000
+      Position.X = 9.000000000000000000
+      Position.Y = 63.000000000000000000
+      Text = 'Arbitrary Range'
+      Visible = False
+      Width = 120.000000000000000000
+    end
+    object monthRadio: TRadioButton
+      DisableFocusEffect = False
+      Height = 19.000000000000000000
+      Position.X = 9.000000000000000000
+      Position.Y = 86.000000000000000000
+      Text = 'Month'
+      Visible = False
+      Width = 120.000000000000000000
+    end
+    object yearRadio: TRadioButton
+      DisableFocusEffect = False
+      Height = 19.000000000000000000
+      Position.X = 9.000000000000000000
+      Position.Y = 109.000000000000000000
+      Text = 'Year'
+      Visible = False
+      Width = 120.000000000000000000
+    end
   end
 end

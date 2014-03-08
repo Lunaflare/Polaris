@@ -1721,10 +1721,113 @@ void __fastcall TForm4::roleListBoxChangeCheck(TObject *Sender)
 	else
 	{
 		selectAllButton->Text = "Select All";
-    }
+	}
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TForm4::dayRadioClick(TObject *Sender)
+{
+	//hide everything that could be made visible in other radio on clicks
+	rangeTabContainer->Visible = false;
+	monthPopupBox->Visible = false;
+	yearPopupBox->Visible = false;
 
+	if (!readGrid->IsVisible)
+		return;
+	else
+	{
+		int dayCalendarX = dayCalendar->Position->X;
+		int dayCalendarY = dayCalendar->Position->Y;
+		dayCalendar->Position->X = 20;
+		dayCalendar->Position->Y = 430;
+		dayCalendar->Scale->X = 1.25;
+		dayCalendar->Scale->Y = 1.25;
+		dayCalendar->Visible = true;
+	}
+}
+//---------------------------------------------------------------------------
 
+void __fastcall TForm4::weekRadioClick(TObject *Sender)
+{
+	//hide everything that could be made visible in other radio on clicks
+	rangeTabContainer->Visible = false;
+	monthPopupBox->Visible = false;
+	yearPopupBox->Visible = false;
+
+	if (!readGrid->IsVisible)
+		return;
+	else
+	{
+		int dayCalendarX = dayCalendar->Position->X;
+		int dayCalendarY = dayCalendar->Position->Y;
+		dayCalendar->Position->X = 20;
+		dayCalendar->Position->Y = 430;
+		dayCalendar->Scale->X = 1.25;
+		dayCalendar->Scale->Y = 1.25;
+		dayCalendar->Visible = true;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::arbitraryRadioClick(TObject *Sender)
+{
+	//hide everything that could be made visible in other radio on clicks
+	dayCalendar->Visible = false;
+	monthPopupBox->Visible = false;
+	yearPopupBox->Visible = false;
+
+	if (!readGrid->IsVisible)
+		return;
+	else
+	{
+		rangeTabContainer->Visible = true;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::monthRadioClick(TObject *Sender)
+{
+	//hide everything that could be made visible in other radio on clicks
+	dayCalendar->Visible = false;
+	rangeTabContainer->Visible = false;
+
+	if (!readGrid->IsVisible)
+		return;
+	else
+	{
+		int monthPopupBoxX = monthPopupBox->Position->X;
+		int monthPopupBoxY = monthPopupBox->Position->Y;
+		monthPopupBox->Position->X = 20;
+		monthPopupBox->Position->Y = 430;
+		monthPopupBox->Visible = true;
+
+		int yearPopupBoxX = yearPopupBox->Position->X;
+		int yearPopupBoxY = yearPopupBox->Position->Y;
+		yearPopupBox->Position->X = 120;
+		yearPopupBox->Position->Y = 430;
+		yearPopupBox->Visible = true;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::yearRadioClick(TObject *Sender)
+{
+	//hide everything that could be made visible in other radio on clicks
+	dayCalendar->Visible = false;
+	rangeTabContainer->Visible = false;
+	monthPopupBox->Visible = false;
+	yearPopupBox->Visible = false;
+
+	if (!readGrid->IsVisible)
+		return;
+	else
+	{
+		int dayCalendarX = selectAllButton->Position->X;
+		int dayCalendarY = selectAllButton->Position->Y;
+		dayCalendar->Position->X = 20;
+		dayCalendar->Position->Y = 400;
+		dayCalendar->Visible = true;
+	}
+}
+//---------------------------------------------------------------------------
 

@@ -35,7 +35,11 @@ void __fastcall TForm4::displayFilters(String filterType, int arbitraryIdentifie
 	roleListBox->Position->Y = 50;
 
 	//move radio buttons to center left of screen
-	int dayRadioX = dayRadio->Position->X;
+	int radioGroupBoxX = radioGroupBox->Position->X;
+	int radioGroupBoxY = radioGroupBox->Position->Y;
+	radioGroupBox->Position->X = 20;
+	radioGroupBox->Position->Y = 280;
+	/*int dayRadioX = dayRadio->Position->X;
 	int dayRadioY = dayRadio->Position->Y;
 	dayRadio->Position->X = 20;
 	dayRadio->Position->Y = 280;
@@ -54,7 +58,7 @@ void __fastcall TForm4::displayFilters(String filterType, int arbitraryIdentifie
 	int yearRadioX = yearRadio->Position->X;
 	int yearRadioY = yearRadio->Position->Y;
 	yearRadio->Position->X = 20;
-	yearRadio->Position->Y = 400;
+	yearRadio->Position->Y = 400;*/
 
 	//show selectors depending on what radio button is currently
 
@@ -67,6 +71,7 @@ void __fastcall TForm4::displayFilters(String filterType, int arbitraryIdentifie
 	arbitraryRadio->Visible = true;
 	monthRadio->Visible = true;
 	yearRadio->Visible = true;
+	radioGroupBox->Visible = true;
 }
 
 //calculate what a value is as a percent to one decimal point
@@ -1661,6 +1666,7 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 				arbitraryRadio->Visible = true;
 				monthRadio->Visible = true;
 				yearRadio->Visible = true;
+				radioGroupBox->Visible = true;
 			}
 
 			break;
@@ -1715,10 +1721,100 @@ void __fastcall TForm4::roleListBoxChangeCheck(TObject *Sender)
 	else
 	{
 		selectAllButton->Text = "Select All";
-    }
+	}
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TForm4::dayRadioClick(TObject *Sender)
+{
+	//hide everything that could be made visible in other radio on clicks
+    rangeTabContainer->Visible = false;
 
+	if (!readGrid->IsVisible)
+		return;
+	else
+	{
+		int dayCalendarX = dayCalendar->Position->X;
+		int dayCalendarY = dayCalendar->Position->Y;
+		dayCalendar->Position->X = 20;
+		dayCalendar->Position->Y = 430;
+		dayCalendar->Scale->X = 1.25;
+		dayCalendar->Scale->Y = 1.25;
+		dayCalendar->Visible = true;
+	}
+}
+//---------------------------------------------------------------------------
 
+void __fastcall TForm4::weekRadioClick(TObject *Sender)
+{
+	//hide everything that could be made visible in other radio on clicks
+	rangeTabContainer->Visible = false;
+
+	if (!readGrid->IsVisible)
+		return;
+	else
+	{
+		int dayCalendarX = dayCalendar->Position->X;
+		int dayCalendarY = dayCalendar->Position->Y;
+		dayCalendar->Position->X = 20;
+		dayCalendar->Position->Y = 430;
+		dayCalendar->Scale->X = 1.25;
+		dayCalendar->Scale->Y = 1.25;
+		dayCalendar->Visible = true;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::arbitraryRadioClick(TObject *Sender)
+{
+	//hide everything that could be made visible in other radio on clicks
+	dayCalendar->Visible = false;
+
+	if (!readGrid->IsVisible)
+		return;
+	else
+	{
+		rangeTabContainer->Visible = true;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::monthRadioClick(TObject *Sender)
+{
+	//hide everything that could be made visible in other radio on clicks
+	dayCalendar->Visible = false;
+	rangeTabContainer->Visible = false;
+
+	if (!readGrid->IsVisible)
+		return;
+	else
+	{
+		int monthPopupBoxX = monthPopupBox->Position->X;
+		int monthPopupBoxY = monthPopupBox->Position->Y;
+		monthPopupBox->Position->X = 20;
+		monthPopupBox->Position->Y = 430;
+		monthPopupBox->Visible = true;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::yearRadioClick(TObject *Sender)
+{
+	//hide everything that could be made visible in other radio on clicks
+	dayCalendar->Visible = false;
+	rangeTabContainer->Visible = false;
+	monthPopupBox->Visible = false;
+
+	if (!readGrid->IsVisible)
+		return;
+	else
+	{
+		int dayCalendarX = selectAllButton->Position->X;
+		int dayCalendarY = selectAllButton->Position->Y;
+		dayCalendar->Position->X = 20;
+		dayCalendar->Position->Y = 400;
+		dayCalendar->Visible = true;
+	}
+}
+//---------------------------------------------------------------------------
 
