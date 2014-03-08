@@ -168,6 +168,7 @@ void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
 	displayGrid->Visible = false;
 	submitButton->Visible = false;
 	Image1->Visible=false;
+	errorImage->Visible=false;
 
 	//set calendar choice back to current date
 	calendar->Date = Now();
@@ -206,7 +207,7 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 				{
 					if(inputString[i+1]<48 || inputString[i+1]>57)
 					{
-                        dbFieldEdit->Text="";
+						dbFieldEdit->Text="";
 						errorLabel->Visible=true;
 						return;
 					}
@@ -407,6 +408,7 @@ void __fastcall TForm3::backImageButtonClick(TObject *Sender)
 {
 	//make sure the error label does not appear
 	errorLabel->Visible=false;
+	errorImage->Visible=false;
 
 	//for when grid displayed and back button pressed
 	if (displayGrid->Visible)
@@ -434,7 +436,44 @@ void __fastcall TForm3::backImageButtonClick(TObject *Sender)
 //ask user if sure, yes == submit and no == do nothing
 void __fastcall TForm3::submitButtonClick(TObject *Sender)
 {
+		//fade out Error image and useArrowsImage
+	 errorImage->Visible=false;
+	 useArrowsImage->Visible=false;
+		//check to see if string contains only digits and decimal
+	for(int j=0;j<displayGrid->RowCount;++j)
+	{
+			//check for blank input
+		if(displayGrid->Cells[1][j].IsEmpty())
+		{
+			errorImage->Visible=true;
+			return;
+		}
+		//put each entry into a string that will be type checked
+		string inputString=AnsiString(displayGrid->Cells[1][j]).c_str();
+		for (int i = 0; i < inputString.length(); i++)
+		{
+			//check to see if the character is 0-9 or a decimal
+			if(inputString[i]<48 || inputString[i]>57)
+			{
+				if(inputString[i]==46)
+				{
+					if(inputString[i+1]<48 || inputString[i+1]>57)
+					{
+						displayGrid->Cells[1][j]="";
+						errorImage->Visible=true;
+						return;
+					}
+				}
+				else
+				{
+					displayGrid->Cells[1][j]="";
+					errorImage->Visible=true;
+					return;
+				}
 
+			}
+		}
+	}
 	int msgboxID = MessageBox(
 		NULL,
 		L"Would you really like to submit?",
@@ -704,7 +743,8 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 		inputLabelImage->Visible=false;
 		Image3->Visible=false;
 		//make sure the error label does not appear
-	errorLabel->Visible=false;
+		errorLabel->Visible=false;
+		errorImage->Visible=false;
 	}
 	else
 	{
@@ -938,6 +978,7 @@ homeLabelImage->Visible=false;
 void __fastcall TForm3::homeImageButton5Click(TObject *Sender)
 {
 	//hide certain items
+	errorImage->Visible=false;
 	backImageButton->Visible = false;
 	useArrowsImage->Visible =false;
 	Image4->Visible=false;
@@ -1027,7 +1068,8 @@ useArrowsImage->Visible=true;
 
 void __fastcall TForm3::displayGridClick(TObject *Sender)
 {
-useArrowsImage->Visible=true;
+    errorImage->Visible=false;
+	useArrowsImage->Visible=true;
 }
 //---------------------------------------------------------------------------
 
@@ -1041,4 +1083,5 @@ if(Key==VK_UP || Key==VK_DOWN)
 	}
 }
 //---------------------------------------------------------------------------
+
 
