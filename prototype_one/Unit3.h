@@ -79,6 +79,15 @@ class calculateInfo
 		double percentPerformance;
 };
 
+class TMyThread : public TThread
+{
+protected:
+	virtual void __fastcall Execute();
+public:
+	__fastcall TMyThread();
+};
+
+
 //---------------------------------------------------------------------------
 class TForm3 : public TForm
 {
@@ -134,12 +143,12 @@ __published:	// IDE-managed Components
 	TLabel *errorLabel;
 	TImage *errorImage;
 	TFloatAnimation *opacityFadeIn;
+	TAniIndicator *loadingIndicator;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton3Click(TObject *Sender);
 	void __fastcall nextImageButtonClick(TObject *Sender);
 	void __fastcall backImageButtonClick(TObject *Sender);
-	void __fastcall submitButtonClick(TObject *Sender);
 	void __fastcall dbFieldEditKeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
 		  TShiftState Shift);
 	void __fastcall chooseDateImageButtonClick(TObject *Sender);
@@ -154,11 +163,14 @@ __published:	// IDE-managed Components
 	void __fastcall submitButtonMouseEnter(TObject *Sender);
 	void __fastcall submitButtonMouseLeave(TObject *Sender);
 	void __fastcall StringColumn2KeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
-          TShiftState Shift);
+		  TShiftState Shift);
 	void __fastcall displayGridClick(TObject *Sender);
 	void __fastcall displayGridKeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
-          TShiftState Shift);
-private:	// User declarations
+		  TShiftState Shift);
+	void __fastcall submitButtonClick(TObject *Sender);
+
+//was private
+public:	// User declarations
 	inputValues inputObject;
 	String inputTable;
 	String readTable;
@@ -170,6 +182,8 @@ private:	// User declarations
 	String selectedDate;
 public:		// User declarations
 	__fastcall TForm3(TComponent* Owner);
+	void __fastcall TForm3::ThreadTerminated(TObject *Sender);
+
 
 };
 
