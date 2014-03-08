@@ -18,6 +18,62 @@ __fastcall TForm4::TForm4(TComponent* Owner)
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TForm4::displayFilters(String filterType, int arbitraryIdentifier)
+{
+	//display the filters depending on whether day, week, month, range, year
+
+	//move selectAllButton to upper left corner
+	int selectAllButtonX = selectAllButton->Position->X;
+	int selectAllButtonY = selectAllButton->Position->Y;
+	selectAllButton->Position->X = 20;
+	selectAllButton->Position->Y = 20;
+
+	//move roleListBox to upper left corner below select all button
+	int RoleListBoxX = roleListBox->Position->X;
+	int RoleListBoxY = roleListBox->Position->Y;
+	roleListBox->Position->X = 20;
+	roleListBox->Position->Y = 50;
+
+	//move radio buttons to center left of screen
+	int radioGroupBoxX = radioGroupBox->Position->X;
+	int radioGroupBoxY = radioGroupBox->Position->Y;
+	radioGroupBox->Position->X = 20;
+	radioGroupBox->Position->Y = 280;
+	/*int dayRadioX = dayRadio->Position->X;
+	int dayRadioY = dayRadio->Position->Y;
+	dayRadio->Position->X = 20;
+	dayRadio->Position->Y = 280;
+	int weekRadioX = weekRadio->Position->X;
+	int weekRadioY = weekRadio->Position->Y;
+	weekRadio->Position->X = 20;
+	weekRadio->Position->Y = 310;
+	int arbitraryRadioX = arbitraryRadio->Position->X;
+	int arbitraryRadioY = arbitraryRadio->Position->Y;
+	arbitraryRadio->Position->X = 20;
+	arbitraryRadio->Position->Y = 340;
+	int monthRadioX = monthRadio->Position->X;
+	int monthRadioY = monthRadio->Position->Y;
+	monthRadio->Position->X = 20;
+	monthRadio->Position->Y = 370;
+	int yearRadioX = yearRadio->Position->X;
+	int yearRadioY = yearRadio->Position->Y;
+	yearRadio->Position->X = 20;
+	yearRadio->Position->Y = 400;*/
+
+	//show selectors depending on what radio button is currently
+
+
+	//make all filters visible
+	selectAllButton->Visible = true;
+	roleListBox->Visible = true;
+	dayRadio->Visible = true;
+	weekRadio->Visible = true;
+	arbitraryRadio->Visible = true;
+	monthRadio->Visible = true;
+	yearRadio->Visible = true;
+	radioGroupBox->Visible = true;
+}
+
 //calculate what a value is as a percent to one decimal point
 float __fastcall TForm4::makePercent(float value)
 {
@@ -581,7 +637,10 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		}
 
 		if (columnIndex == 1)
-			readGrid->Cells[indexOn][columnIndex] = blank + makePercent(occupancyPercent) + "%";
+			if (occupancyPercent != -1)
+				readGrid->Cells[indexOn][columnIndex] = blank + makePercent(occupancyPercent) + "%";
+			else
+				readGrid->Cells[indexOn][columnIndex] = "N/A";
 		else
 			readGrid->Cells[indexOn][columnIndex] = totalCounter;
 		totalCounter = 0;
@@ -696,7 +755,10 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar(toDouble(readGrid->Cells[0][3]) - actualCostTotal))) + " Variance";
 
 	//make grid visible to user
-  	readGrid->Visible = true;
+	readGrid->Visible = true;
+
+	//call display filters
+	displayFilters(type, monthChosen);
 }
 
 //populate grid for when viewing by day
@@ -1282,6 +1344,7 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	arbitraryRadio->IsChecked = false;
 	monthRadio->IsChecked = false;
 	yearRadio->IsChecked = false;
+	radioGroupBox->Visible = false;
 	selectAllButton->Text = "Select All";
 	roleListBox->Items->Clear();
 	roleListBox->Visible = false;
@@ -1329,6 +1392,7 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			arbitraryRadio->Visible = true;
 			monthRadio->Visible = true;
 			yearRadio->Visible = true;
+			radioGroupBox->Visible = true;
 
 			break;
 		//week filter
@@ -1339,6 +1403,7 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			arbitraryRadio->Visible = false;
 			monthRadio->Visible = false;
 			yearRadio->Visible = false;
+			radioGroupBox->Visible = false;
 
 			if (!secondTimeArbitrary)
 			{
@@ -1541,6 +1606,7 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 				arbitraryRadio->Visible = true;
 				monthRadio->Visible = true;
 				yearRadio->Visible = true;
+				radioGroupBox->Visible = true;
 
 				//special case set viewType to blank to avoid issues
 				viewType = "";
@@ -1554,6 +1620,7 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 				arbitraryRadio->Visible = false;
 				monthRadio->Visible = false;
 				yearRadio->Visible = false;
+				radioGroupBox->Visible = false;
 
 				//role filter
 				basicState--;
@@ -1599,6 +1666,7 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 				arbitraryRadio->Visible = true;
 				monthRadio->Visible = true;
 				yearRadio->Visible = true;
+				radioGroupBox->Visible = true;
 			}
 
 			break;
@@ -1656,6 +1724,7 @@ void __fastcall TForm4::roleListBoxChangeCheck(TObject *Sender)
     }
 }
 //---------------------------------------------------------------------------
+
 
 
 

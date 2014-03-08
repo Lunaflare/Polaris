@@ -40,3 +40,4 @@
 .extra calculations on side for month and year in read?
 .store "accounting for particular months/weeks/years in order to calculate extra stuff in top left of grid?
 	-right now these calculations will not be correct because there is a hardcoded number for "accounting"
+.in advanced input if press no after submit then goes back to welcome screen
