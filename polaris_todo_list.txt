@@ -1,12 +1,6 @@
-
 .make sure login form buttons go to correct links - ONLY "Register" needs changing
 .taskbar issue for all forms (does not show up as minimized in taskbar)
-.add timer icon code between transitions with expected delays (excess database interaction, etc.)
 .add old input data to raw_input table
-.enforce password constraints when changing the password
-.sanitize login input
-.for input forms both basic and advanced - type check/error check (i.e. blank cells)
-.write message saying use arrow keys in grids (for users knowledge)
 .change first day of week in calendars to saturday (to match dlr)
 	-will this throw off week calculations?
 .Add button to remove a date?
@@ -20,7 +14,6 @@
 .when basic input & click back after edit, doesn't store in local struct
 	-may or may not want to implement this
 .allow user in input once they have selected a date if press back should let them select a new date
-.Asyncronous submission of data
 .might want to adjust db field types based on how we want to display (i.e. round before, sometimes want whole number)
 .allow user to add roles
 .in db store number of things in read that are not roles (i.e. everything that comes before the roles)
@@ -40,4 +33,3 @@
 .extra calculations on side for month and year in read?
 .store "accounting for particular months/weeks/years in order to calculate extra stuff in top left of grid?
 	-right now these calculations will not be correct because there is a hardcoded number for "accounting"
-.in advanced input if press no after submit then goes back to welcome screen
