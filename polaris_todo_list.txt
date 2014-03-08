@@ -36,3 +36,7 @@
 .changed hotel_ref avg pay per hour from 14.23 to 15.86 and overtime per hour from 21.34 to 23.79
 .rooms occupied percent not correct for week (need to also adjust query here for month to include new year parameter)
 .labor cost calculation should also add overtime premium cost
+.temporarily for testing changed in role table pm housemen's lookup to be carpet care instead of pm rooms cleaned
+.extra calculations on side for month and year in read?
+.store "accounting for particular months/weeks/years in order to calculate extra stuff in top left of grid?
+	-right now these calculations will not be correct because there is a hardcoded number for "accounting"
