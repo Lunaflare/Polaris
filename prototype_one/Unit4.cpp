@@ -749,32 +749,59 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 	if (readGrid->Cells[indexOn][columnIndex - 10] == 0)
 		readGrid->Cells[indexOn][columnIndex++] = 0;
 	else
-		readGrid->Cells[indexOn][columnIndex++] = roundTwo((readGrid->Cells[indexOn][columnIndex-10] * 60) / totalRoomsCleanedTotal);
-
+	{
+		if (totalRoomsCleanedTotal != 0)
+			readGrid->Cells[indexOn][columnIndex++] = roundTwo((readGrid->Cells[indexOn][columnIndex-10] * 60) / totalRoomsCleanedTotal);
+		else
+           	readGrid->Cells[indexOn][columnIndex++] = 0;
+	}
 	//fill productivity for rooms cleaned per AM gra
 	if (amRoomAttendantsTotal == 0)
 		readGrid->Cells[indexOn][columnIndex++] = 0;
 	else
-		readGrid->Cells[indexOn][columnIndex++] = roundTwo(amRoomsCleanedTotal / (amRoomAttendantsTotal / 8.0));
+	{
+		if (amRoomAttendantsTotal != 0)
+			readGrid->Cells[indexOn][columnIndex++] = roundTwo(amRoomsCleanedTotal / (amRoomAttendantsTotal / 8.0));
+		else
+			readGrid->Cells[indexOn][columnIndex++] = 0;
+	}
 
 	//fill productivity for rooms cleaned per PM gra
 	if (pmRoomAttendantsTotal == 0)
 		readGrid->Cells[indexOn][columnIndex++] = 0;
 	else
-		readGrid->Cells[indexOn][columnIndex++] = roundTwo(pmRoomsCleanedTotal / (pmRoomAttendantsTotal / 8.0));
-
+	{
+		if (pmRoomAttendantsTotal != 0)
+			readGrid->Cells[indexOn][columnIndex++] = roundTwo(pmRoomsCleanedTotal / (pmRoomAttendantsTotal / 8.0));
+		else
+			readGrid->Cells[indexOn][columnIndex++] = 0;
+	}
 	//fill productivity for rooms per laundry attendant
 	if (laundryAttendantTotal == 0)
 		readGrid->Cells[indexOn][columnIndex++] = 0;
 	else
-		readGrid->Cells[indexOn][columnIndex++] = roundTwo(totalRoomsCleanedTotal / (laundryAttendantTotal / 7.5));
-
+	{
+		if (laundryAttendantTotal != 0)
+			readGrid->Cells[indexOn][columnIndex++] = roundTwo(totalRoomsCleanedTotal / (laundryAttendantTotal / 7.5));
+		else
+			readGrid->Cells[indexOn][columnIndex++] = 0;
+	}
 	//fill cells in top left with extra statistics
 	readGrid->Cells[0][0] = "$12.96 Budget";
 	if (actualCostTotal < 0)
-		readGrid->Cells[0][2] = blank + "$" + roundTwo((actualCostTotal * -1) / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+	{
+		if (offsetRoomsOccupiedTotal != 0)
+			readGrid->Cells[0][2] = blank + "$" + roundTwo((actualCostTotal * -1) / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+		else
+			readGrid->Cells[0][2] = "$0 Payroll cost to clean room";
+	}
 	else
-		readGrid->Cells[0][2] = blank + "$" + roundTwo(actualCostTotal / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+	{
+		if (offsetRoomsOccupiedTotal != 0)
+			readGrid->Cells[0][2] = blank + "$" + roundTwo(actualCostTotal / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+		else
+			readGrid->Cells[0][2] = "$0 Payroll cost to clean room";
+	}
 	if (toDouble(readGrid->Cells[0][2]) < 0)
 		readGrid->Cells[0][1] = blank + "$" + roundTwo((toDouble(readGrid->Cells[0][2])*-1) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
 	else
@@ -1137,9 +1164,19 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
     //fill cells in top left with extra statistics
 	readGrid->Cells[0][0] = "$12.96 Budget";
 	if (actualCostTotal < 0)
-		readGrid->Cells[0][2] = blank + "$" + roundTwo((actualCostTotal * -1) / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+	{
+		if (offsetRoomsOccupiedTotal != 0)
+			readGrid->Cells[0][2] = blank + "$" + roundTwo((actualCostTotal * -1) / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+		else
+			readGrid->Cells[0][2] = "$0 Payroll cost to clean room";
+	}
 	else
-		readGrid->Cells[0][2] = blank + "$" + roundTwo(actualCostTotal / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+	{
+		if (offsetRoomsOccupiedTotal != 0)
+			readGrid->Cells[0][2] = blank + "$" + roundTwo(actualCostTotal / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+		else
+          	readGrid->Cells[0][2] = "$0 Payroll cost to clean room";
+	}
 	if (toDouble(readGrid->Cells[0][2]) < 0)
 		readGrid->Cells[0][1] = blank + "$" + roundTwo((toDouble(readGrid->Cells[0][2])*-1) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
 	else
@@ -1154,88 +1191,6 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 
 	//call display filters
 	displayFilters("day", 0);
-}
-
-//computes the week number based on a date parameter (does not line up with calendar week numbers)
-typedef TDayTable* PDayTable;
-
-TDayTable MonthDays[2] = {
-{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
-{31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}};
-
-Word CDayMap[7] = {7, 1, 2, 3, 4, 5, 6};
-
-const int DayMonday = 1;
-const int DayTuesday = 2;
-const int DayWednesday = 3;
-const int DayThursday = 4;
-const int DayFriday = 5;
-const int DaySaturday = 6;
-const int DaySunday = 7;
-
-void __fastcall DivMod(int Dividend, Word Divisor, Word &Result, Word &Remainder)
-{
-Result = (Word) (Dividend / Divisor);
-Remainder = (Word) (Dividend % Divisor);
-}
-
-Word __fastcall DayOfTheWeek(const TDateTime &AValue)
-{
-return ((DateTimeToTimeStamp(AValue).Date - 1) % 7) + 1;
-}
-
-void __fastcall DecodeDateWeek(const TDateTime &AValue, Word &AYear,
-Word &AWeekOfYear, Word &ADayOfWeek)
-{
-int LDayOfYear;
-Word LMonth, LDay;
-TDateTime LStart;
-Word LStartDayOfWeek, LEndDayOfWeek;
-bool LLeap;
-
-LLeap = DecodeDateFully(AValue, AYear, LMonth, LDay, ADayOfWeek);
-ADayOfWeek = CDayMap[ADayOfWeek-1];
-LStart = EncodeDate(AYear, 1, 1);
-LDayOfYear = (int)(AValue - LStart + 1);
-LStartDayOfWeek = DayOfTheWeek(LStart);
-if( (LStartDayOfWeek >= DayFriday) && (LStartDayOfWeek <=
-DaySunday) )
-LDayOfYear -= (8 - LStartDayOfWeek);
-else
-LDayOfYear += (LStartDayOfWeek - 1);
-if( LDayOfYear <= 0 )
-DecodeDateWeek(LStart - 1, AYear, AWeekOfYear, LDay);
-else
-{
-AWeekOfYear = (LDayOfYear / 7);
-if( (LDayOfYear % 7) != 0 )
-++AWeekOfYear;
-if( AWeekOfYear > 52 )
-{
-LEndDayOfWeek = LStartDayOfWeek;
-if( LLeap )
-{
-if( LEndDayOfWeek == DaySunday )
-LEndDayOfWeek = DayMonday;
-else
-++LEndDayOfWeek;
-}
-if( (LEndDayOfWeek >= DayMonday) && (LEndDayOfWeek <=
-DayWednesday) )
-{
-++AYear;
-AWeekOfYear = 1;
-}
-}
-}
-}
-//end find week number stuff
-
-Word __fastcall WeekOfTheYear(const TDateTime &AValue)
-{
-Word LYear, LDOW, LResult;
-DecodeDateWeek(AValue, LYear, LResult, LDOW);
-return LResult;
 }
 
 //hides Form2 from view when this form is shown
@@ -1320,14 +1275,43 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		//simply call populateGrid function passing in today's week and running as week type
 
 		//fill roleVector with all the roles currently possible
+		String bareRole = "";
+		String bareRoleFormatted = "";
 		Form3->SQLQuery2->SQL->Text = "SELECT Bare_Role_Name FROM baldwins_hotel_data.role_table WHERE hotelID = '"+currentHotelID+"';";
 		Form3->SQLQuery2->Open();
 		Form3->SQLQuery2->First();
 		while (!Form3->SQLQuery2->Eof)
 		{
+			bareRole = Form3->SQLQuery2->Fields->Fields[0]->AsString;
+			bareRoleFormatted = StringReplace(bareRole, "_", " ", TReplaceFlags() << rfReplaceAll);
+			roleListBox->Items->Add(bareRoleFormatted);
 			roleVector.push_back(Form3->SQLQuery2->Fields->Fields[0]->AsString);
 			Form3->SQLQuery2->Next();
 		}
+
+		//make mandatory items' checkbox not enabled
+		for (int i = 0; i < roleListBox->Items->Count; ++i)
+			if (SameText(roleListBox->ItemByIndex(i)->Text, "AM Room Attendants"))
+			{
+				roleListBox->ItemByIndex(i)->IsChecked = true;
+				roleListBox->ItemByIndex(i)->Enabled = false;
+			}
+			else if (SameText(roleListBox->ItemByIndex(i)->Text, "PM Room Attendants"))
+			{
+				roleListBox->ItemByIndex(i)->IsChecked = true;
+				roleListBox->ItemByIndex(i)->Enabled = false;
+			}
+			else if (SameText(roleListBox->ItemByIndex(i)->Text, "Laundry Attendant"))
+			{
+				roleListBox->ItemByIndex(i)->IsChecked = true;
+				roleListBox->ItemByIndex(i)->Enabled = false;
+			}
+
+		//simulate select all button press
+        selectAllButton->OnClick(NULL);
+
+		//simulate week radio button being checked
+		weekRadio->IsChecked = true;
 
         //get the date and change to a string
 		TDateTime dayChosenStart = dayCalendar->Date;
@@ -1338,7 +1322,7 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		//get the week selected by the day selected from the calendar
 		while (DayOfWeek(dayChosenStart) != 7)
 			dayChosenStart--;
-		while (DayOfWeek(dayChosenEnd) != 1)
+		while (DayOfWeek(dayChosenEnd) != 6)
 			dayChosenEnd++;
 
 		//convert to strings to pass into populateGrid function
@@ -1388,6 +1372,8 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	roleVector.clear();
 	monthPopupBox->ItemIndex = 0;
 	yearPopupBox->ItemIndex = 0;
+	monthPopupBox->Visible = false;
+	yearPopupBox->Visible = false;
 	readGrid->Visible = false;
 	secondTimeArbitrary = false;
 	dayCalendar->Visible = false;

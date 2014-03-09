@@ -1,8 +1,4 @@
-﻿[Form1.SQLQuery1]
-Coordinates=486,150,105,51
-Visible=True
-
-[homeImageButton4]
+﻿[homeImageButton4]
 Coordinates=200,78,110,51
 
 [monthRadio]
@@ -50,18 +46,6 @@ Coordinates=364,78,106,51
 
 []
 Coordinates=370,140,106,80
-
-[Form3.SQLQuery2]
-Coordinates=508,53,105,51
-
-[Form3.SQLTable1]
-Coordinates=288,343,143,357
-
-[Form3.ClientDataSet1]
-Coordinates=126,254,143,357
-
-[Form3.SQLQuery3]
-Coordinates=351,148,105,51
 
 [StringColumn10]
 Coordinates=46,202,93,33
