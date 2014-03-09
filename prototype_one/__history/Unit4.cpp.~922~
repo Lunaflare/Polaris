@@ -23,45 +23,68 @@ void __fastcall TForm4::displayFilters(String filterType, int arbitraryIdentifie
 	//display the filters depending on whether day, week, month, range, year
 
 	//move selectAllButton to upper left corner
-	int selectAllButtonX = selectAllButton->Position->X;
-	int selectAllButtonY = selectAllButton->Position->Y;
+	selectAllButtonX = selectAllButton->Position->X;
+	selectAllButtonY = selectAllButton->Position->Y;
 	selectAllButton->Position->X = 20;
 	selectAllButton->Position->Y = 20;
 
 	//move roleListBox to upper left corner below select all button
-	int RoleListBoxX = roleListBox->Position->X;
-	int RoleListBoxY = roleListBox->Position->Y;
+	RoleListBoxX = roleListBox->Position->X;
+	RoleListBoxY = roleListBox->Position->Y;
 	roleListBox->Position->X = 20;
 	roleListBox->Position->Y = 50;
 
 	//move radio buttons to center left of screen
-	int radioGroupBoxX = radioGroupBox->Position->X;
-	int radioGroupBoxY = radioGroupBox->Position->Y;
+	radioGroupBoxX = radioGroupBox->Position->X;
+	radioGroupBoxY = radioGroupBox->Position->Y;
 	radioGroupBox->Position->X = 20;
 	radioGroupBox->Position->Y = 280;
-	/*int dayRadioX = dayRadio->Position->X;
-	int dayRadioY = dayRadio->Position->Y;
-	dayRadio->Position->X = 20;
-	dayRadio->Position->Y = 280;
-	int weekRadioX = weekRadio->Position->X;
-	int weekRadioY = weekRadio->Position->Y;
-	weekRadio->Position->X = 20;
-	weekRadio->Position->Y = 310;
-	int arbitraryRadioX = arbitraryRadio->Position->X;
-	int arbitraryRadioY = arbitraryRadio->Position->Y;
-	arbitraryRadio->Position->X = 20;
-	arbitraryRadio->Position->Y = 340;
-	int monthRadioX = monthRadio->Position->X;
-	int monthRadioY = monthRadio->Position->Y;
-	monthRadio->Position->X = 20;
-	monthRadio->Position->Y = 370;
-	int yearRadioX = yearRadio->Position->X;
-	int yearRadioY = yearRadio->Position->Y;
-	yearRadio->Position->X = 20;
-	yearRadio->Position->Y = 400;*/
+
+	//get all the original locations of different items to be set back on home button click
+	dayCalendarX = dayCalendar->Position->X;
+	dayCalendarY = dayCalendar->Position->Y;
+	monthPopupBoxX = monthPopupBox->Position->X;
+	monthPopupBoxY = monthPopupBox->Position->Y;
+	yearPopupBoxX = yearPopupBox->Position->X;
+	yearPopupBoxY = yearPopupBox->Position->Y;
 
 	//show selectors depending on what radio button is currently
+	if (dayRadio->IsChecked)
+	{
+		dayCalendar->Position->X = 20;
+		dayCalendar->Position->Y = 430;
+		dayCalendar->Scale->X = 1.25;
+		dayCalendar->Scale->Y = 1.25;
+		dayCalendar->Visible = true;
+	}
+	else if (weekRadio->IsChecked)
+	{
+		dayCalendar->Position->X = 20;
+		dayCalendar->Position->Y = 430;
+		dayCalendar->Scale->X = 1.25;
+		dayCalendar->Scale->Y = 1.25;
+		dayCalendar->Visible = true;
+	}
+	else if (arbitraryRadio->IsChecked)
+	{
+		rangeTabContainer->Visible = true;
+	}
+	else if (monthRadio->IsChecked)
+	{
+		monthPopupBox->Position->X = 20;
+		monthPopupBox->Position->Y = 430;
+		monthPopupBox->Visible = true;
 
+		yearPopupBox->Position->X = 120;
+		yearPopupBox->Position->Y = 430;
+		yearPopupBox->Visible = true;
+	}
+	else if (yearRadio->IsChecked)
+	{
+		yearPopupBox->Position->X = 20;
+		yearPopupBox->Position->Y = 430;
+		yearPopupBox->Visible = true;
+	}
 
 	//make all filters visible
 	selectAllButton->Visible = true;
@@ -72,6 +95,7 @@ void __fastcall TForm4::displayFilters(String filterType, int arbitraryIdentifie
 	monthRadio->Visible = true;
 	yearRadio->Visible = true;
 	radioGroupBox->Visible = true;
+	updateImageButton->Visible = true;
 }
 
 //calculate what a value is as a percent to one decimal point
@@ -1358,6 +1382,26 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	dayCalendar->Date = Now();
 	rangeEndCalendar->Date = Now();
 
+	//set coordinates back to originals
+	selectAllButton->Position->X = selectAllButtonX;
+	selectAllButton->Position->Y = selectAllButtonY;
+	roleListBox->Position->X = RoleListBoxX;
+	roleListBox->Position->Y = RoleListBoxY;
+	radioGroupBox->Position->X = radioGroupBoxX;
+	radioGroupBox->Position->Y = radioGroupBoxY;
+	dayCalendar->Position->X = dayCalendarX;
+	dayCalendar->Position->Y = dayCalendarY;
+	monthPopupBox->Position->X = monthPopupBoxX;
+	monthPopupBox->Position->Y = monthPopupBoxY;
+	yearPopupBox->Position->X = yearPopupBoxX;
+	yearPopupBox->Position->Y = yearPopupBoxY;
+
+	//set other filter related items back to default values or hide
+	updateImageButton->Visible = false;
+	rangeTabContainer->Visible = false;
+	filterStartCalendar->Date = Now();
+	filterEndCalendar->Date = Now();
+
 	//clear readGrid and set rowCount back to bare minimum (19)
 	for (int i = 0; i < 10; ++i)
 		for (int j = 0; j < readGrid->RowCount; ++j)
@@ -1728,14 +1772,14 @@ void __fastcall TForm4::roleListBoxChangeCheck(TObject *Sender)
 void __fastcall TForm4::dayRadioClick(TObject *Sender)
 {
 	//hide everything that could be made visible in other radio on clicks
-    rangeTabContainer->Visible = false;
+	rangeTabContainer->Visible = false;
+	monthPopupBox->Visible = false;
+	yearPopupBox->Visible = false;
 
 	if (!readGrid->IsVisible)
 		return;
 	else
 	{
-		int dayCalendarX = dayCalendar->Position->X;
-		int dayCalendarY = dayCalendar->Position->Y;
 		dayCalendar->Position->X = 20;
 		dayCalendar->Position->Y = 430;
 		dayCalendar->Scale->X = 1.25;
@@ -1749,13 +1793,13 @@ void __fastcall TForm4::weekRadioClick(TObject *Sender)
 {
 	//hide everything that could be made visible in other radio on clicks
 	rangeTabContainer->Visible = false;
+	monthPopupBox->Visible = false;
+	yearPopupBox->Visible = false;
 
 	if (!readGrid->IsVisible)
 		return;
 	else
 	{
-		int dayCalendarX = dayCalendar->Position->X;
-		int dayCalendarY = dayCalendar->Position->Y;
 		dayCalendar->Position->X = 20;
 		dayCalendar->Position->Y = 430;
 		dayCalendar->Scale->X = 1.25;
@@ -1769,6 +1813,8 @@ void __fastcall TForm4::arbitraryRadioClick(TObject *Sender)
 {
 	//hide everything that could be made visible in other radio on clicks
 	dayCalendar->Visible = false;
+	monthPopupBox->Visible = false;
+	yearPopupBox->Visible = false;
 
 	if (!readGrid->IsVisible)
 		return;
@@ -1789,11 +1835,13 @@ void __fastcall TForm4::monthRadioClick(TObject *Sender)
 		return;
 	else
 	{
-		int monthPopupBoxX = monthPopupBox->Position->X;
-		int monthPopupBoxY = monthPopupBox->Position->Y;
 		monthPopupBox->Position->X = 20;
 		monthPopupBox->Position->Y = 430;
 		monthPopupBox->Visible = true;
+
+		yearPopupBox->Position->X = 120;
+		yearPopupBox->Position->Y = 430;
+		yearPopupBox->Visible = true;
 	}
 }
 //---------------------------------------------------------------------------
@@ -1803,16 +1851,118 @@ void __fastcall TForm4::yearRadioClick(TObject *Sender)
 	//hide everything that could be made visible in other radio on clicks
 	dayCalendar->Visible = false;
 	rangeTabContainer->Visible = false;
+	monthPopupBox->Visible = false;
+	yearPopupBox->Visible = false;
 
 	if (!readGrid->IsVisible)
 		return;
 	else
 	{
-		int dayCalendarX = selectAllButton->Position->X;
-		int dayCalendarY = selectAllButton->Position->Y;
-		dayCalendar->Position->X = 20;
-		dayCalendar->Position->Y = 400;
-		dayCalendar->Visible = true;
+		yearPopupBox->Position->X = 20;
+		yearPopupBox->Position->Y = 430;
+		yearPopupBox->Visible = true;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::updateImageButtonClick(TObject *Sender)
+{
+	//handle the refreshing of the grid based on the filters to the left of the grid
+
+	//no matter what I will get whatever roles are currently selected
+	roleVector.clear();
+	for (int i = 0; i < roleListBox->Items->Count; ++i)
+		if (roleListBox->ItemByIndex(i)->IsChecked)
+			roleVector.push_back(roleListBox->Items->operator [](i));
+
+	//variables used below
+	String dbDayChosen = "";
+	String dbDayChosenStart = "";
+	String dbDayChosenEnd = "";
+
+	//clear readGrid and set rowCount back to bare minimum (19) and make invisible
+	readGrid->Visible = false;
+	for (int i = 0; i < 10; ++i)
+	{
+		if (i != 1)
+			readGrid->ColumnByIndex(i)->Header = "";
+
+		for (int j = 0; j < readGrid->RowCount; ++j)
+			readGrid->Cells[i][j] = "";
+	}
+	readGrid->RowCount = 19;
+
+	//check which radio was selected
+	if (dayRadio->IsChecked)
+	{
+		//get the date selected from the calendar
+		TDateTime dayChosen = dayCalendar->Date;
+		dbDayChosen = StrToDate(dayChosen).FormatString(L"yyyy-mm-dd");
+
+		//call display function
+		populateGrid(roleVector, dbDayChosen);
+	}
+	else if (weekRadio->IsChecked)
+	{
+		//get the date and change to a string
+		TDateTime dayChosenStart = dayCalendar->Date;
+		TDateTime dayChosenEnd = dayCalendar->Date;
+
+		//get the week selected by the day selected from the calendar
+		while (DayOfWeek(dayChosenStart) != 7)
+			dayChosenStart--;
+		while (DayOfWeek(dayChosenEnd) != 6)
+			dayChosenEnd++;
+
+		//convert to strings to pass into populateGrid function
+		dbDayChosenStart = StrToDate(dayChosenStart).FormatString(L"yyyy-mm-dd");
+		dbDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"yyyy-mm-dd");
+		privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
+		privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
+
+		//call display function
+		populateGrid(roleVector, 0, dbDayChosenStart, dbDayChosenEnd, "week");
+	}
+	else if (arbitraryRadio->IsChecked)
+	{
+		//get the date and change to a string
+		TDateTime dayChosenStart = filterStartCalendar->Date;
+		TDateTime dayChosenEnd = filterEndCalendar->Date;
+
+		//convert to strings to pass into populateGrid function
+		dbDayChosenStart = StrToDate(dayChosenStart).FormatString(L"yyyy-mm-dd");
+		dbDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"yyyy-mm-dd");
+		privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
+		privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
+
+		//call display function (should work same with week as with arbitrary)
+		populateGrid(roleVector, -1, dbDayChosenStart, dbDayChosenEnd, "week");
+	}
+	else if (monthRadio->IsChecked)
+	{
+		//get the month selected from the drop down (value 1 through 12)
+		int currentMonthIndex = monthPopupBox->ItemIndex + 1;
+
+		//get the year selected from the drop down
+		int currentYearIndex = yearPopupBox->ItemIndex;
+		String currentYear = yearPopupBox->Items->operator [](currentYearIndex);
+		monthYearSelected = ((int) toDouble(currentYear));
+
+		//call display function
+		populateGrid(roleVector, currentMonthIndex, "null", "null", "month");
+	}
+	else if (yearRadio->IsChecked)
+	{
+		//get the year selected from the drop down
+		int currentYearIndex = yearPopupBox->ItemIndex;
+		String currentYear = yearPopupBox->Items->operator [](currentYearIndex);
+
+		//testing
+		filtersLabel->Text = currentYear;
+		filtersLabel->Visible = true;
+
+		//call display function
+		populateGrid(roleVector, (int) toDouble(currentYear), "null", "null", "year");
 	}
 }
 //---------------------------------------------------------------------------

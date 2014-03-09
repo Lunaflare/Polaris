@@ -78,6 +78,7 @@ __published:	// IDE-managed Components
 	void __fastcall arbitraryRadioClick(TObject *Sender);
 	void __fastcall monthRadioClick(TObject *Sender);
 	void __fastcall yearRadioClick(TObject *Sender);
+	void __fastcall updateImageButtonClick(TObject *Sender);
 private:	// User declarations
 	String inputTable;
 	String readTable;
@@ -88,7 +89,20 @@ private:	// User declarations
 	String privateDayChosenStart;
 	String privateDayChosenEnd;
 	bool secondTimeArbitrary;
+	int selectAllButtonX;
+	int selectAllButtonY;
+	int RoleListBoxX;
+	int RoleListBoxY;
+	int radioGroupBoxX;
+	int radioGroupBoxY;
 	int monthYearSelected;
+	int dayCalendarX;
+	int dayCalendarY;
+	int monthPopupBoxX;
+	int monthPopupBoxY;
+	int yearPopupBoxX;
+	int yearPopupBoxY;
+	bool homeAlreadyPressed;
 public:		// User declarations
 	__fastcall TForm4(TComponent* Owner);
 	void __fastcall populateGrid(vector<String>, String);
