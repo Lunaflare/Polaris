@@ -168,6 +168,7 @@ __published:	// IDE-managed Components
 	void __fastcall displayGridKeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
 		  TShiftState Shift);
 	void __fastcall submitButtonClick(TObject *Sender);
+	void __fastcall FormCloseQuery(TObject *Sender, bool &CanClose);
 
 //was private
 public:	// User declarations

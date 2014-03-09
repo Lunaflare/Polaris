@@ -16,7 +16,287 @@ __fastcall TForm3::TForm3(TComponent* Owner)
 {
 }
 //---------------------------------------------------------------------------
+__fastcall TMyThread::TMyThread()
+	: TThread(true)
+{
+	FreeOnTerminate = true;
+	// setup other thread parameters as needed...
+}
 
+void __fastcall TMyThread::Execute()
+{
+		//disable home button
+		Form3->homeImageButton5->Enabled=false;
+		//yes selected, save information in grid to database
+
+		//create empty strings to add to query once populated from grid
+		String headings = "";
+		String values = "";
+		String update = "";
+		String updateHeading = "";
+
+		//get day of week
+		int Day = DayOfWeek(Form3->pureDate);
+		String DayName;
+		switch(Day)
+		{
+		case 1:
+			DayName = L"Sunday";
+			break;
+		case 2:
+			DayName = L"Monday";
+			break;
+		case 3:
+			DayName = L"Tuesday";
+			break;
+		case 4:
+			DayName = L"Wednesday";
+			break;
+		case 5:
+			DayName = L"Thursday";
+			break;
+		case 6:
+			DayName = L"Friday";
+			break;
+		case 7:
+			DayName = L"Saturday";
+		}
+
+		//populate date and day of week (probably temporary solution)
+		headings += ("Date, Day_Of_Week, ");
+		values += ("'" + Form3->dateChosen + "', '" + DayName + "', ");
+
+		//construct headings and values for an update query instead of insert query
+		if (Form3->alreadyThere)
+		{
+			//populate strings only from the grid
+			for (int i = 0; i < Form3->displayGrid->RowCount; ++i)
+			{
+				updateHeading = StringReplace(Form3->displayGrid->Cells[0][i], " ", "_", TReplaceFlags() << rfReplaceAll);
+
+				if (i + 1 == Form3->displayGrid->RowCount)
+				{
+					update += (updateHeading + " = '" + Form3->displayGrid->Cells[1][i] + "'");
+				}
+				else
+				{
+					update += (updateHeading + " = '" + Form3->displayGrid->Cells[1][i] + "', ");
+				}
+			}
+		}
+		//check if basic input was used, if so populate headings/values from inputObject
+		else if (Form1->getInputLevel() == 0)
+		{
+			//populate rest of strings from grid
+			for (int i = 0; i < Form3->inputObject.size; ++i)
+			{
+				if (i + 1 == Form3->inputObject.size)
+				{
+					headings += ("" + Form3->inputObject.valueMap[i][0] + "");
+					values += ("'" + Form3->displayGrid->Cells[1][i] + "'");
+				}
+				else
+				{
+					headings += ("" + Form3->inputObject.valueMap[i][0] + ", ");
+					values += ("'" + Form3->displayGrid->Cells[1][i] + "', ");
+				}
+			}
+		}
+		//if inputLevel is not basic, get both headings and values from the grid
+		else
+		{
+			//populate strings only from the grid (might not be "minus 1")
+			for (int i = 0; i < Form3->displayGrid->RowCount; ++i)
+			{
+				if (i + 1 == Form3->displayGrid->RowCount)
+				{
+					headings += ("" + StringReplace(Form3->displayGrid->Cells[0][i], " ", "_", TReplaceFlags() << rfReplaceAll) + "");
+					values += ("'" + Form3->displayGrid->Cells[1][i] + "'");
+				}
+				else
+				{
+					headings += ("" + StringReplace(Form3->displayGrid->Cells[0][i], " ", "_", TReplaceFlags() << rfReplaceAll) + ", ");
+					values += ("'" + Form3->displayGrid->Cells[1][i] + "', ");
+				}
+			}
+		}
+
+		//run update query if item already in database
+		if (Form3->alreadyThere)
+		{
+			//update the raw_input table
+			Form3->SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data."+Form3->inputTable+" SET "+update+" WHERE "+Form3->inputTable+".Date = '"+Form3->dateChosen+"';";
+			Form3->SQLQuery2->ExecSQL();
+
+			//update the read_data table
+			Form3->SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data."+Form3->readTable+" SET "+update+" WHERE "+Form3->readTable+".Date = '"+Form3->dateChosen+"';";
+			Form3->SQLQuery2->ExecSQL();
+		}
+		//if item not there, then run the normal insert query
+		else
+		{
+			//query input_table db and insert new row
+			Form3->SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data."+Form3->inputTable+" ("+headings+") VALUES ("+values+");";
+			Form3->SQLQuery2->ExecSQL();
+
+			//query read_table db and insert new row
+			Form3->SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data."+Form3->readTable+" ("+headings+") VALUES ("+values+");";
+			Form3->SQLQuery2->ExecSQL();
+		}
+
+		//Calculate and update values for Standard_Hours and Percent_Performance
+		//first, query role_table to get all the Role_Name, Bare_Role_Name and Standard_Hours_Reference
+		String currentHotelID = Form1->getHotelID();
+		vector<calculateInfo> infoVector;
+		String roleName = "";
+		String roleStandardHoursName = "";
+		String bareRoleName = "";
+		String standardHoursReference = "";
+		int context = 0;
+		double actual = 0;
+		double labor = 0;
+		double roleWages = 0;
+		double totalLaborHoursHoursPaid = 0;
+		double totalLaborHoursStandardHours = 0;
+		double totalLaborHoursPercentPerformance = 0;
+		double totalLaborCostHoursPaid = 0;
+		double totalLaborCostStandardHours = 0;
+		double totalLaborCostPercentPerformance = 0;
+		Form3->SQLQuery2->SQL->Text = "SELECT Role_Name, Bare_Role_Name, Standard_Hours_Reference, Role_Wages FROM baldwins_hotel_data.role_table WHERE hotelID = '"+currentHotelID+"';";
+		Form3->SQLQuery2->Open();
+		Form3->SQLQuery2->First();
+		while (!Form3->SQLQuery2->Eof)
+		{
+			//fill strings
+			roleName = Form3->SQLQuery2->Fields->Fields[0]->AsString;
+			roleStandardHoursName = StringReplace(roleName, "Hours_Paid", "Standard_Hours", TReplaceFlags() << rfReplaceAll);
+			bareRoleName = Form3->SQLQuery2->Fields->Fields[1]->AsString;
+			standardHoursReference = Form3->SQLQuery2->Fields->Fields[2]->AsString;
+			roleWages = Form3->SQLQuery2->Fields->Fields[3]->AsFloat;
+
+			//get the integer value based on above strings
+			Form3->SQLQuery3->SQL->Text = "SELECT "+roleName+", "+standardHoursReference+" FROM baldwins_hotel_data."+Form3->readTable+" WHERE Date = '"+Form3->dateChosen+"';";
+			Form3->SQLQuery3->Open();
+			Form3->SQLQuery3->First();
+			if (!Form3->SQLQuery3->Eof)
+			{
+				//get values for normal use in this while loop
+				actual = Form3->SQLQuery3->Fields->Fields[0]->AsFloat;
+				context = Form3->SQLQuery3->Fields->Fields[1]->AsInteger;
+			}
+
+			//get the labor value for standard hours
+			Form3->SQLQuery3->SQL->Text = "SELECT "+bareRoleName+" FROM baldwins_hotel_data."+Form3->laborTable+" WHERE "+context+" >= Rooms_Occupied_Low AND "+context+" <= Rooms_Occupied_High;";
+			Form3->SQLQuery3->Open();
+			Form3->SQLQuery3->First();
+			if (!Form3->SQLQuery3->Eof)
+			{
+				labor = Form3->SQLQuery3->Fields->Fields[0]->AsFloat;
+			}
+
+			//push_back calculateInfo object
+			infoVector.push_back(calculateInfo(roleName, roleStandardHoursName, bareRoleName, standardHoursReference, context, actual, labor));
+
+			//compute values used below this while loop in actual update query
+			totalLaborHoursHoursPaid += actual;
+			totalLaborHoursStandardHours += labor;
+			totalLaborCostHoursPaid = totalLaborCostHoursPaid + (actual * roleWages);
+			totalLaborCostStandardHours = totalLaborCostStandardHours + (labor * roleWages);
+
+			//reset strings and doubles to empty for next iteration
+			roleName = "";
+			roleStandardHoursName = "";
+			bareRoleName = "";
+			standardHoursReference = "";
+			actual = 0;
+			context = 0;
+			labor = 0;
+			roleWages = 0;
+			/*totalLaborHoursHoursPaid = 0;
+			totalLaborHoursStandardHours = 0;
+			totalLaborHoursPercentPerformance = 0;
+			totalLaborCostHoursPaid = 0;
+			totalLaborCostStandardHours = 0;
+			totalLaborCostPercentPerformance = 0;*/
+
+			//move cursor to next item
+			Form3->SQLQuery2->Next();
+		}
+
+		//run update query that updates standard hours and percent performance
+		updateHeading = "";
+		String updateHeading2 = "";
+		update = "";
+		labor = 0;
+		double percent = 0;
+		for (int i = 0; i < infoVector.size(); ++i)
+		{
+			updateHeading = infoVector[i].roleStandardHours;
+			updateHeading2 = StringReplace(updateHeading, "Standard_Hours", "Percent_Performance", TReplaceFlags() << rfReplaceAll);
+			labor = infoVector[i].laborValue;
+			percent = infoVector[i].percentPerformance;
+
+			/*if (i + 1 == infoVector.size())
+			{
+				update += (updateHeading + " = '" + labor + "', " + updateHeading2 + " = '" + percent + "'");
+			}*/
+			//else
+			//{
+				update += (updateHeading + " = '" + labor + "', " + updateHeading2 + " = '" + percent + "', ");
+			//}
+		}
+
+		//calculate/store overtime, total_labor_hours, total_labor_cost in read_data
+		double overtimeHoursPaid = 0;
+		double overtimeStandardHours = 0;
+		double overtimePercentPerformance = 0;
+		Form3->SQLQuery3->SQL->Text = "SELECT Overtime_Hours_Paid FROM baldwins_hotel_data."+Form3->inputTable+" WHERE "+Form3->inputTable+".Date = '"+Form3->dateChosen+"';";
+		Form3->SQLQuery3->Open();
+		Form3->SQLQuery3->First();
+		if (!Form3->SQLQuery3->Eof)
+			overtimeHoursPaid = Form3->SQLQuery3->Fields->Fields[0]->AsFloat;
+		overtimeStandardHours = Form3->overtimePerHour * overtimeHoursPaid;
+		overtimePercentPerformance = overtimeStandardHours / 3;
+		if (totalLaborHoursHoursPaid != 0)
+			totalLaborHoursPercentPerformance = totalLaborHoursStandardHours / totalLaborHoursHoursPaid;
+		else
+			totalLaborHoursPercentPerformance = 0;
+		if (totalLaborCostHoursPaid != 0)
+			totalLaborCostPercentPerformance = totalLaborCostStandardHours / totalLaborCostHoursPaid;
+		else
+			totalLaborCostPercentPerformance = 0;
+		totalLaborCostHoursPaid += overtimePercentPerformance;
+		String spaceTaker = "";
+		update += (spaceTaker + "Overtime_Hours_Paid = '" + overtimeHoursPaid + "', " + "Overtime_Standard_Hours = '" + overtimeStandardHours + "', " + "Overtime_Percent_Performance = '" + overtimePercentPerformance + "', ");
+		update += (spaceTaker + "Total_Labor_Hours_Hours_Paid = '" + totalLaborHoursHoursPaid + "', " + "Total_Labor_Hours_Standard_Hours = '" + totalLaborHoursStandardHours + "', " + "Total_Labor_Hours_Percent_Performance = '" + totalLaborHoursPercentPerformance + "', ");
+		update += (spaceTaker + "Total_Labor_Cost_Hours_Paid = '" + totalLaborCostHoursPaid + "', " + "Total_Labor_Cost_Standard_Hours = '" + totalLaborCostStandardHours + "', " + "Total_Labor_Cost_Percent_Performance = '" + totalLaborCostPercentPerformance + "'");
+		Form3->SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data."+Form3->readTable+" SET "+update+" WHERE "+Form3->readTable+".Date = '"+Form3->dateChosen+"';";
+		Form3->SQLQuery2->ExecSQL();
+	}
+
+void __fastcall TForm3::ThreadTerminated(TObject *Sender)
+{
+		Form3->loadingIndicator->Enabled=false;
+		Form3->loadingIndicator->Visible=false;
+			//enable home button
+		Form3->homeImageButton5->Enabled=true;
+			//Take back to welcome screen (form2)
+		Form3->Hide();
+		Form2->Show();
+
+		//hide unecessary items
+		useArrowsImage->Visible=false;
+		displayGrid->Visible = false;
+		submitButton->Visible = false;
+		Image1->Visible=false;
+		backImageButton->Visible = false;
+		Image4->Visible=false;
+		inputLabelImage->Visible=false;
+		Image3->Visible=false;
+		//make sure the error label does not appear
+		errorLabel->Visible=false;
+		errorImage->Visible=false;
+}
 //hides Form2 from view when this form is shown, sets up form for certain input level
 void __fastcall TForm3::FormShow(TObject *Sender)
 {
@@ -168,6 +448,7 @@ void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
 	displayGrid->Visible = false;
 	submitButton->Visible = false;
 	Image1->Visible=false;
+	errorImage->Visible=false;
 
 	//set calendar choice back to current date
 	calendar->Date = Now();
@@ -186,6 +467,51 @@ void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
 //go through column headings as desired by the user
 void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 {
+
+		//check for blank input
+		if (SameText(dbFieldEdit->Text,""))
+		{
+			errorLabel->Visible=true;
+			return;
+		}
+
+		//check to see if string contains only digits and decimal
+		int numDecimals=0;
+	string inputString=AnsiString(dbFieldEdit->Text).c_str();
+	for (int i = 0; i < inputString.length(); i++)
+	{
+			//check to see if the character is 0-9 or a decimal
+			//if((inputString[i]<48 || inputString[i]>57) && inputString[i]!=46)
+			if(inputString[i]<48 || inputString[i]>57)
+			{
+				if(inputString[i]==46)
+				{
+					numDecimals++;
+					if(numDecimals>1)
+					{
+						dbFieldEdit->Text="";
+						errorLabel->Visible=true;
+						return;
+					}
+					if(inputString[i+1]<48 || inputString[i+1]>57)
+					{
+						dbFieldEdit->Text="";
+						errorLabel->Visible=true;
+						return;
+					}
+				}
+				else
+				{
+					dbFieldEdit->Text="";
+					errorLabel->Visible=true;
+					return;
+				}
+
+			}
+	}
+
+	//make sure the error label does not appear
+	errorLabel->Visible=false;
 	if (inputObject.currentIndex == 0 && inputObject.size == 0)
 	{
 		//run when displayObject is empty
@@ -368,6 +694,10 @@ void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 //go to previous item in struct, show in label field
 void __fastcall TForm3::backImageButtonClick(TObject *Sender)
 {
+	//make sure the error label does not appear
+	errorLabel->Visible=false;
+	errorImage->Visible=false;
+
 	//for when grid displayed and back button pressed
 	if (displayGrid->Visible)
 	{
@@ -392,291 +722,15 @@ void __fastcall TForm3::backImageButtonClick(TObject *Sender)
 //---------------------------------------------------------------------------
 
 //ask user if sure, yes == submit and no == do nothing
-void __fastcall TForm3::submitButtonClick(TObject *Sender)
-{
-	int msgboxID = MessageBox(
-		NULL,
-		L"Would you really like to submit?",
-		L"Confirm Input Submission",
-		MB_ICONEXCLAMATION | MB_YESNO
-	);
-
-	if (msgboxID == IDYES)
-	{
-		//yes selected, save information in grid to database
-
-		//create empty strings to add to query once populated from grid
-		String headings = "";
-		String values = "";
-		String update = "";
-		String updateHeading = "";
-
-		//get day of week
-		int Day = DayOfWeek(pureDate);
-		String DayName;
-		switch(Day)
-		{
-		case 1:
-			DayName = L"Sunday";
-			break;
-		case 2:
-			DayName = L"Monday";
-			break;
-		case 3:
-			DayName = L"Tuesday";
-			break;
-		case 4:
-			DayName = L"Wednesday";
-			break;
-		case 5:
-			DayName = L"Thursday";
-			break;
-		case 6:
-			DayName = L"Friday";
-			break;
-		case 7:
-			DayName = L"Saturday";
-		}
-
-		//populate date and day of week (probably temporary solution)
-		headings += ("Date, Day_Of_Week, ");
-		values += ("'" + dateChosen + "', '" + DayName + "', ");
-
-		//construct headings and values for an update query instead of insert query
-		if (alreadyThere)
-		{
-			//populate strings only from the grid
-			for (int i = 0; i < displayGrid->RowCount; ++i)
-			{
-				updateHeading = StringReplace(displayGrid->Cells[0][i], " ", "_", TReplaceFlags() << rfReplaceAll);
-
-				if (i + 1 == displayGrid->RowCount)
-				{
-					update += (updateHeading + " = '" + displayGrid->Cells[1][i] + "'");
-				}
-				else
-				{
-					update += (updateHeading + " = '" + displayGrid->Cells[1][i] + "', ");
-				}
-			}
-		}
-		//check if basic input was used, if so populate headings/values from inputObject
-		else if (Form1->getInputLevel() == 0)
-		{
-			//populate rest of strings from grid
-			for (int i = 0; i < inputObject.size; ++i)
-			{
-				if (i + 1 == inputObject.size)
-				{
-					headings += ("" + inputObject.valueMap[i][0] + "");
-					values += ("'" + displayGrid->Cells[1][i] + "'");
-				}
-				else
-				{
-					headings += ("" + inputObject.valueMap[i][0] + ", ");
-					values += ("'" + displayGrid->Cells[1][i] + "', ");
-				}
-			}
-		}
-		//if inputLevel is not basic, get both headings and values from the grid
-		else
-		{
-			//populate strings only from the grid (might not be "minus 1")
-			for (int i = 0; i < displayGrid->RowCount; ++i)
-			{
-				if (i + 1 == displayGrid->RowCount)
-				{
-					headings += ("" + StringReplace(displayGrid->Cells[0][i], " ", "_", TReplaceFlags() << rfReplaceAll) + "");
-					values += ("'" + displayGrid->Cells[1][i] + "'");
-				}
-				else
-				{
-					headings += ("" + StringReplace(displayGrid->Cells[0][i], " ", "_", TReplaceFlags() << rfReplaceAll) + ", ");
-					values += ("'" + displayGrid->Cells[1][i] + "', ");
-				}
-			}
-		}
-
-		//run update query if item already in database
-		if (alreadyThere)
-		{
-			//update the raw_input table
-			SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data."+inputTable+" SET "+update+" WHERE "+inputTable+".Date = '"+dateChosen+"';";
-			SQLQuery2->ExecSQL();
-
-			//update the read_data table
-			SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data."+readTable+" SET "+update+" WHERE "+readTable+".Date = '"+dateChosen+"';";
-			SQLQuery2->ExecSQL();
-		}
-		//if item not there, then run the normal insert query
-		else
-		{
-			//query input_table db and insert new row
-			SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data."+inputTable+" ("+headings+") VALUES ("+values+");";
-			SQLQuery2->ExecSQL();
-
-			//query read_table db and insert new row
-			SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data."+readTable+" ("+headings+") VALUES ("+values+");";
-			SQLQuery2->ExecSQL();
-		}
-
-		//Calculate and update values for Standard_Hours and Percent_Performance
-		//first, query role_table to get all the Role_Name, Bare_Role_Name and Standard_Hours_Reference
-		String currentHotelID = Form1->getHotelID();
-		vector<calculateInfo> infoVector;
-		String roleName = "";
-		String roleStandardHoursName = "";
-		String bareRoleName = "";
-		String standardHoursReference = "";
-		int context = 0;
-		double actual = 0;
-		double labor = 0;
-		double roleWages = 0;
-		double totalLaborHoursHoursPaid = 0;
-		double totalLaborHoursStandardHours = 0;
-		double totalLaborHoursPercentPerformance = 0;
-		double totalLaborCostHoursPaid = 0;
-		double totalLaborCostStandardHours = 0;
-		double totalLaborCostPercentPerformance = 0;
-		SQLQuery2->SQL->Text = "SELECT Role_Name, Bare_Role_Name, Standard_Hours_Reference, Role_Wages FROM baldwins_hotel_data.role_table WHERE hotelID = '"+currentHotelID+"';";
-		SQLQuery2->Open();
-		SQLQuery2->First();
-		while (!SQLQuery2->Eof)
-		{
-			//fill strings
-			roleName = SQLQuery2->Fields->Fields[0]->AsString;
-			roleStandardHoursName = StringReplace(roleName, "Hours_Paid", "Standard_Hours", TReplaceFlags() << rfReplaceAll);
-			bareRoleName = SQLQuery2->Fields->Fields[1]->AsString;
-			standardHoursReference = SQLQuery2->Fields->Fields[2]->AsString;
-			roleWages = SQLQuery2->Fields->Fields[3]->AsFloat;
-
-			//get the integer value based on above strings
-			SQLQuery3->SQL->Text = "SELECT "+roleName+", "+standardHoursReference+" FROM baldwins_hotel_data."+readTable+" WHERE Date = '"+dateChosen+"';";
-			SQLQuery3->Open();
-			SQLQuery3->First();
-			if (!SQLQuery3->Eof)
-			{
-				//get values for normal use in this while loop
-				actual = SQLQuery3->Fields->Fields[0]->AsFloat;
-				context = SQLQuery3->Fields->Fields[1]->AsInteger;
-			}
-
-			//get the labor value for standard hours
-			SQLQuery3->SQL->Text = "SELECT "+bareRoleName+" FROM baldwins_hotel_data."+laborTable+" WHERE "+context+" >= Rooms_Occupied_Low AND "+context+" <= Rooms_Occupied_High;";
-			SQLQuery3->Open();
-			SQLQuery3->First();
-			if (!SQLQuery3->Eof)
-			{
-               	labor = SQLQuery3->Fields->Fields[0]->AsFloat;
-			}
-
-			//push_back calculateInfo object
-			infoVector.push_back(calculateInfo(roleName, roleStandardHoursName, bareRoleName, standardHoursReference, context, actual, labor));
-
-			//compute values used below this while loop in actual update query
-			totalLaborHoursHoursPaid += actual;
-			totalLaborHoursStandardHours += labor;
-			totalLaborCostHoursPaid += (actual * roleWages);
-			totalLaborCostStandardHours += (labor * roleWages);
-
-			//reset strings and doubles to empty for next iteration
-			roleName = "";
-			roleStandardHoursName = "";
-			bareRoleName = "";
-			standardHoursReference = "";
-			actual = 0;
-			context = 0;
-			labor = 0;
-			roleWages = 0;
-			/*totalLaborHoursHoursPaid = 0;
-			totalLaborHoursStandardHours = 0;
-			totalLaborHoursPercentPerformance = 0;
-			totalLaborCostHoursPaid = 0;
-			totalLaborCostStandardHours = 0;
-			totalLaborCostPercentPerformance = 0;*/
-
-			//move cursor to next item
-			SQLQuery2->Next();
-		}
-
-		//run update query that updates standard hours and percent performance
-		updateHeading = "";
-		String updateHeading2 = "";
-		update = "";
-		labor = 0;
-		double percent = 0;
-		for (int i = 0; i < infoVector.size(); ++i)
-		{
-			updateHeading = infoVector[i].roleStandardHours;
-			updateHeading2 = StringReplace(updateHeading, "Standard_Hours", "Percent_Performance", TReplaceFlags() << rfReplaceAll);
-			labor = infoVector[i].laborValue;
-            percent = infoVector[i].percentPerformance;
-
-			/*if (i + 1 == infoVector.size())
-			{
-				update += (updateHeading + " = '" + labor + "', " + updateHeading2 + " = '" + percent + "'");
-			}*/
-			//else
-			//{
-				update += (updateHeading + " = '" + labor + "', " + updateHeading2 + " = '" + percent + "', ");
-			//}
-		}
-
-		//calculate/store overtime, total_labor_hours, total_labor_cost in read_data
-		double overtimeHoursPaid = 0;
-		double overtimeStandardHours = 0;
-		double overtimePercentPerformance = 0;
-		SQLQuery3->SQL->Text = "SELECT Overtime_Hours_Paid FROM baldwins_hotel_data."+inputTable+" WHERE "+inputTable+".Date = '"+dateChosen+"';";
-		SQLQuery3->Open();
-		SQLQuery3->First();
-		if (!SQLQuery3->Eof)
-			overtimeHoursPaid = SQLQuery3->Fields->Fields[0]->AsFloat;
-		overtimeStandardHours = overtimePerHour * overtimeHoursPaid;
-		overtimePercentPerformance = overtimeStandardHours / 3;
-		if (totalLaborHoursHoursPaid != 0)
-			totalLaborHoursPercentPerformance = totalLaborHoursStandardHours / totalLaborHoursHoursPaid;
-		else
-			totalLaborHoursPercentPerformance = 0;
-		if (totalLaborCostHoursPaid != 0)
-			totalLaborCostPercentPerformance = totalLaborCostStandardHours / totalLaborCostHoursPaid;
-		else
-			totalLaborCostPercentPerformance = 0;
-		String spaceTaker = "";
-		update += (spaceTaker + "Overtime_Hours_Paid = '" + overtimeHoursPaid + "', " + "Overtime_Standard_Hours = '" + overtimeStandardHours + "', " + "Overtime_Percent_Performance = '" + overtimePercentPerformance + "', ");
-		update += (spaceTaker + "Total_Labor_Hours_Hours_Paid = '" + totalLaborHoursHoursPaid + "', " + "Total_Labor_Hours_Standard_Hours = '" + totalLaborHoursStandardHours + "', " + "Total_Labor_Hours_Percent_Performance = '" + totalLaborHoursPercentPerformance + "', ");
-		update += (spaceTaker + "Total_Labor_Cost_Hours_Paid = '" + totalLaborCostHoursPaid + "', " + "Total_Labor_Cost_Standard_Hours = '" + totalLaborCostStandardHours + "', " + "Total_Labor_Cost_Percent_Performance = '" + totalLaborCostPercentPerformance + "'");
-		SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data."+readTable+" SET "+update+" WHERE "+readTable+".Date = '"+dateChosen+"';";
-		SQLQuery2->ExecSQL();
-
-		//Take back to welcome screen (form2)
-		Form3->Hide();
-		Form2->Show();
-
-		//hide unecessary items
-		useArrowsImage->Visible=false;
-		displayGrid->Visible = false;
-		submitButton->Visible = false;
-		Image1->Visible=false;
-		backImageButton->Visible = false;
-		Image4->Visible=false;
-		inputLabelImage->Visible=false;
-		Image3->Visible=false;
-	}
-	else
-	{
-		//no selected, save nothing and show form again (do nothing)
-	}
-}
-//---------------------------------------------------------------------------
 
 //check if enter button is pressed from inside dbFieldEdit
 void __fastcall TForm3::dbFieldEditKeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
-          TShiftState Shift)
+		  TShiftState Shift)
 {
 	//if enter button pressed, click next button
 	if (Key == 13)
 	{
-     	nextImageButton->OnClick(NULL);
+		nextImageButton->OnClick(NULL);
 	}
 }
 //---------------------------------------------------------------------------
@@ -894,6 +948,7 @@ homeLabelImage->Visible=false;
 void __fastcall TForm3::homeImageButton5Click(TObject *Sender)
 {
 	//hide certain items
+	errorImage->Visible=false;
 	backImageButton->Visible = false;
 	useArrowsImage->Visible =false;
 	Image4->Visible=false;
@@ -902,6 +957,8 @@ void __fastcall TForm3::homeImageButton5Click(TObject *Sender)
 	Image1->Visible=false;
 	inputLabelImage->Visible=false;
 	Image3->Visible=false;
+	//make sure the error label does not appear
+	errorLabel->Visible=false;
 
 	//set calendar choice back to current date
 	calendar->Date = Now();
@@ -981,7 +1038,8 @@ useArrowsImage->Visible=true;
 
 void __fastcall TForm3::displayGridClick(TObject *Sender)
 {
-useArrowsImage->Visible=true;
+    errorImage->Visible=false;
+	useArrowsImage->Visible=true;
 }
 //---------------------------------------------------------------------------
 
@@ -995,4 +1053,76 @@ if(Key==VK_UP || Key==VK_DOWN)
 	}
 }
 //---------------------------------------------------------------------------
+
+
+void __fastcall TForm3::submitButtonClick(TObject *Sender)
+{
+    		//fade out Error image and useArrowsImage
+	 Form3->errorImage->Visible=false;
+	 Form3->useArrowsImage->Visible=false;
+		//check to see if string contains only digits and one decimal
+	for(int j=0;j<Form3->displayGrid->RowCount;++j)
+	{
+		int numDecimals=0;
+			//check for blank input
+		if(Form3->displayGrid->Cells[1][j].IsEmpty())
+		{
+			Form3->errorImage->Visible=true;
+			return;
+		}
+		//put each entry into a string that will be type checked
+		string inputString=AnsiString(Form3->displayGrid->Cells[1][j]).c_str();
+		for (int i = 0; i < inputString.length(); i++)
+		{
+			//check to see if the character is 0-9 or a decimal
+			if(inputString[i]<48 || inputString[i]>57)
+			{
+				if(inputString[i]==46)
+				{
+					numDecimals++;
+					if(numDecimals>1)
+					{
+						Form3->displayGrid->Cells[1][j]="";
+						Form3->errorImage->Visible=true;
+						return;
+					}
+					if(inputString[i+1]<48 || inputString[i+1]>57)
+					{
+						Form3->displayGrid->Cells[1][j]="";
+						Form3->errorImage->Visible=true;
+						return;
+					}
+				}
+				else
+				{
+					Form3->displayGrid->Cells[1][j]="";
+					Form3->errorImage->Visible=true;
+					return;
+				}
+
+			}
+		}
+	}
+	int msgboxID = MessageBox(
+		NULL,
+		L"Would you really like to submit?",
+		L"Confirm Input Submission",
+		MB_ICONEXCLAMATION | MB_YESNO
+	);
+
+	if (msgboxID == IDYES)
+	{
+	Form3->loadingIndicator->Enabled=true;
+	Form3->loadingIndicator->Visible=true;
+	TMyThread *thrd = new TMyThread();
+    thrd->OnTerminate = &ThreadTerminated;
+	thrd->Resume();
+	}
+	else
+	{
+		//do nothing
+    }
+}
+//---------------------------------------------------------------------------
+
 

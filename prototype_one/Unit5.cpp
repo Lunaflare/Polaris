@@ -129,6 +129,8 @@ void __fastcall TForm5::saveChangesButtonClick(TObject *Sender)
 				//query database and change input and read levels appropriately
 				Form1->SQLQuery1->SQL->Text="UPDATE baldwins_beta.user_info SET preference_read='"+currentReadLevel+"', password=md5('"+newPassword+"'), preference_write='"+currentInputLevel+"' WHERE user_info.userID='"+Form1->getUserID()+"';";
 				Form1->SQLQuery1->ExecSQL();
+				Form1->SQLQuery1->SQL->Text="UPDATE baldwins_mant541.mantis_user_table SET password=md5('"+newPassword+"') WHERE mantis_user_table.username='"+Form1->getUsername()+"'";
+				Form1->SQLQuery1->ExecSQL();
 
 				//set read and input levels appropriately given the desired changes (so populated upon return to this form)
 				Form1->setReadLevel(currentReadLevel);

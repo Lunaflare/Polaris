@@ -119,7 +119,7 @@ void __fastcall TForm1::loginregisterButtonClick(TObject *Sender)
 //Opens browser with recover password form when register button clicked (still need to create form)
 void __fastcall TForm1::recoverPasswordButtonClick(TObject *Sender)
 {
-	ShellExecute(NULL, L"open", L"http://www.facebook.com/l.php?u=http%3A%2F%2Flunaflare.com%2FaccountRecovery&h=_AQHbaAuc", NULL, NULL, SW_SHOWNORMAL);
+	ShellExecute(NULL, L"open", L"http://Lunaflare.com/accountRecovery", NULL, NULL, SW_SHOWNORMAL);
 }
 //----------------------------------------------------------------------------
 

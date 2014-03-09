@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------
 
 #include <windows.h>
+#include <Registry.hpp>
 #include <fmx.h>
 #pragma hdrstop
 
@@ -22,6 +23,21 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 //If not, will display error message
 void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 {
+	//checking for the sql comment to prevent hack
+	string check=AnsiString(usernameEdit->Text).c_str();
+	if(check.find("#")!=check.npos)
+		{
+				errorLabel->Text = "Username contains invalid symbol!";
+				errorLabel->Visible = true;
+			return;
+		}
+	check=AnsiString(passwordEdit->Text).c_str();
+		if(check.find("#")!=check.npos)
+		{
+			errorLabel->Text = "Password contains invalid symbol!";
+				errorLabel->Visible = true;
+			return;
+		}
 	//query the db for username and password
 	SQLQuery1->SQL->Text="select * from user_info where username='"+usernameEdit->Text+"' and password=md5('"+passwordEdit->Text+"');";
 	SQLQuery1->Open();
@@ -32,6 +48,7 @@ void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 	{
 		loadIndicator->Enabled=true;
 		loadIndicator->Visible=true;
+
 		//success (not empty), spawn next form, get rid of error message
 		//first save some variables about the user
 		errorLabel->Visible = false;
@@ -41,6 +58,21 @@ void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 		readLevel = SQLQuery1->Fields->Fields[8]->AsString;
 		accessLevel = SQLQuery1->Fields->Fields[4]->AsString;
 		userID = SQLQuery1->Fields->Fields[0]->AsString;
+		hotelID = SQLQuery1->Fields->Fields[7]->AsString;
+
+		//if rememberMe is set, update registry entry
+		TRegistry* reg = new TRegistry(KEY_READ);
+		reg->RootKey = HKEY_CURRENT_USER;
+		reg->Access = KEY_WRITE;
+		reg->OpenKey("Software\\Lunaflare\\Polaris\\", true);
+		reg->WriteString("user", usernameEdit->Text);
+		if(Switch1->IsChecked)
+			reg->WriteInteger("remember", 1);
+		else
+			reg->WriteInteger("remember", 0);
+
+		reg->CloseKey();
+		reg->Free();
 
 		//spawn the next form
 		Form2->Show();
@@ -59,9 +91,9 @@ void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 			}
 		else
 			{
-				recoverPasswordButton->Visible=false;
-				errorLabel->Text="Please fill out the fields below.";
-				errorLabel->Visible=true;
+				recoverPasswordButton->Visible = false;
+				errorLabel->Text = "Please fill out the fields below.";
+				errorLabel->Visible = true;
 			}
 		//add glow effect to empty edit text boxes
 		if (usernameEdit->Text == "")
@@ -87,14 +119,9 @@ void __fastcall TForm1::loginregisterButtonClick(TObject *Sender)
 //Opens browser with recover password form when register button clicked (still need to create form)
 void __fastcall TForm1::recoverPasswordButtonClick(TObject *Sender)
 {
-	ShellExecute(NULL, L"open", L"http://baldwinserver.com/Lunaflare/generateKey.php", NULL, NULL, SW_SHOWNORMAL);
+	ShellExecute(NULL, L"open", L"http://www.facebook.com/l.php?u=http%3A%2F%2Flunaflare.com%2FaccountRecovery&h=_AQHbaAuc", NULL, NULL, SW_SHOWNORMAL);
 }
-//---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
-
-
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 void __fastcall TForm1::passwordEditKeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
           TShiftState Shift)
@@ -103,6 +130,36 @@ if (Key==13)
 	{
 		loginSubmitButton->OnClick(NULL);
 	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::FormCreate(TObject *Sender)
+{
+//initialize registry settings
+TRegistry* reg = new TRegistry(KEY_READ);
+		reg->RootKey = HKEY_CURRENT_USER;
+		reg->Access = KEY_READ;
+		if(reg->OpenKey("Software\\Lunaflare\\Polaris\\", true))
+		{
+			if(reg->ValueExists("remember"))
+			{
+			  if(reg->ReadInteger("remember")==1)
+			  {
+				Switch1->IsChecked=true;
+				usernameEdit->Text=reg->ReadString("user");
+				passwordEdit->SetFocus();
+			  }
+			}
+			else
+			{
+			reg->Access = KEY_WRITE;
+			reg->OpenKey("Software\\Lunaflare\\Polaris\\", true);
+			reg->WriteInteger("remember", 0);
+			usernameEdit->SetFocus();
+			}
+		}
+		reg->CloseKey();
+		reg->Free();
 }
 //---------------------------------------------------------------------------
 

@@ -26,6 +26,7 @@ void __fastcall TForm5::FormShow(TObject *Sender)
 	if (Form1->getAccessLevel() == 2)
 		{
 			editDLRButton->Visible = true;
+			addRoleButton->Visible = true;
 			sep2Image->Visible=true;
 			adminLabel->Visible=true;
 		}
@@ -85,8 +86,24 @@ void __fastcall TForm5::saveChangesButtonClick(TObject *Sender)
 		{
 			ShowMessage(L"Passwords do not match");
 		}
+		else if(passwordChangeEdit->Text.Length()<8)
+		{
+			ShowMessage(L"Password must be atleast 8 characters");
+		}
+		else if(passwordChangeEdit->Text.Length()>24)
+		{
+			ShowMessage(L"Password must be less than 25 characters");
+		}
 		else
 		{
+		 //check to make sure the new password does not contain # to prevent hack
+		 string checkValid = AnsiString(passwordChangeEdit->Text).c_str();
+			if(checkValid.find("#")!=checkValid.npos)
+		{
+			ShowMessage(L"Password cannot contain #!");
+			return;
+		}
+
 			int msgboxID = MessageBox(
 				NULL,
 				L"Would you really like to change your password?",
@@ -111,6 +128,8 @@ void __fastcall TForm5::saveChangesButtonClick(TObject *Sender)
 
 				//query database and change input and read levels appropriately
 				Form1->SQLQuery1->SQL->Text="UPDATE baldwins_beta.user_info SET preference_read='"+currentReadLevel+"', password=md5('"+newPassword+"'), preference_write='"+currentInputLevel+"' WHERE user_info.userID='"+Form1->getUserID()+"';";
+				Form1->SQLQuery1->ExecSQL();
+				Form1->SQLQuery1->SQL->Text="UPDATE baldwins_mant541.mantis_user_table SET password=md5('"+newPassword+"')";
 				Form1->SQLQuery1->ExecSQL();
 
 				//set read and input levels appropriately given the desired changes (so populated upon return to this form)
@@ -180,6 +199,7 @@ homeImageButton5->Bitmap=home_swapper->Bitmap;
 homeLabelImage->Visible=false;
 }
 //---------------------------------------------------------------------------
+
 
 
 

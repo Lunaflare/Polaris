@@ -1121,8 +1121,19 @@ void __fastcall TForm3::submitButtonClick(TObject *Sender)
 	else
 	{
 		//do nothing
-    }
+	}
 }
 //---------------------------------------------------------------------------
 
+
+
+void __fastcall TForm3::FormCloseQuery(TObject *Sender, bool &CanClose)
+{
+if(loadingIndicator->Visible==true)
+	CanClose=false;
+else CanClose=true;
+}
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
 
