@@ -3,6 +3,7 @@
 #include <fmx.h>
 #pragma hdrstop
 
+#include "Unit6.h"
 #include "Unit5.h"
 #include "prototype.h"
 #include "Unit2.h"
@@ -200,7 +201,10 @@ homeLabelImage->Visible=false;
 }
 //---------------------------------------------------------------------------
 
-
-
-
+void __fastcall TForm5::addRoleButtonClick(TObject *Sender)
+{
+	Form5->Hide();
+	Form6->Show();
+}
+//---------------------------------------------------------------------------
 

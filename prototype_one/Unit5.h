@@ -64,6 +64,7 @@ __published:	// IDE-managed Components
 	void __fastcall saveChangesButtonClick(TObject *Sender);
 	void __fastcall homeImageButton5MouseEnter(TObject *Sender);
 	void __fastcall homeImageButton5MouseLeave(TObject *Sender);
+	void __fastcall addRoleButtonClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TForm5(TComponent* Owner);

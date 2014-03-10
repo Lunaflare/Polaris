@@ -12,6 +12,7 @@
     <Transaction>2014/01/29 12:45:05.000.203,=C:\Users\Alex\Documents\GitHub\Polaris\prototype_one\Unit3.cpp</Transaction>
     <Transaction>2014/01/29 14:05:22.000.653,=C:\Users\Alex\Documents\GitHub\Polaris\prototype_one\Unit4.cpp</Transaction>
     <Transaction>2014/01/29 14:15:13.000.287,=C:\Users\Alex\Documents\GitHub\Polaris\prototype_one\Unit5.cpp</Transaction>
+    <Transaction>2014/03/10 17:35:55.609,=C:\Users\Alex\Documents\GitHub\Polaris\prototype_one\Unit6.cpp</Transaction>
   </Transactions>
 	<ProjectSortOrder AutoSort="0" SortType="0">
     <File Path="prototype.cpp"/>
@@ -36,5 +37,9 @@
     <File Path="Unit5.cpp"/>
     <File Path="Unit5.fmx"/>
     <File Path="Unit5.h"/>
+    <File Path="Unit6.cpp"/>
+    <File Path="Unit6.cpp"/>
+    <File Path="Unit6.fmx"/>
+    <File Path="Unit6.h"/>
   </ProjectSortOrder>
 </BorlandProject>
