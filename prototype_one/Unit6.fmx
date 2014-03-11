@@ -4,14 +4,17 @@ object Form6: TForm6
   Caption = 'Add a Role'
   ClientHeight = 480
   ClientWidth = 640
+  Position = poScreenCenter
   FormFactor.Width = 1366
   FormFactor.Height = 768
   FormFactor.Devices = [dkDesktop]
+  OnClose = FormClose
+  OnShow = FormShow
   object saveChangesButton: TButton
     DisableFocusEffect = False
     Height = 38.000000000000000000
-    Position.X = 392.000000000000000000
-    Position.Y = 408.000000000000000000
+    Position.X = 280.000000000000000000
+    Position.Y = 264.000000000000000000
     Text = 'Save'
     Width = 105.000000000000000000
     OnClick = saveChangesButtonClick
@@ -161,9 +164,10 @@ object Form6: TForm6
       0001E8A4D603C48BD000DC1020006E081000370408801B0204C00D0102E08600
       017043800038198DFE0F13EA53B9B3AFE5A40000000049454E44AE426082}
     Height = 50.000000000000000000
-    Position.X = 24.000000000000000000
-    Position.Y = 406.000000000000000000
+    Position.X = 80.000000000000000000
+    Position.Y = 390.000000000000000000
     Width = 50.000000000000000000
+    OnClick = homeImageButton6Click
   end
   object backImageButton: TImage
     Bitmap.PNG = {
@@ -978,9 +982,56 @@ object Form6: TForm6
       C493C1608C0BC6A3A0C662A4BEEF78398E23256E4C34190CC6388790FF0FB864
       E214BEF49B0E0000000049454E44AE426082}
     Height = 74.000000000000000000
-    Position.X = 190.000000000000000000
-    Position.Y = 390.000000000000000000
-    Visible = False
+    Position.X = 470.000000000000000000
+    Position.Y = 374.000000000000000000
     Width = 82.000000000000000000
+    OnClick = backImageButtonClick
+  end
+  object roleNameLabel: TLabel
+    Height = 15.000000000000000000
+    Position.X = 48.000000000000000000
+    Position.Y = 40.000000000000000000
+    Text = 'Role Name:'
+    Width = 120.000000000000000000
+  end
+  object roleNameEdit: TEdit
+    DisableFocusEffect = False
+    KeyboardType = vktDefault
+    Password = False
+    Position.X = 216.000000000000000000
+    Position.Y = 32.000000000000000000
+    Width = 233.000000000000000000
+    Height = 22.000000000000000000
+  end
+  object roleWagesLabel: TLabel
+    Height = 15.000000000000000000
+    Position.X = 48.000000000000000000
+    Position.Y = 104.000000000000000000
+    Text = 'Role Wages:'
+    Width = 120.000000000000000000
+  end
+  object roleWagesEdit: TEdit
+    DisableFocusEffect = False
+    KeyboardType = vktDefault
+    Password = False
+    Position.X = 216.000000000000000000
+    Position.Y = 96.000000000000000000
+    Width = 233.000000000000000000
+    Height = 22.000000000000000000
+  end
+  object roleReferenceLabel: TLabel
+    Height = 15.000000000000000000
+    Position.X = 48.000000000000000000
+    Position.Y = 168.000000000000000000
+    Text = 'Labor Standards Reference:'
+    Width = 161.000000000000000000
+  end
+  object referencePopupBox: TPopupBox
+    DisableFocusEffect = False
+    Height = 22.000000000000000000
+    ItemIndex = -1
+    Position.X = 216.000000000000000000
+    Position.Y = 160.000000000000000000
+    Width = 233.000000000000000000
   end
 end

@@ -33,3 +33,7 @@
 .extra calculations on side for month and year in read?
 .store "accounting for particular months/weeks/years in order to calculate extra stuff in top left of grid?
 	-right now these calculations will not be correct because there is a hardcoded number for "accounting"
+.in settings form - "add role" and "edit dlr" button stay "clicked" when look at them again after going to add role form and pressing back or home
+.possibly change edit dlr in settings to just be view dlr and simply display the labor standars?
+	-could even make some parts read only but make other parts directly changeable since it would only affect future calculations 
+.type check in add role form
