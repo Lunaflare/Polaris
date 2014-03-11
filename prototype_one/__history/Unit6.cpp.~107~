@@ -26,9 +26,8 @@ void __fastcall TForm6::backImageButtonClick(TObject *Sender)
 	//set things back to empty
 	roleNameEdit->Text = "";
 	roleWagesEdit->Text = "";
-	//referencePopupBox->Items->Clear();
+	referencePopupBox->Items->Clear();
 	referencePopupBox->ItemIndex = 0;
-	referencePopupBox->Visible = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm6::saveChangesButtonClick(TObject *Sender)
@@ -67,9 +66,8 @@ void __fastcall TForm6::homeImageButton6Click(TObject *Sender)
 	//set things back to empty
 	roleNameEdit->Text = "";
 	roleWagesEdit->Text = "";
-	//referencePopupBox->Items->Clear();
+	referencePopupBox->Items->Clear();
 	referencePopupBox->ItemIndex = 0;
-	referencePopupBox->Visible = true;
 }
 //---------------------------------------------------------------------------
 
@@ -104,7 +102,7 @@ void __fastcall TForm6::FormShow(TObject *Sender)
 	}
 	for (int i = 0; i < referenceVector.size() - 2; ++i)
 		referencePopupBox->Items->Add(StringReplace(referenceVector[i], "_", " ", TReplaceFlags() << rfReplaceAll));
-	referencePopupBox->Index = 0;
+	//referencePopupBox->Index = 0;
 }
 //---------------------------------------------------------------------------
 

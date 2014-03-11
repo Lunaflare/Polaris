@@ -27,7 +27,7 @@ void __fastcall TForm6::backImageButtonClick(TObject *Sender)
 	roleNameEdit->Text = "";
 	roleWagesEdit->Text = "";
 	referencePopupBox->Items->Clear();
-	//referencePopupBox->ItemIndex = 0;
+	referencePopupBox->ItemIndex = 0;
 	//referencePopupBox->Visible = true;
 }
 //---------------------------------------------------------------------------
@@ -68,7 +68,7 @@ void __fastcall TForm6::homeImageButton6Click(TObject *Sender)
 	roleNameEdit->Text = "";
 	roleWagesEdit->Text = "";
 	referencePopupBox->Items->Clear();
-	//referencePopupBox->ItemIndex = 0;
+	referencePopupBox->ItemIndex = 0;
 	//referencePopupBox->Visible = true;
 }
 //---------------------------------------------------------------------------

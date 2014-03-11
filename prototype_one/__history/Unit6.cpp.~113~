@@ -26,9 +26,8 @@ void __fastcall TForm6::backImageButtonClick(TObject *Sender)
 	//set things back to empty
 	roleNameEdit->Text = "";
 	roleWagesEdit->Text = "";
-	//referencePopupBox->Items->Clear();
-	//referencePopupBox->ItemIndex = 0;
-	//referencePopupBox->Visible = true;
+	referencePopupBox->Items->Clear();
+	referencePopupBox->ItemIndex = 0;
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm6::saveChangesButtonClick(TObject *Sender)
@@ -45,9 +44,13 @@ void __fastcall TForm6::saveChangesButtonClick(TObject *Sender)
 	String rolePercentPerformance = bareRoleName + "_Percent_Performance";
 
 	//add to role table
-	String roleValues = "'" + currentHotelID + "', '" + roleHoursPaid + "', '" + bareRoleName + "', '" + roleWages + "', '" + roleReference + "'";
+	/*String roleValues = "'" + currentHotelID + "', '" + roleHoursPaid + "', '" + bareRoleName + "', '" + roleWages + "', '" + roleReference + "'";
 	Form3->SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data.role_table (hotelID, Role_Name, Bare_Role_Name, Role_Wages, Standard_Hours_Reference) VALUES ("+roleValues+");";
-	Form3->SQLQuery2->ExecSQL();
+	Form3->SQLQuery2->ExecSQL();*/
+
+	//add to input table
+	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+inputTable+" ADD COLUMN '"+roleHoursPaid+"' DOUBLE NOT NULL AFTER "+StringReplace(referencePopupBox->Items->operator [](referencePopupBox->Items->Count-1), " ", "_", TReplaceFlags() << rfReplaceAll)+";";
+    Form3->SQLQuery2->ExecSQL();
 
 	//take back to settings page
 	backImageButton->OnClick(NULL);
@@ -67,9 +70,8 @@ void __fastcall TForm6::homeImageButton6Click(TObject *Sender)
 	//set things back to empty
 	roleNameEdit->Text = "";
 	roleWagesEdit->Text = "";
-	//referencePopupBox->Items->Clear();
-	//referencePopupBox->ItemIndex = 0;
-	//referencePopupBox->Visible = true;
+	referencePopupBox->Items->Clear();
+	referencePopupBox->ItemIndex = 0;
 }
 //---------------------------------------------------------------------------
 
@@ -104,7 +106,6 @@ void __fastcall TForm6::FormShow(TObject *Sender)
 	}
 	for (int i = 0; i < referenceVector.size() - 2; ++i)
 		referencePopupBox->Items->Add(StringReplace(referenceVector[i], "_", " ", TReplaceFlags() << rfReplaceAll));
-	referencePopupBox->Index = 0;
 }
 //---------------------------------------------------------------------------
 
