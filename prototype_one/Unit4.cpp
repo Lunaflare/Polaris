@@ -455,43 +455,19 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 	{
 		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE MONTH(Date) = '" + monthChosen + "' AND YEAR(Date) = '" + monthYearSelected + "' GROUP BY Day_Of_Week;";
 		Form3->SQLQuery2->Open();
-		if (Form3->SQLQuery2->Eof)
-		{
-			/*******************************************
-			/Handle Situation When Query Returns Nothing
-			*///////////////////////////////////////////
-			return;
-		}
-		else
-			Form3->SQLQuery2->First();
+		Form3->SQLQuery2->First();
 	}
 	else if (SameText(type, "year"))
 	{
 		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE YEAR(Date) = '" + monthChosen + "' GROUP BY Day_Of_Week;";
 		Form3->SQLQuery2->Open();
-		if (Form3->SQLQuery2->Eof)
-		{
-			/*******************************************
-			/Handle Situation When Query Returns Nothing
-			*///////////////////////////////////////////
-			return;
-		}
-		else
-			Form3->SQLQuery2->First();
+		Form3->SQLQuery2->First();
 	}
 	else if (SameText(type, "week"))
 	{
 		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE Date BETWEEN '" + rangeStart + "' AND '" + rangeEnd + "' GROUP BY Day_Of_Week;";
 		Form3->SQLQuery2->Open();
-		if (Form3->SQLQuery2->Eof)
-		{
-			/*******************************************
-			/Handle Situation When Query Returns Nothing
-			*///////////////////////////////////////////
-			return;
-		}
-		else
-			Form3->SQLQuery2->First();
+		Form3->SQLQuery2->First();
     }
 
 	//start filling column 1
@@ -1130,15 +1106,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 	//construct actual query
 	Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE Date = '" + currentDate + "';";
 	Form3->SQLQuery2->Open();
-	if (Form3->SQLQuery2->Eof)
-		{
-			/*******************************************
-			/Handle Situation When Query Returns Nothing
-			*///////////////////////////////////////////
-			return;
-		}
-		else
-			Form3->SQLQuery2->First();
+	Form3->SQLQuery2->First();
 
 	//start filling column 1
 	String firstColumnNoDayWeek[9] = {"Date", "Offset_Rooms_Occupied", "Occupancy_Percent", "AM_Rooms_Cleaned", "PM_Rooms_Cleaned", "Rooms_Sold", "Total_Rooms_Cleaned", "Guestroom_Carpets_Cleaned", "Documented_Inspections"};
