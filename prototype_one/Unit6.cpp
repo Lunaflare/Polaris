@@ -44,12 +44,16 @@ void __fastcall TForm6::saveChangesButtonClick(TObject *Sender)
 	String rolePercentPerformance = bareRoleName + "_Percent_Performance";
 
 	//add to role table
-	/*String roleValues = "'" + currentHotelID + "', '" + roleHoursPaid + "', '" + bareRoleName + "', '" + roleWages + "', '" + roleReference + "'";
+	String roleValues = "'" + currentHotelID + "', '" + roleHoursPaid + "', '" + bareRoleName + "', '" + roleWages + "', '" + roleReference + "'";
 	Form3->SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data.role_table (hotelID, Role_Name, Bare_Role_Name, Role_Wages, Standard_Hours_Reference) VALUES ("+roleValues+");";
-	Form3->SQLQuery2->ExecSQL();*/
+	Form3->SQLQuery2->ExecSQL();
 
 	//add to input table
-	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+inputTable+" ADD COLUMN "+roleHoursPaid+" DOUBLE NOT NULL AFTER "+StringReplace(referencePopupBox->Items->operator [](referencePopupBox->Items->Count-1) + "_Hours_Paid", " ", "_", TReplaceFlags() << rfReplaceAll)+";";
+	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+inputTable+" ADD COLUMN "+roleHoursPaid+" DOUBLE NOT NULL AFTER Director_And_Two_Managers_Hours_Paid;";
+	Form3->SQLQuery2->ExecSQL();
+
+	//add to read table
+	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+readTable+" ADD COLUMN "+roleHoursPaid+" DOUBLE NOT NULL AFTER Director_And_Two_Managers_Percent_Performance, ADD COLUMN "+roleStandardHours+" DOUBLE NOT NULL AFTER "+roleHoursPaid+", ADD COLUMN "+rolePercentPerformance+" DOUBLE NOT NULL AFTER "+roleStandardHours+";";
     Form3->SQLQuery2->ExecSQL();
 
 	//take back to settings page
@@ -91,11 +95,9 @@ void __fastcall TForm6::FormShow(TObject *Sender)
 	}
 
 	//query information schema of labor standards table to get possible reference names
-	Form3->SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_hotel_data' AND TABLE_NAME = '"+laborTable+"';";
+	Form3->SQLQuery2->SQL->Text = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'baldwins_hotel_data' AND TABLE_NAME = '"+inputTable+"';";
 	Form3->SQLQuery2->Open();
 	Form3->SQLQuery2->First();
-	Form3->SQLQuery2->Next();
-	Form3->SQLQuery2->Next();
 	Form3->SQLQuery2->Next();
 	Form3->SQLQuery2->Next();
 	vector<String> referenceVector;
@@ -104,7 +106,7 @@ void __fastcall TForm6::FormShow(TObject *Sender)
 		referenceVector.push_back(Form3->SQLQuery2->Fields->Fields[0]->AsString);
 		Form3->SQLQuery2->Next();
 	}
-	for (int i = 0; i < referenceVector.size() - 2; ++i)
+	for (int i = 0; i < 7; ++i)
 		referencePopupBox->Items->Add(StringReplace(referenceVector[i], "_", " ", TReplaceFlags() << rfReplaceAll));
 }
 //---------------------------------------------------------------------------

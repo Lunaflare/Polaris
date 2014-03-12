@@ -37,3 +37,5 @@
 .possibly change edit dlr in settings to just be view dlr and simply display the labor standars?
 	-could even make some parts read only but make other parts directly changeable since it would only affect future calculations 
 .type check in add role form
+.in add role need to adjust overtime pay per hour and avg pay per hour to include new role and its wages
+.labor standards in database do not match up to the excel sheets

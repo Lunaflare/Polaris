@@ -49,7 +49,12 @@ void __fastcall TForm6::saveChangesButtonClick(TObject *Sender)
 	Form3->SQLQuery2->ExecSQL();
 
 	//add to input table
+	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+inputTable+" ADD COLUMN "+roleHoursPaid+" DOUBLE NOT NULL AFTER "+StringReplace(referencePopupBox->Items->operator [](referencePopupBox->Items->Count-1) + "_Hours_Paid", " ", "_", TReplaceFlags() << rfReplaceAll)+";";
+	Form3->SQLQuery2->ExecSQL();
 
+	//add to read table
+	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+readTable+" ADD COLUMN "+roleHoursPaid+" DOUBLE NOT NULL AFTER "+StringReplace(referencePopupBox->Items->operator [](referencePopupBox->Items->Count-1) + "_Percent_Performance", " ", "_", TReplaceFlags() << rfReplaceAll)+", ADD COLUMN "+roleStandardHours+" DOUBLE NOT NULL AFTER "+roleHoursPaid+", ADD COLUMN "+rolePercentPerformance+" DOUBLE NOT NULL AFTER "+roleStandardHours+";";
+    Form3->SQLQuery2->ExecSQL();
 
 	//take back to settings page
 	backImageButton->OnClick(NULL);
