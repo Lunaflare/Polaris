@@ -17,6 +17,24 @@ __fastcall TForm4::TForm4(TComponent* Owner)
 {
 }
 //---------------------------------------------------------------------------
+//Thread Class
+__fastcall TReadThread::TReadThread()
+	: TThread(true)
+{
+	FreeOnTerminate = true;
+	// setup other thread parameters as needed...
+}
+
+void __fastcall TReadThread::Execute()
+{
+  //run Code
+  Form4->chooseButtonCode();
+}
+
+void __fastcall TForm4::ThreadTerminated(TObject *Sender)
+{
+ //do nothing
+}
 
 void __fastcall TForm4::displayFilters(String filterType, int arbitraryIdentifier)
 {
@@ -1867,7 +1885,16 @@ void __fastcall TForm4::yearRadioClick(TObject *Sender)
 
 void __fastcall TForm4::updateImageButtonClick(TObject *Sender)
 {
-	//handle the refreshing of the grid based on the filters to the left of the grid
+	//start thread!
+	TReadThread *readThrd = new TReadThread();
+	readThrd->OnTerminate = &ThreadTerminated;
+	readThrd->Resume();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::chooseButtonCode()
+{
+    //handle the refreshing of the grid based on the filters to the left of the grid
 
 	//no matter what I will get whatever roles are currently selected
 	roleVector.clear();
@@ -1961,5 +1988,3 @@ void __fastcall TForm4::updateImageButtonClick(TObject *Sender)
 		populateGrid(roleVector, (int) toDouble(currentYear), "null", "null", "year");
 	}
 }
-//---------------------------------------------------------------------------
-

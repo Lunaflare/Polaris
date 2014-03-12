@@ -1275,14 +1275,43 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		//simply call populateGrid function passing in today's week and running as week type
 
 		//fill roleVector with all the roles currently possible
+		String bareRole = "";
+		String bareRoleFormatted = "";
 		Form3->SQLQuery2->SQL->Text = "SELECT Bare_Role_Name FROM baldwins_hotel_data.role_table WHERE hotelID = '"+currentHotelID+"';";
 		Form3->SQLQuery2->Open();
 		Form3->SQLQuery2->First();
 		while (!Form3->SQLQuery2->Eof)
 		{
+			bareRole = Form3->SQLQuery2->Fields->Fields[0]->AsString;
+			bareRoleFormatted = StringReplace(bareRole, "_", " ", TReplaceFlags() << rfReplaceAll);
+			roleListBox->Items->Add(bareRoleFormatted);
 			roleVector.push_back(Form3->SQLQuery2->Fields->Fields[0]->AsString);
 			Form3->SQLQuery2->Next();
 		}
+
+		//make mandatory items' checkbox not enabled
+		for (int i = 0; i < roleListBox->Items->Count; ++i)
+			if (SameText(roleListBox->ItemByIndex(i)->Text, "AM Room Attendants"))
+			{
+				roleListBox->ItemByIndex(i)->IsChecked = true;
+				roleListBox->ItemByIndex(i)->Enabled = false;
+			}
+			else if (SameText(roleListBox->ItemByIndex(i)->Text, "PM Room Attendants"))
+			{
+				roleListBox->ItemByIndex(i)->IsChecked = true;
+				roleListBox->ItemByIndex(i)->Enabled = false;
+			}
+			else if (SameText(roleListBox->ItemByIndex(i)->Text, "Laundry Attendant"))
+			{
+				roleListBox->ItemByIndex(i)->IsChecked = true;
+				roleListBox->ItemByIndex(i)->Enabled = false;
+			}
+
+		//simulate select all button press
+        selectAllButton->OnClick(NULL);
+
+		//simulate week radio button being checked
+		weekRadio->IsChecked = true;
 
         //get the date and change to a string
 		TDateTime dayChosenStart = dayCalendar->Date;
@@ -1293,7 +1322,7 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		//get the week selected by the day selected from the calendar
 		while (DayOfWeek(dayChosenStart) != 7)
 			dayChosenStart--;
-		while (DayOfWeek(dayChosenEnd) != 1)
+		while (DayOfWeek(dayChosenEnd) != 6)
 			dayChosenEnd++;
 
 		//convert to strings to pass into populateGrid function
@@ -1343,6 +1372,8 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	roleVector.clear();
 	monthPopupBox->ItemIndex = 0;
 	yearPopupBox->ItemIndex = 0;
+	monthPopupBox->Visible = false;
+	yearPopupBox->Visible = false;
 	readGrid->Visible = false;
 	secondTimeArbitrary = false;
 	dayCalendar->Visible = false;

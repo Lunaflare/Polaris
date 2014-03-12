@@ -13,7 +13,7 @@ object Form4: TForm4
   OnShow = FormShow
   object dayCalendar: TCalendar
     ClipChildren = False
-    Date = 41708.000000000000000000
+    Date = 41710.000000000000000000
     EnableDragHighlight = False
     Height = 164.000000000000000000
     Position.X = 296.000000000000000000
@@ -36,7 +36,7 @@ object Form4: TForm4
   end
   object rangeEndCalendar: TCalendar
     ClipChildren = False
-    Date = 41708.000000000000000000
+    Date = 41710.000000000000000000
     Height = 164.000000000000000000
     Position.X = 296.000000000000000000
     Position.Y = 360.000000000000000000
@@ -12783,10 +12783,10 @@ object Form4: TForm4
       IsSelected = True
       Position.X = 1.000000000000000000
       Text = 'Start Date'
-      Width = 71.000000000000000000
+      Width = 69.000000000000000000
       object filterStartCalendar: TCalendar
         ClipChildren = False
-        Date = 41708.000000000000000000
+        Date = 41710.000000000000000000
         Height = 164.000000000000000000
         Position.X = 8.000000000000000000
         Position.Y = 8.000000000000000000
@@ -12800,12 +12800,12 @@ object Form4: TForm4
       WordWrap = False
       Height = 24.000000000000000000
       IsSelected = False
-      Position.X = 72.000000000000000000
+      Position.X = 70.000000000000000000
       Text = 'End Date'
-      Width = 66.000000000000000000
+      Width = 64.000000000000000000
       object filterEndCalendar: TCalendar
         ClipChildren = False
-        Date = 41708.000000000000000000
+        Date = 41710.000000000000000000
         Height = 164.000000000000000000
         Position.X = 8.000000000000000000
         Position.Y = 8.000000000000000000
