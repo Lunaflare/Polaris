@@ -12989,4 +12989,11 @@ object Form4: TForm4
     Width = 81.000000000000000000
     OnClick = updateImageButtonClick
   end
+  object readLoadingIndicator: TAniIndicator
+    Height = 169.000000000000000000
+    Position.X = 272.000000000000000000
+    Position.Y = 248.000000000000000000
+    Visible = False
+    Width = 977.000000000000000000
+  end
 end

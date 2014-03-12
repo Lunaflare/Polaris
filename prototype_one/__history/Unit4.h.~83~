@@ -28,6 +28,14 @@
 
 using namespace std;
 //---------------------------------------------------------------------------
+class TReadThread : public TThread
+{
+protected:
+	virtual void __fastcall Execute();
+public:
+	__fastcall TReadThread();
+};
+
 class TForm4 : public TForm
 {
 __published:	// IDE-managed Components
@@ -65,6 +73,7 @@ __published:	// IDE-managed Components
 	TTabItem *rangeEndCalendarTab;
 	TCalendar *filterStartCalendar;
 	TCalendar *filterEndCalendar;
+	TImage *updateImageButton;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton4Click(TObject *Sender);
@@ -77,7 +86,9 @@ __published:	// IDE-managed Components
 	void __fastcall arbitraryRadioClick(TObject *Sender);
 	void __fastcall monthRadioClick(TObject *Sender);
 	void __fastcall yearRadioClick(TObject *Sender);
-private:	// User declarations
+	void __fastcall updateImageButtonClick(TObject *Sender);
+	//was private
+	public:	// User declarations
 	String inputTable;
 	String readTable;
 	String laborTable;
@@ -87,7 +98,20 @@ private:	// User declarations
 	String privateDayChosenStart;
 	String privateDayChosenEnd;
 	bool secondTimeArbitrary;
+	int selectAllButtonX;
+	int selectAllButtonY;
+	int RoleListBoxX;
+	int RoleListBoxY;
+	int radioGroupBoxX;
+	int radioGroupBoxY;
 	int monthYearSelected;
+	int dayCalendarX;
+	int dayCalendarY;
+	int monthPopupBoxX;
+	int monthPopupBoxY;
+	int yearPopupBoxX;
+	int yearPopupBoxY;
+	bool homeAlreadyPressed;
 public:		// User declarations
 	__fastcall TForm4(TComponent* Owner);
 	void __fastcall populateGrid(vector<String>, String);
@@ -99,6 +123,8 @@ public:		// User declarations
 	String __fastcall commas(string num);
 	double __fastcall toDouble(String);
 	void __fastcall displayFilters(String, int);
+	void __fastcall TForm4::ThreadTerminated(TObject *Sender);
+	void __fastcall chooseButtonCode();
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm4 *Form4;

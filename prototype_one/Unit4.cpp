@@ -33,7 +33,8 @@ void __fastcall TReadThread::Execute()
 
 void __fastcall TForm4::ThreadTerminated(TObject *Sender)
 {
- //do nothing
+	readLoadingIndicator->Enabled=false;
+	readLoadingIndicator->Visible=false;
 }
 
 void __fastcall TForm4::displayFilters(String filterType, int arbitraryIdentifier)
@@ -1886,6 +1887,8 @@ void __fastcall TForm4::yearRadioClick(TObject *Sender)
 void __fastcall TForm4::updateImageButtonClick(TObject *Sender)
 {
 	//start thread!
+	readLoadingIndicator->Enabled=true;
+	readLoadingIndicator->Visible=true;
 	TReadThread *readThrd = new TReadThread();
 	readThrd->OnTerminate = &ThreadTerminated;
 	readThrd->Resume();
