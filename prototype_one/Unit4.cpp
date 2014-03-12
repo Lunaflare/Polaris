@@ -18,210 +18,6 @@ __fastcall TForm4::TForm4(TComponent* Owner)
 }
 //---------------------------------------------------------------------------
 
-__fastcall TReadThread::TReadThread()
-	: TThread(true)
-{
-	FreeOnTerminate = true;
-	// setup other thread parameters as needed...
-}
-__fastcall TbasicReadThread::TbasicReadThread()
-	: TThread(true)
-{
-	FreeOnTerminate = true;
-	// setup other thread parameters as needed...
-}
-
-void __fastcall TReadThread::Execute()
-{
-  //handle the refreshing of the grid based on the filters to the left of the grid
-
-	//no matter what I will get whatever roles are currently selected
-	Form4->roleVector.clear();
-	for (int i = 0; i < Form4->roleListBox->Items->Count; ++i)
-		if (Form4->roleListBox->ItemByIndex(i)->IsChecked)
-			Form4->roleVector.push_back(Form4->roleListBox->Items->operator [](i));
-
-	//variables used below
-	String dbDayChosen = "";
-	String dbDayChosenStart = "";
-	String dbDayChosenEnd = "";
-
-	//clear readGrid and set rowCount back to bare minimum (19) and make invisible
-   //	Form4->readGrid->Visible = false;
-	for (int i = 0; i < 10; ++i)
-	{
-		if (i != 1)
-			Form4->readGrid->ColumnByIndex(i)->Header = "";
-
-		for (int j = 0; j < Form4->readGrid->RowCount; ++j)
-			Form4->readGrid->Cells[i][j] = "";
-	}
-	Form4->readGrid->RowCount = 19;
-
-	//check which radio was selected
-	if (Form4->dayRadio->IsChecked)
-	{
-		//get the date selected from the calendar
-		TDateTime dayChosen = Form4->dayCalendar->Date;
-		dbDayChosen = StrToDate(dayChosen).FormatString(L"yyyy-mm-dd");
-
-		//call display function
-		Form4->populateGrid(Form4->roleVector, dbDayChosen);
-	}
-	else if (Form4->weekRadio->IsChecked)
-	{
-		//get the date and change to a string
-		TDateTime dayChosenStart = Form4->dayCalendar->Date;
-		TDateTime dayChosenEnd = Form4->dayCalendar->Date;
-
-		//get the week selected by the day selected from the calendar
-		while (DayOfWeek(dayChosenStart) != 7)
-			dayChosenStart--;
-		while (DayOfWeek(dayChosenEnd) != 6)
-			dayChosenEnd++;
-
-		//convert to strings to pass into populateGrid function
-		dbDayChosenStart = StrToDate(dayChosenStart).FormatString(L"yyyy-mm-dd");
-		dbDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"yyyy-mm-dd");
-		Form4->privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
-		Form4->privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
-
-		//call display function
-		Form4->populateGrid(Form4->roleVector, 0, dbDayChosenStart, dbDayChosenEnd, "week");
-	}
-	else if (Form4->arbitraryRadio->IsChecked)
-	{
-		//get the date and change to a string
-		TDateTime dayChosenStart = Form4->filterStartCalendar->Date;
-		TDateTime dayChosenEnd = Form4->filterEndCalendar->Date;
-
-		//convert to strings to pass into populateGrid function
-		dbDayChosenStart = StrToDate(dayChosenStart).FormatString(L"yyyy-mm-dd");
-		dbDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"yyyy-mm-dd");
-		Form4->privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
-		Form4->privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
-
-		//call display function (should work same with week as with arbitrary)
-		Form4->populateGrid(Form4->roleVector, -1, dbDayChosenStart, dbDayChosenEnd, "week");
-	}
-	else if (Form4->monthRadio->IsChecked)
-	{
-		//get the month selected from the drop down (value 1 through 12)
-		int currentMonthIndex = Form4->monthPopupBox->ItemIndex + 1;
-
-		//get the year selected from the drop down
-		int currentYearIndex =Form4-> yearPopupBox->ItemIndex;
-		String currentYear = Form4->yearPopupBox->Items->operator [](currentYearIndex);
-		Form4->monthYearSelected = ((int) Form4->toDouble(currentYear));
-
-		//call display function
-		Form4->populateGrid(Form4->roleVector, currentMonthIndex, "null", "null", "month");
-	}
-	else if (Form4->yearRadio->IsChecked)
-	{
-		//get the year selected from the drop down
-		int currentYearIndex = Form4->yearPopupBox->ItemIndex;
-		String currentYear = Form4->yearPopupBox->Items->operator [](currentYearIndex);
-
-		//call display function
-		Form4->populateGrid(Form4->roleVector, (int) Form4->toDouble(currentYear), "null", "null", "year");
-	}
-}
-
-void __fastcall TbasicReadThread::Execute()
-{
-			Form4->filtersLabel->Visible = false;
-			Form4->backImageButton2->Visible = false;
-			Form4->nextImageButton2->Visible = false;
-			Form4->dayCalendar->Visible = false;
-			Form4->rangeEndCalendar->Visible = false;
-			Form4->monthPopupBox->Visible = false;
-			Form4->yearPopupBox->Visible = false;
-
-			//needed to compile
-			String dbDayChosen = "";
-			String dbDayChosenStart = "";
-			String dbDayChosenEnd = "";
-
-			//get whatever data was chosen by user (i.e. day, week, month or year)
-			if (Form4->viewType == "Day")
-			{
-				//get the date selected from the calendar
-				TDateTime dayChosen = Form4->dayCalendar->Date;
-				dbDayChosen = StrToDate(dayChosen).FormatString(L"yyyy-mm-dd");
-
-				//call display function
-				Form4->populateGrid(Form4->roleVector, dbDayChosen);
-			}
-			else if (Form4->viewType == "Week")
-			{
-				//get the date and change to a string
-				TDateTime dayChosenStart = Form4->dayCalendar->Date;
-				TDateTime dayChosenEnd = Form4->dayCalendar->Date;
-
-				//get the week selected by the day selected from the calendar
-				while (DayOfWeek(dayChosenStart) != 7)
-					dayChosenStart--;
-				while (DayOfWeek(dayChosenEnd) != 6)
-					dayChosenEnd++;
-
-				//convert to strings to pass into populateGrid function
-				dbDayChosenStart = StrToDate(dayChosenStart).FormatString(L"yyyy-mm-dd");
-				dbDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"yyyy-mm-dd");
-				Form4->privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
-				Form4->privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
-
-				//call display function
-				Form4->populateGrid(Form4->roleVector, 0, dbDayChosenStart, dbDayChosenEnd, "week");
-			}
-			else if (Form4->viewType == "Arbitrary")
-			{
-				//get the date and change to a string
-				TDateTime dayChosenStart = Form4->dayCalendar->Date;
-				TDateTime dayChosenEnd = Form4->rangeEndCalendar->Date;
-
-				//convert to strings to pass into populateGrid function
-				dbDayChosenStart = StrToDate(dayChosenStart).FormatString(L"yyyy-mm-dd");
-				dbDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"yyyy-mm-dd");
-				Form4->privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
-				Form4->privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
-
-				//call display function (should work same with week as with arbitrary)
-				Form4->populateGrid(Form4->roleVector, -1, dbDayChosenStart, dbDayChosenEnd, "week");
-            }
-			else if (Form4->viewType == "Month")
-			{
-				//get the month selected from the drop down (value 1 through 12)
-				int currentMonthIndex = Form4->monthPopupBox->ItemIndex + 1;
-
-				//get the year selected from the drop down
-				int currentYearIndex = Form4->yearPopupBox->ItemIndex;
-				String currentYear = Form4->yearPopupBox->Items->operator [](currentYearIndex);
-				Form4->monthYearSelected = ((int) Form4->toDouble(currentYear));
-
-				//call display function
-				Form4->populateGrid(Form4->roleVector, currentMonthIndex, "null", "null", "month");
-			}
-			else
-			{
-				//get the year selected from the drop down
-				int currentYearIndex = Form4->yearPopupBox->ItemIndex;
-				String currentYear = Form4->yearPopupBox->Items->operator [](currentYearIndex);
-
-				//call display function
-				Form4->populateGrid(Form4->roleVector, (int) Form4->toDouble(currentYear), "null", "null", "year");
-			}
-
-			//hide things from testing
-			Form4->filtersLabel->Visible = false;
-}
-
-void __fastcall TForm4::ThreadTerminated(TObject *Sender)
-{
- readLoadingIndicator->Enabled=false;
- readLoadingIndicator->Visible=false;
-}
-
 void __fastcall TForm4::displayFilters(String filterType, int arbitraryIdentifier)
 {
 	//display the filters depending on whether day, week, month, range, year
@@ -1734,11 +1530,91 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 		case 2:
 			//increase basicState and hide things
 			basicState++;
-			readLoadingIndicator->Enabled=true;
-			readLoadingIndicator->Visible=true;
-			TbasicReadThread *basicReadThrd = new TbasicReadThread();
-			basicReadThrd->OnTerminate = &ThreadTerminated;
-			basicReadThrd->Resume();
+			filtersLabel->Visible = false;
+			backImageButton2->Visible = false;
+			nextImageButton2->Visible = false;
+			dayCalendar->Visible = false;
+			rangeEndCalendar->Visible = false;
+			monthPopupBox->Visible = false;
+			yearPopupBox->Visible = false;
+
+			//needed to compile
+			String dbDayChosen = "";
+			String dbDayChosenStart = "";
+			String dbDayChosenEnd = "";
+
+			//get whatever data was chosen by user (i.e. day, week, month or year)
+			if (viewType == "Day")
+			{
+				//get the date selected from the calendar
+				TDateTime dayChosen = dayCalendar->Date;
+				dbDayChosen = StrToDate(dayChosen).FormatString(L"yyyy-mm-dd");
+
+				//call display function
+				populateGrid(roleVector, dbDayChosen);
+			}
+			else if (viewType == "Week")
+			{
+				//get the date and change to a string
+				TDateTime dayChosenStart = dayCalendar->Date;
+				TDateTime dayChosenEnd = dayCalendar->Date;
+
+				//get the week selected by the day selected from the calendar
+				while (DayOfWeek(dayChosenStart) != 7)
+					dayChosenStart--;
+				while (DayOfWeek(dayChosenEnd) != 6)
+					dayChosenEnd++;
+
+				//convert to strings to pass into populateGrid function
+				dbDayChosenStart = StrToDate(dayChosenStart).FormatString(L"yyyy-mm-dd");
+				dbDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"yyyy-mm-dd");
+				privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
+				privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
+
+				//call display function
+				populateGrid(roleVector, 0, dbDayChosenStart, dbDayChosenEnd, "week");
+			}
+			else if (viewType == "Arbitrary")
+			{
+				//get the date and change to a string
+				TDateTime dayChosenStart = dayCalendar->Date;
+				TDateTime dayChosenEnd = rangeEndCalendar->Date;
+
+				//convert to strings to pass into populateGrid function
+				dbDayChosenStart = StrToDate(dayChosenStart).FormatString(L"yyyy-mm-dd");
+				dbDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"yyyy-mm-dd");
+				privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
+				privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
+
+				//call display function (should work same with week as with arbitrary)
+				populateGrid(roleVector, -1, dbDayChosenStart, dbDayChosenEnd, "week");
+            }
+			else if (viewType == "Month")
+			{
+				//get the month selected from the drop down (value 1 through 12)
+				int currentMonthIndex = monthPopupBox->ItemIndex + 1;
+
+				//get the year selected from the drop down
+				int currentYearIndex = yearPopupBox->ItemIndex;
+				String currentYear = yearPopupBox->Items->operator [](currentYearIndex);
+                monthYearSelected = ((int) toDouble(currentYear));
+
+				//call display function
+				populateGrid(roleVector, currentMonthIndex, "null", "null", "month");
+			}
+			else
+			{
+				//get the year selected from the drop down
+				int currentYearIndex = yearPopupBox->ItemIndex;
+				String currentYear = yearPopupBox->Items->operator [](currentYearIndex);
+
+				//call display function
+				populateGrid(roleVector, (int) toDouble(currentYear), "null", "null", "year");
+			}
+
+			//hide things from testing
+			filtersLabel->Visible = false;
+
 			break;
 	}
 }
@@ -1989,14 +1865,101 @@ void __fastcall TForm4::yearRadioClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-
 void __fastcall TForm4::updateImageButtonClick(TObject *Sender)
 {
- readLoadingIndicator->Enabled=true;
- readLoadingIndicator->Visible=true;
- TReadThread *readThrd = new TReadThread();
-	readThrd->OnTerminate = &ThreadTerminated;
-	readThrd->Resume();
+	//handle the refreshing of the grid based on the filters to the left of the grid
+
+	//no matter what I will get whatever roles are currently selected
+	roleVector.clear();
+	for (int i = 0; i < roleListBox->Items->Count; ++i)
+		if (roleListBox->ItemByIndex(i)->IsChecked)
+			roleVector.push_back(roleListBox->Items->operator [](i));
+
+	//variables used below
+	String dbDayChosen = "";
+	String dbDayChosenStart = "";
+	String dbDayChosenEnd = "";
+
+	//clear readGrid and set rowCount back to bare minimum (19) and make invisible
+	readGrid->Visible = false;
+	for (int i = 0; i < 10; ++i)
+	{
+		if (i != 1)
+			readGrid->ColumnByIndex(i)->Header = "";
+
+		for (int j = 0; j < readGrid->RowCount; ++j)
+			readGrid->Cells[i][j] = "";
+	}
+	readGrid->RowCount = 19;
+
+	//check which radio was selected
+	if (dayRadio->IsChecked)
+	{
+		//get the date selected from the calendar
+		TDateTime dayChosen = dayCalendar->Date;
+		dbDayChosen = StrToDate(dayChosen).FormatString(L"yyyy-mm-dd");
+
+		//call display function
+		populateGrid(roleVector, dbDayChosen);
+	}
+	else if (weekRadio->IsChecked)
+	{
+		//get the date and change to a string
+		TDateTime dayChosenStart = dayCalendar->Date;
+		TDateTime dayChosenEnd = dayCalendar->Date;
+
+		//get the week selected by the day selected from the calendar
+		while (DayOfWeek(dayChosenStart) != 7)
+			dayChosenStart--;
+		while (DayOfWeek(dayChosenEnd) != 6)
+			dayChosenEnd++;
+
+		//convert to strings to pass into populateGrid function
+		dbDayChosenStart = StrToDate(dayChosenStart).FormatString(L"yyyy-mm-dd");
+		dbDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"yyyy-mm-dd");
+		privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
+		privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
+
+		//call display function
+		populateGrid(roleVector, 0, dbDayChosenStart, dbDayChosenEnd, "week");
+	}
+	else if (arbitraryRadio->IsChecked)
+	{
+		//get the date and change to a string
+		TDateTime dayChosenStart = filterStartCalendar->Date;
+		TDateTime dayChosenEnd = filterEndCalendar->Date;
+
+		//convert to strings to pass into populateGrid function
+		dbDayChosenStart = StrToDate(dayChosenStart).FormatString(L"yyyy-mm-dd");
+		dbDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"yyyy-mm-dd");
+		privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
+		privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
+
+		//call display function (should work same with week as with arbitrary)
+		populateGrid(roleVector, -1, dbDayChosenStart, dbDayChosenEnd, "week");
+	}
+	else if (monthRadio->IsChecked)
+	{
+		//get the month selected from the drop down (value 1 through 12)
+		int currentMonthIndex = monthPopupBox->ItemIndex + 1;
+
+		//get the year selected from the drop down
+		int currentYearIndex = yearPopupBox->ItemIndex;
+		String currentYear = yearPopupBox->Items->operator [](currentYearIndex);
+		monthYearSelected = ((int) toDouble(currentYear));
+
+		//call display function
+		populateGrid(roleVector, currentMonthIndex, "null", "null", "month");
+	}
+	else if (yearRadio->IsChecked)
+	{
+		//get the year selected from the drop down
+		int currentYearIndex = yearPopupBox->ItemIndex;
+		String currentYear = yearPopupBox->Items->operator [](currentYearIndex);
+
+		//call display function
+		populateGrid(roleVector, (int) toDouble(currentYear), "null", "null", "year");
+	}
 }
 //---------------------------------------------------------------------------
 
