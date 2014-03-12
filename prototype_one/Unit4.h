@@ -28,6 +28,22 @@
 
 using namespace std;
 //---------------------------------------------------------------------------
+class TReadThread : public TThread
+{
+protected:
+	virtual void __fastcall Execute();
+public:
+	__fastcall TReadThread();
+};
+
+class TbasicReadThread : public TThread
+{
+protected:
+	virtual void __fastcall Execute();
+public:
+	__fastcall TbasicReadThread();
+};
+
 class TForm4 : public TForm
 {
 __published:	// IDE-managed Components
@@ -66,6 +82,7 @@ __published:	// IDE-managed Components
 	TCalendar *filterStartCalendar;
 	TCalendar *filterEndCalendar;
 	TImage *updateImageButton;
+	TAniIndicator *readLoadingIndicator;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton4Click(TObject *Sender);
@@ -79,7 +96,7 @@ __published:	// IDE-managed Components
 	void __fastcall monthRadioClick(TObject *Sender);
 	void __fastcall yearRadioClick(TObject *Sender);
 	void __fastcall updateImageButtonClick(TObject *Sender);
-private:	// User declarations
+public:	// User declarations
 	String inputTable;
 	String readTable;
 	String laborTable;
@@ -114,6 +131,7 @@ public:		// User declarations
 	String __fastcall commas(string num);
 	double __fastcall toDouble(String);
 	void __fastcall displayFilters(String, int);
+	void __fastcall TForm4::ThreadTerminated(TObject *Sender);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm4 *Form4;
