@@ -17,25 +17,6 @@ __fastcall TForm4::TForm4(TComponent* Owner)
 {
 }
 //---------------------------------------------------------------------------
-//Thread Class
-__fastcall TReadThread::TReadThread()
-	: TThread(true)
-{
-	FreeOnTerminate = true;
-	// setup other thread parameters as needed...
-}
-
-void __fastcall TReadThread::Execute()
-{
-  //run Code
-  Form4->chooseButtonCode();
-}
-
-void __fastcall TForm4::ThreadTerminated(TObject *Sender)
-{
-	readLoadingIndicator->Enabled=false;
-	readLoadingIndicator->Visible=false;
-}
 
 void __fastcall TForm4::displayFilters(String filterType, int arbitraryIdentifier)
 {
@@ -1294,8 +1275,6 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		//simply call populateGrid function passing in today's week and running as week type
 
 		//fill roleVector with all the roles currently possible
-		String bareRole = "";
-		String bareRoleFormatted = "";
 		Form3->SQLQuery2->SQL->Text = "SELECT Bare_Role_Name FROM baldwins_hotel_data.role_table WHERE hotelID = '"+currentHotelID+"';";
 		Form3->SQLQuery2->Open();
 		Form3->SQLQuery2->First();
@@ -1308,26 +1287,8 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 			Form3->SQLQuery2->Next();
 		}
 
-		//make mandatory items' checkbox not enabled
-		for (int i = 0; i < roleListBox->Items->Count; ++i)
-			if (SameText(roleListBox->ItemByIndex(i)->Text, "AM Room Attendants"))
-			{
-				roleListBox->ItemByIndex(i)->IsChecked = true;
-				roleListBox->ItemByIndex(i)->Enabled = false;
-			}
-			else if (SameText(roleListBox->ItemByIndex(i)->Text, "PM Room Attendants"))
-			{
-				roleListBox->ItemByIndex(i)->IsChecked = true;
-				roleListBox->ItemByIndex(i)->Enabled = false;
-			}
-			else if (SameText(roleListBox->ItemByIndex(i)->Text, "Laundry Attendant"))
-			{
-				roleListBox->ItemByIndex(i)->IsChecked = true;
-				roleListBox->ItemByIndex(i)->Enabled = false;
-			}
-
 		//simulate select all button press
-        selectAllButton->OnClick(NULL);
+
 
 		//simulate week radio button being checked
 		weekRadio->IsChecked = true;
@@ -1341,7 +1302,7 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		//get the week selected by the day selected from the calendar
 		while (DayOfWeek(dayChosenStart) != 7)
 			dayChosenStart--;
-		while (DayOfWeek(dayChosenEnd) != 6)
+		while (DayOfWeek(dayChosenEnd) != 1)
 			dayChosenEnd++;
 
 		//convert to strings to pass into populateGrid function
@@ -1391,8 +1352,6 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	roleVector.clear();
 	monthPopupBox->ItemIndex = 0;
 	yearPopupBox->ItemIndex = 0;
-	monthPopupBox->Visible = false;
-	yearPopupBox->Visible = false;
 	readGrid->Visible = false;
 	secondTimeArbitrary = false;
 	dayCalendar->Visible = false;
@@ -1886,18 +1845,7 @@ void __fastcall TForm4::yearRadioClick(TObject *Sender)
 
 void __fastcall TForm4::updateImageButtonClick(TObject *Sender)
 {
-	//start thread!
-	readLoadingIndicator->Enabled=true;
-	readLoadingIndicator->Visible=true;
-	TReadThread *readThrd = new TReadThread();
-	readThrd->OnTerminate = &ThreadTerminated;
-	readThrd->Resume();
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TForm4::chooseButtonCode()
-{
-    //handle the refreshing of the grid based on the filters to the left of the grid
+	//handle the refreshing of the grid based on the filters to the left of the grid
 
 	//no matter what I will get whatever roles are currently selected
 	roleVector.clear();
@@ -1921,11 +1869,6 @@ void __fastcall TForm4::chooseButtonCode()
 			readGrid->Cells[i][j] = "";
 	}
 	readGrid->RowCount = 19;
-
-	 //*****************//
-	//THIS IS A TEST!!!//
-	//****************//
-	readGrid->Visible=true;
 
 	//check which radio was selected
 	if (dayRadio->IsChecked)
@@ -1996,3 +1939,5 @@ void __fastcall TForm4::chooseButtonCode()
 		populateGrid(roleVector, (int) toDouble(currentYear), "null", "null", "year");
 	}
 }
+//---------------------------------------------------------------------------
+
