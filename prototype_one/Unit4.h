@@ -78,6 +78,13 @@ __published:	// IDE-managed Components
 	TAniIndicator *readLoadingIndicator;
 	TFloatAnimation *gridFadeIn;
 	TFloatAnimation *gridFadeOut;
+	TPanel *rolePanel;
+	TLabel *filterLabel;
+	TImage *filterSeperatorImage;
+	TFloatAnimation *FloatAnimation1;
+	TFloatAnimation *FloatAnimation2;
+	TFloatAnimation *FloatAnimation3;
+	TFloatAnimation *FloatAnimation4;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton4Click(TObject *Sender);

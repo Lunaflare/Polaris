@@ -17,6 +17,25 @@ __fastcall TForm4::TForm4(TComponent* Owner)
 {
 }
 //---------------------------------------------------------------------------
+//Thread Class
+__fastcall TReadThread::TReadThread()
+	: TThread(true)
+{
+	FreeOnTerminate = true;
+	// setup other thread parameters as needed...
+}
+
+void __fastcall TReadThread::Execute()
+{
+  //run Code
+  Form4->chooseButtonCode();
+}
+
+void __fastcall TForm4::ThreadTerminated(TObject *Sender)
+{
+	readLoadingIndicator->Enabled=false;
+	readLoadingIndicator->Visible=false;
+}
 
 void __fastcall TForm4::displayFilters(String filterType, int arbitraryIdentifier)
 {
@@ -25,6 +44,7 @@ void __fastcall TForm4::displayFilters(String filterType, int arbitraryIdentifie
 	//only store locations of things once
 	if (!homeAlreadyPressed)
 	{
+	/*
 		//move selectAllButton to upper left corner
 		selectAllButtonX = selectAllButton->Position->X;
 		selectAllButtonY = selectAllButton->Position->Y;
@@ -52,24 +72,25 @@ void __fastcall TForm4::displayFilters(String filterType, int arbitraryIdentifie
 		yearPopupBoxY = yearPopupBox->Position->Y;
 
 		//set homeAlreadyPressed to true so locations are not reset
+		*/
 		homeAlreadyPressed = true;
 	}
 
 	//show selectors depending on what radio button is currently
 	if (dayRadio->IsChecked)
 	{
-		dayCalendar->Position->X = 20;
+		/*dayCalendar->Position->X = 20;
 		dayCalendar->Position->Y = 430;
 		dayCalendar->Scale->X = 1.25;
-		dayCalendar->Scale->Y = 1.25;
+		dayCalendar->Scale->Y = 1.25; */
 		dayCalendar->Visible = true;
 	}
 	else if (weekRadio->IsChecked)
 	{
-		dayCalendar->Position->X = 20;
+	   /*	dayCalendar->Position->X = 20;
 		dayCalendar->Position->Y = 430;
 		dayCalendar->Scale->X = 1.25;
-		dayCalendar->Scale->Y = 1.25;
+		dayCalendar->Scale->Y = 1.25;  */
 		dayCalendar->Visible = true;
 	}
 	else if (arbitraryRadio->IsChecked)
@@ -78,18 +99,18 @@ void __fastcall TForm4::displayFilters(String filterType, int arbitraryIdentifie
 	}
 	else if (monthRadio->IsChecked)
 	{
-		monthPopupBox->Position->X = 20;
-		monthPopupBox->Position->Y = 430;
+	   /*	monthPopupBox->Position->X = 20;
+		monthPopupBox->Position->Y = 430;   */
 		monthPopupBox->Visible = true;
 
-		yearPopupBox->Position->X = 120;
-		yearPopupBox->Position->Y = 430;
+	   /*	yearPopupBox->Position->X = 120;
+		yearPopupBox->Position->Y = 430;*/
 		yearPopupBox->Visible = true;
 	}
 	else if (yearRadio->IsChecked)
 	{
-		yearPopupBox->Position->X = 20;
-		yearPopupBox->Position->Y = 430;
+		/* yearPopupBox->Position->X = 20;
+		yearPopupBox->Position->Y = 430; */
 		yearPopupBox->Visible = true;
 	}
 
@@ -1275,6 +1296,8 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		//simply call populateGrid function passing in today's week and running as week type
 
 		//fill roleVector with all the roles currently possible
+		String bareRole = "";
+		String bareRoleFormatted = "";
 		Form3->SQLQuery2->SQL->Text = "SELECT Bare_Role_Name FROM baldwins_hotel_data.role_table WHERE hotelID = '"+currentHotelID+"';";
 		Form3->SQLQuery2->Open();
 		Form3->SQLQuery2->First();
@@ -1286,6 +1309,24 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 			roleVector.push_back(Form3->SQLQuery2->Fields->Fields[0]->AsString);
 			Form3->SQLQuery2->Next();
 		}
+
+		//make mandatory items' checkbox not enabled
+		for (int i = 0; i < roleListBox->Items->Count; ++i)
+			if (SameText(roleListBox->ItemByIndex(i)->Text, "AM Room Attendants"))
+			{
+				roleListBox->ItemByIndex(i)->IsChecked = true;
+				roleListBox->ItemByIndex(i)->Enabled = false;
+			}
+			else if (SameText(roleListBox->ItemByIndex(i)->Text, "PM Room Attendants"))
+			{
+				roleListBox->ItemByIndex(i)->IsChecked = true;
+				roleListBox->ItemByIndex(i)->Enabled = false;
+			}
+			else if (SameText(roleListBox->ItemByIndex(i)->Text, "Laundry Attendant"))
+			{
+				roleListBox->ItemByIndex(i)->IsChecked = true;
+				roleListBox->ItemByIndex(i)->Enabled = false;
+			}
 
 		//simulate select all button press
         selectAllButton->OnClick(NULL);
@@ -1302,7 +1343,7 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		//get the week selected by the day selected from the calendar
 		while (DayOfWeek(dayChosenStart) != 7)
 			dayChosenStart--;
-		while (DayOfWeek(dayChosenEnd) != 1)
+		while (DayOfWeek(dayChosenEnd) != 6)
 			dayChosenEnd++;
 
 		//convert to strings to pass into populateGrid function
@@ -1352,6 +1393,8 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	roleVector.clear();
 	monthPopupBox->ItemIndex = 0;
 	yearPopupBox->ItemIndex = 0;
+	monthPopupBox->Visible = false;
+	yearPopupBox->Visible = false;
 	readGrid->Visible = false;
 	secondTimeArbitrary = false;
 	dayCalendar->Visible = false;
@@ -1360,7 +1403,7 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	rangeEndCalendar->Date = Now();
 
 	//set coordinates back to originals
-	selectAllButton->Position->X = selectAllButtonX;
+   /*	selectAllButton->Position->X = selectAllButtonX;
 	selectAllButton->Position->Y = selectAllButtonY;
 	roleListBox->Position->X = RoleListBoxX;
 	roleListBox->Position->Y = RoleListBoxY;
@@ -1371,7 +1414,7 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	monthPopupBox->Position->X = monthPopupBoxX;
 	monthPopupBox->Position->Y = monthPopupBoxY;
 	yearPopupBox->Position->X = yearPopupBoxX;
-	yearPopupBox->Position->Y = yearPopupBoxY;
+	yearPopupBox->Position->Y = yearPopupBoxY; */
 
 	//set other filter related items back to default values or hide
 	updateImageButton->Visible = false;
@@ -1408,8 +1451,8 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			//handle things for view filter
 			basicState++;
 			filtersLabel->Text = "View By:";
-			selectAllButton->Visible = false;
-			roleListBox->Visible = false;
+		 /*  selectAllButton->Visible = false;
+			roleListBox->Visible = false;  */
 			backImageButton2->Visible = true;
 
 			//handle signature things for view filter
@@ -1424,12 +1467,12 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 		//week filter
 		case 1:
 			//hide things from view filter
-			dayRadio->Visible = false;
+		  /*	dayRadio->Visible = false;
 			weekRadio->Visible = false;
 			arbitraryRadio->Visible = false;
 			monthRadio->Visible = false;
 			yearRadio->Visible = false;
-			radioGroupBox->Visible = false;
+			radioGroupBox->Visible = false;  */
 
 			if (!secondTimeArbitrary)
 			{
@@ -1457,8 +1500,9 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 					filtersLabel->Text = L"Choose a start date for the range:";
 					secondTimeArbitrary = true;
 
+                     rangeTabContainer->Visible=true;
 					//show calendar and allow user to choose a start day for the range
-					dayCalendar->Visible = true;
+					//dayCalendar->Visible = true;
 				}
 				else
 				{
@@ -1468,8 +1512,9 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 					filtersLabel->Text = L"Choose an end date for the range:";
 
 					//show calendar and allow user to choose an end day for the range
-					dayCalendar->Visible = false;
-					rangeEndCalendar->Visible = true;
+					rangeTabContainer->ActiveTab=rangeTabContainer->Tabs[1];
+					//dayCalendar->Visible = false;
+					//rangeEndCalendar->Visible = true;
 				}
 			}
 			//follows same pattern for all others
@@ -1555,7 +1600,7 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			else if (viewType == "Arbitrary")
 			{
 				//get the date and change to a string
-				TDateTime dayChosenStart = dayCalendar->Date;
+				TDateTime dayChosenStart = filterStartCalendar->Date;
 				TDateTime dayChosenEnd = rangeEndCalendar->Date;
 
 				//convert to strings to pass into populateGrid function
@@ -1613,22 +1658,23 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 			{
 				//special case, is for start date
 				filtersLabel->Text = "View By:";
-				selectAllButton->Visible = false;
+				/* selectAllButton->Visible = false;
 				roleListBox->Visible = false;
 				backImageButton2->Visible = true;
-				dayCalendar->Visible = false;
 				rangeEndCalendar->Visible = false;
 				dayCalendar->WeekNumbers = false;
 				monthPopupBox->Visible = false;
-				yearPopupBox->Visible = false;
+				yearPopupBox->Visible = false;  */
+				//dayCalendar->Visible = false;
+				rangeTabContainer->Visible=false;
 
 				//handle signature things for view filter
-				dayRadio->Visible = true;
+			   /*	dayRadio->Visible = true;
 				weekRadio->Visible = true;
 				arbitraryRadio->Visible = true;
 				monthRadio->Visible = true;
 				yearRadio->Visible = true;
-				radioGroupBox->Visible = true;
+				radioGroupBox->Visible = true;  */
 
 				//special case set viewType to blank to avoid issues
 				viewType = "";
@@ -1666,15 +1712,16 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 				secondTimeArbitrary = true;
 				basicState--;
 				filtersLabel->Text = L"Choose a start date for the range:";
+                rangeTabContainer->ActiveTab=rangeTabContainer->Tabs[0];
 				rangeEndCalendar->Visible = false;
-				dayCalendar->Visible = true;
+				//dayCalendar->Visible = true;
 			}
 			else
 			{
 				basicState--;
 				filtersLabel->Text = "View By:";
-				selectAllButton->Visible = false;
-				roleListBox->Visible = false;
+			   //	selectAllButton->Visible = false;
+				//roleListBox->Visible = false;
 				backImageButton2->Visible = true;
 				dayCalendar->Visible = false;
 				rangeEndCalendar->Visible = false;
@@ -1755,15 +1802,17 @@ void __fastcall TForm4::dayRadioClick(TObject *Sender)
 	yearPopupBox->Visible = false;
 
 	if (!readGrid->IsVisible)
-		return;
-	else
-	{
-		dayCalendar->Position->X = 20;
+		{
+		  return;
+        }
+   //	else
+   //	{
+	   /*	dayCalendar->Position->X = 20;
 		dayCalendar->Position->Y = 430;
 		dayCalendar->Scale->X = 1.25;
-		dayCalendar->Scale->Y = 1.25;
+		dayCalendar->Scale->Y = 1.25;*/
 		dayCalendar->Visible = true;
-	}
+	//}
 }
 //---------------------------------------------------------------------------
 
@@ -1774,16 +1823,16 @@ void __fastcall TForm4::weekRadioClick(TObject *Sender)
 	monthPopupBox->Visible = false;
 	yearPopupBox->Visible = false;
 
-	if (!readGrid->IsVisible)
+   if (!readGrid->IsVisible)
 		return;
-	else
-	{
-		dayCalendar->Position->X = 20;
+   //	else
+   //	{
+		/*dayCalendar->Position->X = 20;
 		dayCalendar->Position->Y = 430;
 		dayCalendar->Scale->X = 1.25;
-		dayCalendar->Scale->Y = 1.25;
+		dayCalendar->Scale->Y = 1.25;  */
 		dayCalendar->Visible = true;
-	}
+   //	}
 }
 //---------------------------------------------------------------------------
 
@@ -1794,12 +1843,12 @@ void __fastcall TForm4::arbitraryRadioClick(TObject *Sender)
 	monthPopupBox->Visible = false;
 	yearPopupBox->Visible = false;
 
-	if (!readGrid->IsVisible)
-		return;
-	else
-	{
+   if (!readGrid->IsVisible)
+   return;
+   //	else
+   //	{
 		rangeTabContainer->Visible = true;
-	}
+	//}
 }
 //---------------------------------------------------------------------------
 
@@ -1810,17 +1859,17 @@ void __fastcall TForm4::monthRadioClick(TObject *Sender)
 	rangeTabContainer->Visible = false;
 
 	if (!readGrid->IsVisible)
-		return;
-	else
-	{
-		monthPopupBox->Position->X = 20;
-		monthPopupBox->Position->Y = 430;
+	  return;
+   //	else
+  //	{
+	/*monthPopupBox->Position->X = 20;
+		monthPopupBox->Position->Y = 430; */
 		monthPopupBox->Visible = true;
 
-		yearPopupBox->Position->X = 120;
-		yearPopupBox->Position->Y = 430;
+	   /*	yearPopupBox->Position->X = 120;
+		yearPopupBox->Position->Y = 430; */
 		yearPopupBox->Visible = true;
-	}
+   //	}
 }
 //---------------------------------------------------------------------------
 
@@ -1833,19 +1882,30 @@ void __fastcall TForm4::yearRadioClick(TObject *Sender)
 	yearPopupBox->Visible = false;
 
 	if (!readGrid->IsVisible)
-		return;
-	else
-	{
-		yearPopupBox->Position->X = 20;
-		yearPopupBox->Position->Y = 430;
+	 	return;
+	//else
+	//{
+		/* yearPopupBox->Position->X = 20;
+		yearPopupBox->Position->Y = 430; */
 		yearPopupBox->Visible = true;
-	}
+   //	}
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm4::updateImageButtonClick(TObject *Sender)
 {
-	//handle the refreshing of the grid based on the filters to the left of the grid
+	//start thread!
+	readLoadingIndicator->Enabled=true;
+	readLoadingIndicator->Visible=true;
+	TReadThread *readThrd = new TReadThread();
+	readThrd->OnTerminate = &ThreadTerminated;
+	readThrd->Resume();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::chooseButtonCode()
+{
+    //handle the refreshing of the grid based on the filters to the left of the grid
 
 	//no matter what I will get whatever roles are currently selected
 	roleVector.clear();
@@ -1939,5 +1999,4 @@ void __fastcall TForm4::updateImageButtonClick(TObject *Sender)
 		populateGrid(roleVector, (int) toDouble(currentYear), "null", "null", "year");
 	}
 }
-//---------------------------------------------------------------------------
 
