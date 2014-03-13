@@ -107,6 +107,18 @@ object Form4: TForm4
       Position.X = 857.000000000000000000
       Width = 88.000000000000000000
     end
+    object gridFadeIn: TFloatAnimation
+      Duration = 0.400000005960464500
+      PropertyName = 'Opacity'
+      StopValue = 1.000000000000000000
+      Trigger = 'IsVisible=true'
+    end
+    object gridFadeOut: TFloatAnimation
+      Duration = 0.400000005960464500
+      PropertyName = 'Opacity'
+      StartValue = 1.000000000000000000
+      Trigger = 'IsVisible=false'
+    end
   end
   object StyleBook2: TStyleBook
     Resource.Strings = (

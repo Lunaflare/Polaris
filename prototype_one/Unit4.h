@@ -12,6 +12,7 @@
 #include <FMX.Menus.hpp>
 #include <FMX.Grid.hpp>
 #include <FMX.TabControl.hpp>
+#include <FMX.Ani.hpp>
 //---------------------------------------------------------------------------
 #include <vector>
 #include <iostream>
@@ -75,6 +76,8 @@ __published:	// IDE-managed Components
 	TCalendar *filterEndCalendar;
 	TImage *updateImageButton;
 	TAniIndicator *readLoadingIndicator;
+	TFloatAnimation *gridFadeIn;
+	TFloatAnimation *gridFadeOut;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton4Click(TObject *Sender);
