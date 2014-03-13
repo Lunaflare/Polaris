@@ -85,6 +85,10 @@ __published:	// IDE-managed Components
 	TFloatAnimation *FloatAnimation2;
 	TFloatAnimation *FloatAnimation3;
 	TFloatAnimation *FloatAnimation4;
+	TFloatAnimation *FloatAnimation5;
+	TFloatAnimation *FloatAnimation6;
+	TFloatAnimation *FloatAnimation7;
+	TLabel *chooseOneLabel;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton4Click(TObject *Sender);
@@ -136,6 +140,7 @@ public:		// User declarations
 	void __fastcall displayFilters(String, int);
 	void __fastcall TForm4::ThreadTerminated(TObject *Sender);
 	void __fastcall chooseButtonCode();
+	void __fastcall radioButtons(bool which);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm4 *Form4;

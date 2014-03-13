@@ -13466,6 +13466,12 @@ object Form4: TForm4
     Visible = False
     Width = 80.000000000000000000
     OnClick = selectAllButtonClick
+    object FloatAnimation5: TFloatAnimation
+      Duration = 0.500000000000000000
+      PropertyName = 'Opacity'
+      StopValue = 1.000000000000000000
+      Trigger = 'IsVisible=true'
+    end
   end
   object monthPopupBox: TPopupBox
     DisableFocusEffect = False
@@ -13488,6 +13494,12 @@ object Form4: TForm4
     Position.Y = 456.000000000000000000
     Visible = False
     Width = 80.000000000000000000
+    object FloatAnimation6: TFloatAnimation
+      Duration = 0.500000000000000000
+      PropertyName = 'Opacity'
+      StopValue = 1.000000000000000000
+      Trigger = 'IsVisible=true'
+    end
   end
   object yearPopupBox: TPopupBox
     DisableFocusEffect = False
@@ -13501,6 +13513,12 @@ object Form4: TForm4
     Position.Y = 456.000000000000000000
     Visible = False
     Width = 80.000000000000000000
+    object FloatAnimation7: TFloatAnimation
+      Duration = 0.500000000000000000
+      PropertyName = 'Opacity'
+      StopValue = 1.000000000000000000
+      Trigger = 'IsVisible=true'
+    end
   end
   object radioGroupBox: TGroupBox
     Height = 137.000000000000000000
@@ -13792,5 +13810,13 @@ object Form4: TForm4
     Position.X = 8.000000000000000000
     Position.Y = 16.000000000000000000
     Width = 225.000000000000000000
+  end
+  object chooseOneLabel: TLabel
+    Height = 15.000000000000000000
+    Position.X = 256.000000000000000000
+    Position.Y = 112.000000000000000000
+    Text = 'chooseOneLabel'
+    Visible = False
+    Width = 120.000000000000000000
   end
 end

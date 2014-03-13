@@ -1473,7 +1473,7 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			monthRadio->Visible = false;
 			yearRadio->Visible = false;
 			radioGroupBox->Visible = false;  */
-
+             radioButtons(0);
 			if (!secondTimeArbitrary)
 			{
 				//store things from view filter
@@ -1485,8 +1485,13 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 					viewType = "Arbitrary";
 				else if (monthRadio->IsChecked)
 					viewType = "Month";
-				else
+				else if(yearRadio->IsChecked)
 					viewType = "Year";
+				else
+					{
+						//display error message (they must choose one of the items)
+						return;
+                    }
 			}
 			else
 				viewType = "Arbitrary";
@@ -1496,6 +1501,7 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			{
 				if (!secondTimeArbitrary)
 				{
+					//disable all radio buttons except the selected one
 
 					//display filterLabel appropriately
 					//radioGroupBox->Enabled=false;
@@ -1642,6 +1648,7 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 
 			//hide things from testing
 			filtersLabel->Visible = false;
+			radioButtons(1);
 			rangeTabContainer->Tabs[0]->Enabled=true;
 			rangeTabContainer->Tabs[1]->Enabled=true;
 
@@ -1673,6 +1680,7 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 				monthPopupBox->Visible = false;
 				yearPopupBox->Visible = false;  */
 				//dayCalendar->Visible = false;
+
                 radioGroupBox->Enabled=true;
 				rangeTabContainer->Visible=false;
 
@@ -1730,6 +1738,7 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 			{
 				basicState--;
 				filtersLabel->Text = "View By:";
+				radioButtons(1);
 			   //	selectAllButton->Visible = false;
 				//roleListBox->Visible = false;
 				backImageButton2->Visible = true;
@@ -2008,5 +2017,59 @@ void __fastcall TForm4::chooseButtonCode()
 		//call display function
 		populateGrid(roleVector, (int) toDouble(currentYear), "null", "null", "year");
 	}
+}
+
+void __fastcall TForm4::radioButtons(bool which)
+{
+	if(which)
+	{
+	  dayRadio->Enabled=true;
+	  weekRadio->Enabled=true;
+	  monthRadio->Enabled=true;
+	  yearRadio->Enabled=true;
+	  arbitraryRadio->Enabled=true;
+	}
+	else
+	{
+	 if(dayRadio->IsChecked==true)
+		{
+		  monthRadio->Enabled=false;
+		  arbitraryRadio->Enabled=false;
+		  weekRadio->Enabled=false;
+		  yearRadio->Enabled=false;
+		}
+		else if(monthRadio->IsChecked==true)
+		{
+		  dayRadio->Enabled=false;
+		  arbitraryRadio->Enabled=false;
+		  weekRadio->Enabled=false;
+		  yearRadio->Enabled=false;
+		}
+		else if(arbitraryRadio->IsChecked==true)
+		{
+		  monthRadio->Enabled=false;
+		  dayRadio->Enabled=false;
+		  weekRadio->Enabled=false;
+		  yearRadio->Enabled=false;
+		}
+		else if(weekRadio->IsChecked==true)
+		{
+		  monthRadio->Enabled=false;
+		  arbitraryRadio->Enabled=false;
+		  dayRadio->Enabled=false;
+		  yearRadio->Enabled=false;
+		}
+		else if(yearRadio->IsChecked==true)
+		{
+		  monthRadio->Enabled=false;
+		  arbitraryRadio->Enabled=false;
+		  weekRadio->Enabled=false;
+		  dayRadio->Enabled=false;
+		}
+		else
+		{
+			//nothing is selected
+		}
+    }
 }
 
