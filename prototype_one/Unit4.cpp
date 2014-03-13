@@ -1922,11 +1922,6 @@ void __fastcall TForm4::chooseButtonCode()
 	}
 	readGrid->RowCount = 19;
 
-	 //*****************//
-	//THIS IS A TEST!!!//
-	//****************//
-	readGrid->Visible=true;
-
 	//check which radio was selected
 	if (dayRadio->IsChecked)
 	{
