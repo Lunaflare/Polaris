@@ -2,7 +2,6 @@
 .taskbar issue for all forms (does not show up as minimized in taskbar)
 .add old input data to raw_input table
 .change first day of week in calendars to saturday (to match dlr)
-	-will this throw off week calculations?
 .Add button to remove a date?
 .Make way for user to change/upload new labor standards
 	-this should change any values in tables from old labor standards
@@ -14,21 +13,13 @@
 .when basic input & click back after edit, doesn't store in local struct
 	-may or may not want to implement this
 .allow user in input once they have selected a date if press back should let them select a new date
-.might want to adjust db field types based on how we want to display (i.e. round before, sometimes want whole number)
-.allow user to add roles
 .in db store number of things in read that are not roles (i.e. everything that comes before the roles)
 	-right now I am using a static number for this
 	-in db create table holding things we have in read table that are not roles
 .round to exact same number of decimal points in read as in excel?
-.in month of read also need to pick a year
-	*or do we assume month and week are always the current year?
-.sometimes in read get error (floating point)
 .on calander if only change one of top drop down filters and don't actually click a date...doesn't select a new date
-.make occupancy percent calculations more effecient (less db queries)
 .changed in role table managers role wages from 21.47 to 23.55 to match how is in 2013 newer labor stds
 .changed hotel_ref avg pay per hour from 14.23 to 15.86 and overtime per hour from 21.34 to 23.79
-.rooms occupied percent not correct for week (need to also adjust query here for month to include new year parameter)
-.labor cost calculation should also add overtime premium cost
 .temporarily for testing changed in role table pm housemen's lookup to be carpet care instead of pm rooms cleaned
 .extra calculations on side for month and year in read?
 .store "accounting for particular months/weeks/years in order to calculate extra stuff in top left of grid?
@@ -39,3 +30,4 @@
 .type check in add role form
 .in add role need to adjust overtime pay per hour and avg pay per hour to include new role and its wages
 .labor standards in database do not match up to the excel sheets
+.fix read floating point error and instead show error message for user saying that there isn't any data for the query
