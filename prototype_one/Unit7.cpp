@@ -48,7 +48,7 @@ void __fastcall TForm7::FormShow(TObject *Sender)
 	while (!Form3->SQLQuery2->Eof)
 	{
 		rolePopupBox->Items->Add(StringReplace(Form3->SQLQuery2->Fields->Fields[0]->AsString, "_", " ", TReplaceFlags() << rfReplaceAll));
-        Form3->SQLQuery2->Next();
+		Form3->SQLQuery2->Next();
 	}
 	rolePopupBox->ItemIndex = 0;
 	rolePopupBox->Text = rolePopupBox->Items->operator [](rolePopupBox->ItemIndex);
@@ -139,17 +139,31 @@ void __fastcall TForm7::saveChangesButtonClick(TObject *Sender)
 	String roleNameNew = roleNameEdit->Text;
 	String roleWagesNew = roleWagesEdit->Text;
 
-	//update query for role table
+	//construct strings useful in update queries below
+	String roleNameNewUnderScores = StringReplace(roleNameNew, " ", "_", TReplaceFlags() << rfReplaceAll);
+	String roleNameNewHoursPaid = roleNameNewUnderScores + "_Hours_Paid";
+	String roleNameNewStandardHours = roleNameNewUnderScores + "_Standard_Hours";
+	String roleNamePercentPerformance = roleNameNewUnderScores + "_Percent_Performance";
 
+	//update query for role table
+	Form3->SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data.role_table SET Role_Name = '"+roleNameNewHoursPaid+"', Bare_Role_Name = '"+roleNameNewUnderScores+"', Role_Wages = '"+roleWagesNew+"' WHERE hotelID = '"+currentHotelID+"' AND Bare_Role_Name = '"+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll)+"';";
+	Form3->SQLQuery2->ExecSQL();
 
 	//update query for labor standards table
-
+	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+laborTable+" CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll)+" "+roleNameNewUnderScores+" DOUBLE NOT NULL;";
+	Form3->SQLQuery2->ExecSQL();
 
 	//update query for read table
-
+	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+readTable+" CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll) + "_Hours_Paid"+" "+roleNameNewHoursPaid+" DOUBLE NOT NULL, CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll) + "_Standard_Hours"+" "+roleNameNewStandardHours+" DOUBLE NOT NULL, CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll) + "_Percent_Performance"+" "+roleNamePercentPerformance+" DOUBLE NOT NULL;";
+	Form3->SQLQuery2->ExecSQL();
 
 	//update query for input table
+	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+inputTable+" CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll) + "_Hours_Paid"+" "+roleNameNewHoursPaid+" DOUBLE NOT NULL;";
+	Form3->SQLQuery2->ExecSQL();
 
+	//take back to settings page (intentionally called twice)
+	backImageButton->OnClick(NULL);
+	backImageButton->OnClick(NULL);
 }
 
 //---------------------------------------------------------------------------
