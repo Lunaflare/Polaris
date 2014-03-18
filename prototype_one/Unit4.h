@@ -87,7 +87,6 @@ __published:	// IDE-managed Components
 	TFloatAnimation *FloatAnimation5;
 	TFloatAnimation *FloatAnimation6;
 	TFloatAnimation *FloatAnimation7;
-	TLabel *chooseOneLabel;
 	TImage *selectRolesImage;
 	TImage *arrowRoles;
 	TFloatAnimation *FloatAnimation8;
@@ -131,6 +130,18 @@ __published:	// IDE-managed Components
 	TFloatAnimation *FloatAnimation28;
 	TImage *arrowYear;
 	TFloatAnimation *FloatAnimation29;
+	TImage *printButtonImage;
+	TImage *printImageOver;
+	TFloatAnimation *FloatAnimation30;
+	TFloatAnimation *FloatAnimation31;
+	TImage *printLabelImage;
+	TImage *printShadow;
+	TImage *viewButtonImage;
+	TImage *viewImageOver;
+	TImage *viewShadow;
+	TImage *viewLabel;
+	TFloatAnimation *FloatAnimation32;
+	TFloatAnimation *FloatAnimation33;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton4Click(TObject *Sender);
@@ -150,6 +161,10 @@ __published:	// IDE-managed Components
 	void __fastcall nextImageButton2MouseLeave(TObject *Sender);
 	void __fastcall homeImageButton4MouseEnter(TObject *Sender);
 	void __fastcall homeImageButton4MouseLeave(TObject *Sender);
+	void __fastcall printButtonImageMouseEnter(TObject *Sender);
+	void __fastcall printButtonImageMouseLeave(TObject *Sender);
+	void __fastcall viewButtonImageMouseEnter(TObject *Sender);
+	void __fastcall viewButtonImageMouseLeave(TObject *Sender);
 	//was private
 	public:	// User declarations
 	String inputTable;

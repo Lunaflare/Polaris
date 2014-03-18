@@ -1356,6 +1356,8 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 
 		//call display function
 		populateGrid(roleVector, 0, dbDayChosenStart, dbDayChosenEnd, "week");
+		printButtonImage->Visible=true;
+		viewButtonImage->Visible=true;
 
 	}
 }
@@ -1386,6 +1388,8 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	pickEndImage->Visible=false;
 	arrowRange->Visible=false;
 	arrowYear->Visible=false;
+	printButtonImage->Visible=false;
+	viewButtonImage->Visible=false;
 
 	radioButtons(1);
 	selectAllButton->Enabled=true;
@@ -1463,6 +1467,8 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 	{
 		//view filter
 		case 0:
+			//make sure it's cleared
+			roleVector.clear();
 			//store all checked items from roleListBox
 			for (int i = 0; i < roleListBox->Items->Count; ++i)
 				if (roleListBox->ItemByIndex(i)->IsChecked)
@@ -1707,6 +1713,8 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			radioButtons(1);
 			rangeTabContainer->Tabs[0]->Enabled=true;
 			rangeTabContainer->Tabs[1]->Enabled=true;
+			printButtonImage->Visible=true;
+			viewButtonImage->Visible=true;
 
 			break;
 	}
@@ -1715,6 +1723,8 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 
 void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 {
+	 backImageButton2->Position->Y=694;
+	 backImageButton2->Opacity=0.7;
 	//initialize local variabls used in switch statement (work around)
 	String bareRole = "";
 	String bareRoleFormatted = "";
@@ -1836,6 +1846,7 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 
 			break;
 	}
+
 }
 //---------------------------------------------------------------------------
 
@@ -2201,6 +2212,40 @@ void __fastcall TForm4::homeImageButton4MouseLeave(TObject *Sender)
 homeImageButton4->Bitmap=swapImage->Bitmap;
 homeShadow->Visible=false;
 homeLabel->Visible=false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::printButtonImageMouseEnter(TObject *Sender)
+{
+swapImage->Bitmap=printButtonImage->Bitmap;
+printButtonImage->Bitmap=printImageOver->Bitmap;
+printLabelImage->Visible=true;
+printShadow->Visible=true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::printButtonImageMouseLeave(TObject *Sender)
+{
+printButtonImage->Bitmap=swapImage->Bitmap;
+printLabelImage->Visible=false;
+printShadow->Visible=false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::viewButtonImageMouseEnter(TObject *Sender)
+{
+swapImage->Bitmap=viewButtonImage->Bitmap;
+viewButtonImage->Bitmap=viewImageOver->Bitmap;
+viewShadow->Visible=true;
+viewLabel->Visible=true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::viewButtonImageMouseLeave(TObject *Sender)
+{
+viewButtonImage->Bitmap=swapImage->Bitmap;
+viewShadow->Visible=false;
+viewLabel->Visible=false;
 }
 //---------------------------------------------------------------------------
 
