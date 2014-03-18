@@ -1252,8 +1252,8 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 
 		//display first step basic read form items
 		nextImageButton2->Visible = true;
-		filtersLabel->Text = "Select Roles:";
-		filtersLabel->Visible = true;
+		//filtersLabel->Text = "Select Roles:";
+		//filtersLabel->Visible = true;
 
 		//allow user to choose desired roles as filter
 		Form3->SQLQuery2->SQL->Text = "SELECT Bare_Role_Name FROM baldwins_hotel_data.role_table WHERE hotelID = '"+currentHotelID+"';";
@@ -1289,6 +1289,8 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		selectAllButton->Text = "Select All";
 		selectAllButton->Visible = true;
 		roleListBox->Visible = true;
+		selectRolesImage->Visible=true;
+		arrowRoles->Visible=true;
 	}
 	//otherwise display advanced read form (need to populate role vector also)
 	else
@@ -1354,7 +1356,8 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 
 		//call display function
 		populateGrid(roleVector, 0, dbDayChosenStart, dbDayChosenEnd, "week");
-    }
+
+	}
 }
 //---------------------------------------------------------------------------
 
@@ -1372,6 +1375,21 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	Form2->Show();
 
 	//make items not visible again so in good shape upon reentry
+	roleListBox->Enabled=true;
+	arrowDay->Visible=false;
+	pickerArrow->Visible=false;
+	whichDayImage->Visible=false;
+	whichWeekImage->Visible=false;
+	whichMonthImage->Visible=false;
+	whichYearImage->Visible=false;
+	pickStartImage->Visible=false;
+	pickEndImage->Visible=false;
+	arrowRange->Visible=false;
+	arrowYear->Visible=false;
+
+	radioButtons(1);
+	selectAllButton->Enabled=true;
+	selectAllButton->Enabled=true;
 	nextImageButton2->Visible = false;
 	backImageButton2->Visible = false;
 	filtersLabel->Visible = false;
@@ -1432,6 +1450,8 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 			readGrid->Cells[i][j] = "";
 	}
 	readGrid->RowCount = 19;
+
+
 }
 
 //---------------------------------------------------------------------------
@@ -1447,10 +1467,15 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			for (int i = 0; i < roleListBox->Items->Count; ++i)
 				if (roleListBox->ItemByIndex(i)->IsChecked)
 					roleVector.push_back(roleListBox->Items->operator [](i));
-
+			roleListBox->Enabled=false;
+			selectAllButton->Enabled=false;
 			//handle things for view filter
 			basicState++;
-			filtersLabel->Text = "View By:";
+			//filtersLabel->Text = "View By:";
+			selectRolesImage->Visible=false;
+			arrowRoles->Visible=false;
+			viewByImage->Visible=true;
+			arrowView->Visible=true;
 		 /*  selectAllButton->Visible = false;
 			roleListBox->Visible = false;  */
 			backImageButton2->Visible = true;
@@ -1499,17 +1524,21 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			//if arbitray date range, follows seperate pattern
 			if (SameText(viewType, "Arbitrary"))
 			{
+				arrowView->Visible=false;
+				viewByImage->Visible=false;
 				if (!secondTimeArbitrary)
 				{
 					//disable all radio buttons except the selected one
 
 					//display filterLabel appropriately
 					//radioGroupBox->Enabled=false;
-					filtersLabel->Text = L"Choose a start date for the range:";
+					//filtersLabel->Text = L"Choose a start date for the range:";
 					secondTimeArbitrary = true;
 					rangeTabContainer->ActiveTab=rangeTabContainer->Tabs[0];
 					rangeTabContainer->Tabs[1]->Enabled=false;
 					 rangeTabContainer->Visible=true;
+					 pickStartImage->Visible=true;
+					 arrowRange->Visible=true;
 					//show calendar and allow user to choose a start day for the range
 					//dayCalendar->Visible = true;
 				}
@@ -1518,7 +1547,10 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 					//increase basicState and display filterLabel appropriately
 					basicState++;
 					secondTimeArbitrary = false;
-					filtersLabel->Text = L"Choose an end date for the range:";
+					//filtersLabel->Text = L"Choose an end date for the range:";
+					pickStartImage->Visible=false;
+					pickEndImage->Visible=true;
+					arrowRange->Visible=true;
 
 					//show calendar and allow user to choose an end day for the range
 					rangeTabContainer->Tabs[0]->Enabled=false;
@@ -1531,6 +1563,9 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 			//follows same pattern for all others
 			else
 			{
+				arrowView->Visible=false;
+				viewByImage->Visible=false;
+
 				//increase basicState and display filterLabel appropriately
 				basicState++;
 				filtersLabel->Text = "Which " + viewType + "?";
@@ -1539,16 +1574,22 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				if (viewType == "Day")
 				{
 					//show calendar and allow user to choose a day
+					whichDayImage->Visible=true;
+					arrowDay->Visible=true;
 					dayCalendar->Visible = true;
 				}
 				else if (viewType == "Week")
 				{
 					//show calendar with week numbers on side
+					whichWeekImage->Visible=true;
+					arrowDay->Visible=true;
 					dayCalendar->Visible = true;
 				}
 				else if (viewType == "Month")
 				{
 					//show monthPopupBox with months as items
+					whichMonthImage->Visible=true;
+					pickerArrow->Visible=true;
 					monthPopupBox->Visible = true;
 					yearPopupBox->Visible = true;
 				}
@@ -1556,6 +1597,9 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				{
 					//show yearPopupBox with years as items
 					yearPopupBox->Visible = true;
+					arrowYear->Visible=true;
+					whichYearImage->Visible=true;
+				//arrowDay->Visible=true;
 				}
 			}
 
@@ -1648,6 +1692,18 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 
 			//hide things from testing
 			filtersLabel->Visible = false;
+			arrowDay->Visible=false;
+			pickerArrow->Visible=false;
+			whichMonthImage->Visible=false;
+			whichYearImage->Visible=false;
+			whichDayImage->Visible=false;
+			whichWeekImage->Visible=false;
+			pickStartImage->Visible=false;
+			pickEndImage->Visible=false;
+			arrowRange->Visible=false;
+			arrowYear->Visible=false;
+			roleListBox->Enabled=true;
+			selectAllButton->Enabled=true;
 			radioButtons(1);
 			rangeTabContainer->Tabs[0]->Enabled=true;
 			rangeTabContainer->Tabs[1]->Enabled=true;
@@ -1671,7 +1727,7 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 			if (SameText(viewType, "Arbitrary"))
 			{
 				//special case, is for start date
-				filtersLabel->Text = "View By:";
+				//filtersLabel->Text = "View By:";
 				/* selectAllButton->Visible = false;
 				roleListBox->Visible = false;
 				backImageButton2->Visible = true;
@@ -1680,8 +1736,12 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 				monthPopupBox->Visible = false;
 				yearPopupBox->Visible = false;  */
 				//dayCalendar->Visible = false;
-
-                radioGroupBox->Enabled=true;
+				radioButtons(1);
+				viewByImage->Visible=true;
+				arrowView->Visible=true;
+				radioGroupBox->Enabled=true;
+				pickStartImage->Visible=false;
+				arrowRange->Visible=false;
 				rangeTabContainer->Visible=false;
 
 				//handle signature things for view filter
@@ -1705,10 +1765,16 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 				monthRadio->Visible = false;
 				yearRadio->Visible = false;
 				radioGroupBox->Visible = false;
+				viewByImage->Visible=false;
+				arrowView->Visible=false;
 
 				//role filter
 				basicState--;
-				filtersLabel->Text = "Select Roles:";
+				//filtersLabel->Text = "Select Roles:";
+				selectRolesImage->Visible=true;
+				arrowRoles->Visible=true;
+				roleListBox->Enabled=true;
+				selectAllButton->Enabled=true;
 
 				//display first step basic read form items
 				nextImageButton2->Visible = true;
@@ -1732,6 +1798,8 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 				rangeTabContainer->Tabs[1]->Enabled=false;
 				rangeTabContainer->ActiveTab=rangeTabContainer->Tabs[0];
 				rangeEndCalendar->Visible = false;
+				pickEndImage->Visible=false;
+				pickStartImage->Visible=true;
 				//dayCalendar->Visible = true;
 			}
 			else
@@ -1739,6 +1807,14 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 				basicState--;
 				filtersLabel->Text = "View By:";
 				radioButtons(1);
+				whichDayImage->Visible=false;
+				whichWeekImage->Visible=false;
+				whichMonthImage->Visible=false;
+				whichYearImage->Visible=false;
+				arrowDay->Visible=false;
+				arrowRange->Visible=false;
+				pickerArrow->Visible=false;
+				arrowYear->Visible=false;
 			   //	selectAllButton->Visible = false;
 				//roleListBox->Visible = false;
 				backImageButton2->Visible = true;
@@ -1755,6 +1831,7 @@ void __fastcall TForm4::backImageButton2Click(TObject *Sender)
 				monthRadio->Visible = true;
 				yearRadio->Visible = true;
 				radioGroupBox->Visible = true;
+
 			}
 
 			break;
@@ -2072,4 +2149,58 @@ void __fastcall TForm4::radioButtons(bool which)
 		}
     }
 }
+
+
+void __fastcall TForm4::backImageButton2MouseEnter(TObject *Sender)
+{
+backLabel->Visible=true;
+swapImage->Bitmap=backImageButton2->Bitmap;
+backImageButton2->Bitmap=Form3->backOver->Bitmap;
+backShadow->Visible=true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::backImageButton2MouseLeave(TObject *Sender)
+{
+backLabel->Visible=false;
+backImageButton2->Bitmap=swapImage->Bitmap;
+backShadow->Visible=false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::nextImageButton2MouseEnter(TObject *Sender)
+{
+swapImage->Bitmap=nextImageButton2->Bitmap;
+nextImageButton2->Bitmap=Form3->nextOver->Bitmap;
+nextLabelImage->Visible=true;
+nextShadow->Visible=true;
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::nextImageButton2MouseLeave(TObject *Sender)
+{
+nextImageButton2->Bitmap=swapImage->Bitmap;
+nextLabelImage->Visible=false;
+nextShadow->Visible=false;
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::homeImageButton4MouseEnter(TObject *Sender)
+{
+swapImage->Bitmap=homeImageButton4->Bitmap;
+homeImageButton4->Bitmap=Form3->home_over->Bitmap;
+homeShadow->Visible=true;
+homeLabel->Visible=true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::homeImageButton4MouseLeave(TObject *Sender)
+{
+homeImageButton4->Bitmap=swapImage->Bitmap;
+homeShadow->Visible=false;
+homeLabel->Visible=false;
+}
+//---------------------------------------------------------------------------
 
