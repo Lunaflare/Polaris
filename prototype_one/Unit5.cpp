@@ -3,6 +3,7 @@
 #include <fmx.h>
 #pragma hdrstop
 
+#include "Unit7.h"
 #include "Unit6.h"
 #include "Unit5.h"
 #include "prototype.h"
@@ -26,7 +27,7 @@ void __fastcall TForm5::FormShow(TObject *Sender)
 	//if admin, show the edit DLR button
 	if (Form1->getAccessLevel() == 2)
 		{
-			editDLRButton->Visible = true;
+			editRoleButton->Visible = true;
 			addRoleButton->Visible = true;
 			sep2Image->Visible=true;
 			adminLabel->Visible=true;
@@ -205,6 +206,13 @@ void __fastcall TForm5::addRoleButtonClick(TObject *Sender)
 {
 	Form5->Hide();
 	Form6->Show();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm5::editRoleButtonClick(TObject *Sender)
+{
+	Form5->Hide();
+	Form7->Show();
 }
 //---------------------------------------------------------------------------
 

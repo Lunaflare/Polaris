@@ -39,7 +39,7 @@ __published:	// IDE-managed Components
 	TRadioButton *readAdvancedRadio;
 	TEdit *passwordChangeEdit;
 	TButton *saveChangesButton;
-	TButton *editDLRButton;
+	TButton *editRoleButton;
 	TImage *homeImageButton5;
 	TLabel *confirmPasswordLabel;
 	TEdit *confirmPasswordEdit;
@@ -65,6 +65,7 @@ __published:	// IDE-managed Components
 	void __fastcall homeImageButton5MouseEnter(TObject *Sender);
 	void __fastcall homeImageButton5MouseLeave(TObject *Sender);
 	void __fastcall addRoleButtonClick(TObject *Sender);
+	void __fastcall editRoleButtonClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TForm5(TComponent* Owner);

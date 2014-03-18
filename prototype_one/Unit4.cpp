@@ -272,20 +272,38 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 	{
 		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE MONTH(Date) = '" + monthChosen + "' AND YEAR(Date) = '" + monthYearSelected + "' GROUP BY Day_Of_Week;";
 		Form3->SQLQuery2->Open();
-		Form3->SQLQuery2->First();
+		if (!Form3->SQLQuery2->Eof)
+			Form3->SQLQuery2->First();
+		else
+		{
+			//show error message here (floating point error)
+			return;
+		}
 	}
 	else if (SameText(type, "year"))
 	{
 		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE YEAR(Date) = '" + monthChosen + "' GROUP BY Day_Of_Week;";
 		Form3->SQLQuery2->Open();
-		Form3->SQLQuery2->First();
+		if (!Form3->SQLQuery2->Eof)
+			Form3->SQLQuery2->First();
+		else
+		{
+			//show error message here (floating point error)
+			return;
+		}
 	}
 	else if (SameText(type, "week"))
 	{
 		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE Date BETWEEN '" + rangeStart + "' AND '" + rangeEnd + "' GROUP BY Day_Of_Week;";
 		Form3->SQLQuery2->Open();
-		Form3->SQLQuery2->First();
-    }
+		if (!Form3->SQLQuery2->Eof)
+			Form3->SQLQuery2->First();
+		else
+		{
+			//show error message here (floating point error)
+			return;
+		}
+	}
 
 	//start filling column 1
 	String firstColumnNoDayWeek[8] = {"Offset_Rooms_Occupied", "Occupancy_Percent", "AM_Rooms_Cleaned", "PM_Rooms_Cleaned", "Rooms_Sold", "Total_Rooms_Cleaned", "Guestroom_Carpets_Cleaned", "Documented_Inspections"};
@@ -923,7 +941,13 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 	//construct actual query
 	Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE Date = '" + currentDate + "';";
 	Form3->SQLQuery2->Open();
-	Form3->SQLQuery2->First();
+	if (!Form3->SQLQuery2->Eof)
+		Form3->SQLQuery2->First();
+	else
+	{
+		//show error message here (floating point error)
+		return;
+	}
 
 	//start filling column 1
 	String firstColumnNoDayWeek[9] = {"Date", "Offset_Rooms_Occupied", "Occupancy_Percent", "AM_Rooms_Cleaned", "PM_Rooms_Cleaned", "Rooms_Sold", "Total_Rooms_Cleaned", "Guestroom_Carpets_Cleaned", "Documented_Inspections"};
@@ -1243,6 +1267,21 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		laborTable = Form3->SQLQuery2->Fields->Fields[2]->AsString;
 	}
 
+	//add items to yearPopupBox and set the text/item index
+	int count = 0;
+	String year = "";
+	Form3->SQLQuery2->SQL->Text = "SELECT DISTINCT YEAR(Date) FROM baldwins_hotel_data."+inputTable+" ORDER BY YEAR(Date) ASC;";
+	Form3->SQLQuery2->Open();
+	Form3->SQLQuery2->First();
+	while (!Form3->SQLQuery2->Eof)
+	{
+		year = Form3->SQLQuery2->Fields->Fields[0]->AsString;
+		yearPopupBox->Items->Add(year);
+		yearPopupBox->ItemIndex = count++;
+		yearPopupBox->Text = year;
+		Form3->SQLQuery2->Next();
+	}
+
 	//if readLevel == 0, display basic read form (allow selection of roles)
 	if (Form1->getReadLevel() == 0)
 	{
@@ -1358,7 +1397,6 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		populateGrid(roleVector, 0, dbDayChosenStart, dbDayChosenEnd, "week");
 		printButtonImage->Visible=true;
 		viewButtonImage->Visible=true;
-
 	}
 }
 //---------------------------------------------------------------------------

@@ -1,0 +1,44 @@
+//---------------------------------------------------------------------------
+
+#include <fmx.h>
+#pragma hdrstop
+
+#include "Unit7.h"
+//---------------------------------------------------------------------------
+#pragma package(smart_init)
+#pragma resource "*.fmx"
+TForm7 *Form7;
+//---------------------------------------------------------------------------
+__fastcall TForm7::TForm7(TComponent* Owner)
+	: TForm(Owner)
+{
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm7::FormClose(TObject *Sender, TCloseAction &Action)
+{
+	//todo
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm7::FormShow(TObject *Sender)
+{
+	//todo
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm7::homeImageButton7Click(TObject *Sender)
+{
+	//todo
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm7::backImageButtonClick(TObject *Sender)
+{
+	//todo
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm7::nextImageButtonClick(TObject *Sender)
+{
+	//todo
+}
+//---------------------------------------------------------------------------
