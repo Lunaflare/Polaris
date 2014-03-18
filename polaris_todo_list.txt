@@ -31,3 +31,13 @@
 .in add role need to adjust overtime pay per hour and avg pay per hour to include new role and its wages
 .labor standards in database do not match up to the excel sheets
 .fix read floating point error and instead show error message for user saying that there isn't any data for the query
+	-there is a place for cody to put in error messages (4 locations, 3 in first populateGrid, 1 in second populateGrid)
+.set up updater
+.set up installer
+.allow to edit roles (wages etc.)
+	-may need to recalculate avg wages and such in hotel_ref
+.remove view labor standards from settings
+.add ability to view labor standards from read
+.add ability to print grid
+.fix code in read so when you remove some role filters they are not accounted for
+
