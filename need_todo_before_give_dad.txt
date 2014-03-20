@@ -13,12 +13,14 @@
 	-just get rid of accounting and such and add budget to hotel ref and do one extra calculation
 .set up updater to send out most recent version in github?
 .set up installer
-.when add or edit role need to recalculate avg wages and such in hotel_ref
 .type check in add role and edit role forms
-.fix read floating point error and instead show error message for user saying that there isn't any data for the query
-	-there is a place for cody to put in error messages (4 locations, 3 in first populateGrid, 1 in second populateGrid)
+.decide on a new format for to do lists cuz txt file rlly com on
+.in read when press home and go back in, some of the animations for errors and labels do not seem to work the second time through
+
+
+
+
+
 .need to check against duplicate role names in edit and add role
 	-need to not allow the change of the three specific names of roles associated with extra calculations
 	-need to make list of all role names that shouldn't be name changed b/c of input/read forms
-.decide on a new format for to do lists cuz txt file rlly com on
-.in read when press home and go back in, some of the animations for errors and labels do not seem to work the second time through

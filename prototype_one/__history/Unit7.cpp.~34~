@@ -150,15 +150,18 @@ void __fastcall TForm7::saveChangesButtonClick(TObject *Sender)
 	Form3->SQLQuery2->ExecSQL();
 
 	//update query for labor standards table
-	//Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+laborTable+" CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll)+" "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll)+" "+roleNameNewUnderScores+" DOUBLE NOT NULL;";
-	//Form3->SQLQuery2->ExecSQL();
+	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+laborTable+" CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll)+" "+roleNameNewUnderScores+" DOUBLE NOT NULL;";
+	Form3->SQLQuery2->ExecSQL();
 
 	//update query for read table
-
+	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+readTable+" CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll) + "_Hours_Paid"+" "+roleNameNewHoursPaid+" DOUBLE NOT NULL, CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll) + "_Standard_Hours"+" "+roleNameNewStandardHours+" DOUBLE NOT NULL, CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll) + "_Percent_Performance"+" "+roleNamePercentPerformance+" DOUBLE NOT NULL;";
+	Form3->SQLQuery2->ExecSQL();
 
 	//update query for input table
+	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+inputTable+" CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll) + "_Hours_Paid"+" "+roleNameNewHoursPaid+" DOUBLE NOT NULL;";
+	Form3->SQLQuery2->ExecSQL();
 
-	//take back to settings page
+	//take back to settings page (intentionally called twice)
 	backImageButton->OnClick(NULL);
 	backImageButton->OnClick(NULL);
 }

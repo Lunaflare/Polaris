@@ -56,6 +56,27 @@ void __fastcall TForm6::saveChangesButtonClick(TObject *Sender)
 	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+readTable+" ADD COLUMN "+roleHoursPaid+" DOUBLE NOT NULL AFTER Director_And_Two_Managers_Percent_Performance, ADD COLUMN "+roleStandardHours+" DOUBLE NOT NULL AFTER "+roleHoursPaid+", ADD COLUMN "+rolePercentPerformance+" DOUBLE NOT NULL AFTER "+roleStandardHours+";";
     Form3->SQLQuery2->ExecSQL();
 
+	//recalculate Average_Pay_Per_Hourour and Overtime_Per_Hour int hotel ref table to accommodate new role's wages
+	String empty = "";
+	double wagesTotal = 0.0;
+	double numWages = 0.0;
+	Form3->SQLQuery2->SQL->Text = "SELECT Role_Wages FROM role_table WHERE hotelID = '"+currentHotelID+"';";
+	Form3->SQLQuery2->Open();
+	Form3->SQLQuery2->First();
+	while (!Form3->SQLQuery2->Eof)
+	{
+		++numWages;
+		wagesTotal += Form3->SQLQuery2->Fields->Fields[0]->AsFloat;
+
+		Form3->SQLQuery2->Next();
+	}
+	double avgPayPerHour = wagesTotal / numWages;
+	double overtimePerHour = avgPayPerHour * 1.5;
+
+	//update hotel_ref with new values
+	Form3->SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data.hotel_ref SET Average_Pay_Per_Hour = '"+empty+avgPayPerHour+"', Overtime_Per_Hour = '"+empty+overtimePerHour+"' WHERE hotelID = '"+currentHotelID+"';";
+	Form3->SQLQuery2->ExecSQL();
+
 	//take back to settings page
 	backImageButton->OnClick(NULL);
 }
