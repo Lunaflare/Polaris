@@ -2,11 +2,15 @@
 .add 2014 excel data to input and read tables
 .format numbers in read the same way as in excel sheets (newest i.e. 2014)
 	-maybe round to similar number of decimal points also?
+	-maybe add year somewhere in read so user knows what year they are looking at
 .make sure hotel ref table is correct for the marriot long beach Cali
 	-input_table, labor_table, read_table, Average_Pay_Per_Hour, Overtime_Per_Hour
 .make sure role names in role_table, MLB_Labor_Stds_2014 MLB_Test_Input and MLB_Test_Read line up correctly
 	-could also double check wages and standard hours reference line up with MLB_Labor_Stds_2014
 .either take out extra calculations on upper left corner of read grid or give disclaimer that they are working on a hardcoded value for "accounting" and will not be right unless "accounting" is actually this value
+	-also seems to be some other calculations that could do (total labor hours clean
+	one room, management, extra variance)
+	-just get rid of accounting and such and add budget to hotel ref and do one extra calculation
 .set up updater to send out most recent version in github?
 .set up installer
 .when add or edit role need to recalculate avg wages and such in hotel_ref
@@ -16,5 +20,4 @@
 .need to check against duplicate role names in edit and add role
 	-need to not allow the change of the three specific names of roles associated with extra calculations
 	-need to make list of all role names that shouldn't be name changed b/c of input/read forms
-.slick ass logo for the windows icon
 .decide on a new format for to do lists cuz txt file rlly com on
