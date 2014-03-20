@@ -1,46 +1,32 @@
+.change password web stuff should make sure the email address you give is linked to the user's account and not just in the db
 .make sure login form buttons go to correct links - ONLY "Register" needs changing
-.taskbar issue for all forms (does not show up as minimized in taskbar)
-.add old input data to raw_input table
-.change first day of week in calendars to saturday (to match dlr)
+.add 2014 excel data to input and read tables
 .Add button to remove a date?
-.Make way for user to change/upload new labor standards
-	-this should change any values in tables from old labor standards
-.when change in basic input & press back, it doesn't save
-	-may or may not want to implement this
-.make year selection in read dynamic (i.e. only pull years that are in read_data)
-.need to not allow next button to be clicked in read unless a filter has been selected
+.Make way for user to upload new labor standards
 .easy input of budget dollars & productivity (explanation needed)
-.when basic input & click back after edit, doesn't store in local struct
-	-may or may not want to implement this
 .allow user in input once they have selected a date if press back should let them select a new date
 .in db store number of things in read that are not roles (i.e. everything that comes before the roles)
 	-right now I am using a static number for this
-	-in db create table holding things we have in read table that are not roles
 .round to exact same number of decimal points in read as in excel?
-.on calander if only change one of top drop down filters and don't actually click a date...doesn't select a new date
+	-also format numbers the same way (i.e. dollar sign etc)
 .changed in role table managers role wages from 21.47 to 23.55 to match how is in 2013 newer labor stds
 .changed hotel_ref avg pay per hour from 14.23 to 15.86 and overtime per hour from 21.34 to 23.79
 .temporarily for testing changed in role table pm housemen's lookup to be carpet care instead of pm rooms cleaned
-.extra calculations on side for month and year in read?
-.store "accounting for particular months/weeks/years in order to calculate extra stuff in top left of grid?
+	-so that all data would line up for testing (december 2013 namely)
+.store "accounting" for particular months/weeks/years in order to calculate extra stuff in top left of grid?
 	-right now these calculations will not be correct because there is a hardcoded number for "accounting"
-.in settings form - "add role" and "edit dlr" button stay "clicked" when look at them again after going to add role form and pressing back or home
-.possibly change edit dlr in settings to just be view dlr and simply display the labor standars?
-	-could even make some parts read only but make other parts directly changeable since it would only affect future calculations 
-.type check in add role form
-.in add role need to adjust overtime pay per hour and avg pay per hour to include new role and its wages
-.labor standards in database do not match up to the excel sheets
+.all buttons "stay clicked" when they have been clicked and then you return to the form where they were clicked
+	-may or may not be something to adjust for
+.type check in add role and edit role forms
 .fix read floating point error and instead show error message for user saying that there isn't any data for the query
 	-there is a place for cody to put in error messages (4 locations, 3 in first populateGrid, 1 in second populateGrid)
-.set up updater
+.set up updater to send out most recent version in github?
 .set up installer
-.allow to edit roles (wages etc.)
-	-may need to recalculate avg wages and such in hotel_ref
-.remove view labor standards from settings
+.when add or edit role need to recalculate avg wages and such in hotel_ref
 .add ability to view labor standards from read
-.add ability to print grid
-.fix code in read so when you remove some role filters they are not accounted for
+.add ability to print grid from read
 .need to check against duplicate role names in edit and add role
 	-need to not allow the change of the three specific names of roles associated with extra calculations
 	-need to make list of all role names that shouldn't be name changed b/c of input/read forms
+.could add ability to view literally all the data by day in read or somewhere else
 

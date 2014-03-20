@@ -1,0 +1,18 @@
+.change register button on login screen to go to different link (now goes to serial key generation page)
+.add 2014 excel data to input and read tables
+.format numbers in read the same way as in excel sheets (newest i.e. 2014)
+	-maybe round to similar number of decimal points also?
+.make sure hotel ref table is correct for the marriot long beach Cali
+	-input_table, labor_table, read_table, Average_Pay_Per_Hour, Overtime_Per_Hour
+.make sure role names in role_table, MLB_Labor_Stds_2014 MLB_Test_Input and MLB_Test_Read line up correctly
+	-could also double check wages and standard hours reference line up with MLB_Labor_Stds_2014
+.either take out extra calculations on upper left corner of read grid or give disclaimer that they are working on a hardcoded value for "accounting" and will not be right unless "accounting" is actually this value
+.set up updater to send out most recent version in github?
+.set up installer
+.when add or edit role need to recalculate avg wages and such in hotel_ref
+.type check in add role and edit role forms
+.fix read floating point error and instead show error message for user saying that there isn't any data for the query
+	-there is a place for cody to put in error messages (4 locations, 3 in first populateGrid, 1 in second populateGrid)
+.need to check against duplicate role names in edit and add role
+	-need to not allow the change of the three specific names of roles associated with extra calculations
+	-need to make list of all role names that shouldn't be name changed b/c of input/read forms
