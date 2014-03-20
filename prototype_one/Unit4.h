@@ -142,6 +142,7 @@ __published:	// IDE-managed Components
 	TImage *viewLabel;
 	TFloatAnimation *FloatAnimation32;
 	TFloatAnimation *FloatAnimation33;
+	TLabel *errorLabel;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton4Click(TObject *Sender);
@@ -175,6 +176,9 @@ __published:	// IDE-managed Components
 	String viewType;
 	String privateDayChosenStart;
 	String privateDayChosenEnd;
+	String privateDayChosenStartFull;
+	String privateDayChosenEndFull;
+	String privateDBDayChosen;
 	bool secondTimeArbitrary;
 	int selectAllButtonX;
 	int selectAllButtonY;

@@ -203,6 +203,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 	String withUnderscores = "";
 	String select = "";
 	int columnIndex = 0;
+	String DayName = "";
 
 	//add items to select that will be required no matter what
 	String firstColumnHeadings[9] = {"Date", "Day_Of_Week", "SUM(Offset_Rooms_Occupied)", "SUM(AM_Rooms_Cleaned)", "SUM(PM_Rooms_Cleaned)", "SUM(Rooms_Sold)", "SUM(Total_Rooms_Cleaned)", "SUM(Guestroom_Carpets_Cleaned)", "SUM(Documented_Inspections_Completed)"};
@@ -272,590 +273,680 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 	{
 		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE MONTH(Date) = '" + monthChosen + "' AND YEAR(Date) = '" + monthYearSelected + "' GROUP BY Day_Of_Week;";
 		Form3->SQLQuery2->Open();
-		if (!Form3->SQLQuery2->Eof)
-			Form3->SQLQuery2->First();
-		else
-		{
-			//show error message here (floating point error)
-			return;
-		}
 	}
 	else if (SameText(type, "year"))
 	{
 		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE YEAR(Date) = '" + monthChosen + "' GROUP BY Day_Of_Week;";
 		Form3->SQLQuery2->Open();
-		if (!Form3->SQLQuery2->Eof)
-			Form3->SQLQuery2->First();
-		else
-		{
-			//show error message here (floating point error)
-			return;
-		}
 	}
 	else if (SameText(type, "week"))
 	{
 		Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE Date BETWEEN '" + rangeStart + "' AND '" + rangeEnd + "' GROUP BY Day_Of_Week;";
 		Form3->SQLQuery2->Open();
-		if (!Form3->SQLQuery2->Eof)
-			Form3->SQLQuery2->First();
-		else
-		{
-			//show error message here (floating point error)
-			return;
-		}
 	}
 
-	//start filling column 1
-	String firstColumnNoDayWeek[8] = {"Offset_Rooms_Occupied", "Occupancy_Percent", "AM_Rooms_Cleaned", "PM_Rooms_Cleaned", "Rooms_Sold", "Total_Rooms_Cleaned", "Guestroom_Carpets_Cleaned", "Documented_Inspections"};
-	for (int i = 0; i < 8; ++i)
-		readGrid->Cells[1][i] = StringReplace(firstColumnNoDayWeek[i], "_", " ", TReplaceFlags() << rfReplaceAll);
-
-	//continue filling column 1 with headings
-	String roleTypes[3] = {"Actual Hours", "Standard Hours", "% Performance"};
-	columnIndex = 9;
-	for (int i = 0; i < rVector.size(); ++i)
+	//try to open query, if opens continue, otherwise show error and bypass rest of code
+	if (Form3->SQLQuery2->Eof)
 	{
-		for (int j = 0; j < 3; ++j)
-		{
-			readGrid->Cells[1][columnIndex++] = roleTypes[j];
-		}
+		//temporarily change user read level to basic if advanced (only locally, not at db level)
+        Form1->setReadLevel("0");
 
-		++columnIndex;
-	}
+		//make basic read appear
+		homeImageButton4->OnClick(NULL);
+		Form2->readButtonImageClick(NULL);
 
-	//continue filling column 1 with headers
-	String overtimeHeaders[3] = {"Overtime Hours", "Overtime Cost", "Overtime Premium Cost"};
-	for (int i = 0; i < 3; ++i)
-	{
-       	readGrid->Cells[1][columnIndex++] = overtimeHeaders[i];
-	}
-	++columnIndex;
-
-	//continue filling column 1 with headers
-	for (int i = 0; i < 3; ++i)
-	{
-		readGrid->Cells[1][columnIndex++] = roleTypes[i];
-	}
-	++columnIndex;
-
-	//continue filling column 1 with headers
-	for (int i = 0; i < 3; ++i)
-	{
-		readGrid->Cells[1][columnIndex++] = StringReplace(roleTypes[i], "Hours", "Cost", TReplaceFlags() << rfReplaceAll);
-	}
-	readGrid->Cells[1][columnIndex++] = "Productivity Goals";
-
-	//get productivity index to be used later
-    int productivityStartIndex = columnIndex;
-
-	//create index indicating which column I am currently filling
-	int indexOn = 2;
-
-	//iterate through cursor until empty
-	columnIndex = 0;
-	String blank = "";
-
-	//index indicating where in query cursor you currently are (i.e. which field)
-	//just hardcoded for now but could be size of a return of another query
-	int queryIndex = 9;
-
-	//running calculations for productivity goals
-	double manMinutesRoomsCleaned = 0;
-	int roomsCleanedAM = 0;
-	int roomsCleanedPM = 0;
-	int roomsCleanedAMSingleInstance = 0;
-	int roomsCleanedPMSingleInstance = 0;
-	double productivityRoomsCleanedAM = 0;
-	double productivityRoomsCleanedPM = 0;
-	double productivityLaundry = 0;
-	double productivityNonGoalAM = 0;
-	double productivityNonGoalPM = 0;
-	double productivityNonGoalLaundry = 0;
-	int totalRoomsCleaned = 0;
-	int totalRoomsCleanedSingleInstance = 0;
-	double hoursVarianceOne = 0;
-	double hoursVarianceTwo = 0;
-	double costVarianceOne = 0;
-	double costVarianceTwo = 0;
-
-	while (!Form3->SQLQuery2->Eof)
-	{
-		//set indexOn so that week days appear in correct order (may need to do something in case a specific week day is not returned)
-		if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
-			indexOn = 2;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
-			indexOn = 3;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
-			indexOn = 4;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
-			indexOn = 5;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
-			indexOn = 6;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
-			indexOn = 7;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Friday"))
-			indexOn = 8;
-
-		//populate the header for this column with the day of the week
-		readGrid->ColumnByIndex(indexOn)->Header = Form3->SQLQuery2->Fields->Fields[1]->AsString;
-
-		//continue populating items
-		//readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[0]->AsString;
-		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[2]->AsString;
-
-		//compute occupancy percent (involves querying db)
+		//show message specific to whatever error they had
 		if (SameText(type, "month"))
 		{
-			readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 1240.0) + " %";
+			//get string value for month integer
+			switch(monthChosen)
+			{
+				case 1:
+					DayName = L"January";
+					break;
+				case 2:
+					DayName = L"February";
+					break;
+				case 3:
+					DayName = L"March";
+					break;
+				case 4:
+					DayName = L"April";
+					break;
+				case 5:
+					DayName = L"May";
+					break;
+				case 6:
+					DayName = L"June";
+					break;
+				case 7:
+					DayName = L"July";
+					break;
+				case 8:
+					DayName = L"August";
+					break;
+				case 9:
+					DayName = L"September";
+					break;
+				case 10:
+					DayName = L"October";
+					break;
+				case 11:
+					DayName = L"November";
+					break;
+				case 12:
+					DayName = L"December";
+					break;
+			}
+
+			//show month error message
+			errorLabel->Text = spaceTaker + "Error: no data currently exists for " + DayName + " " + monthYearSelected + ". Please try again...";
+			errorLabel->Visible = true;
 		}
-		else if (SameText(type, "year"))
+		else
 		{
-			readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 14880.0) + " %";
-		}
-		else if (SameText(type, "week") && monthChosen == -1)
-		{
-			//arbitrary range
-			readGrid->Cells[indexOn][columnIndex++] = "N/A";
-		}
-		else if (SameText(type, "week"))
-		{
-			readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 310.0) + " %";
+			//show week/range error message
+			errorLabel->Text = spaceTaker + "Error: no data currently exists for the range " + privateDayChosenStartFull + " to " + privateDayChosenEndFull + ". Please try again...";
+			errorLabel->Visible = true;
 		}
 
-		//fill with rest of non role type stuff
-		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[3]->AsString;
-		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[4]->AsString;
-		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[5]->AsString;
-		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[6]->AsString;
-		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[7]->AsString;
-		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[8]->AsString;
+		//hide some things for correct reentry
+		/*filtersLabel->Visible = false;
+		arrowDay->Visible=false;
+		pickerArrow->Visible=false;
+		whichMonthImage->Visible=false;
+		whichYearImage->Visible=false;
+		whichDayImage->Visible=false;
+		whichWeekImage->Visible=false;
+		pickStartImage->Visible=false;
+		pickEndImage->Visible=false;
+		arrowRange->Visible=false;
+		arrowYear->Visible=false;
+		roleListBox->Enabled=true;
+		selectAllButton->Enabled=true;
+		radioButtons(1);
+		rangeTabContainer->Tabs[0]->Enabled=true;
+		rangeTabContainer->Tabs[1]->Enabled=true;*/
+	}
+	else
+	{
+		//open query and continue with displaying the grid and filters
+		Form3->SQLQuery2->First();
 
-		//fill with role items
-		++columnIndex;
+		//start filling column 1
+		String firstColumnNoDayWeek[8] = {"Offset_Rooms_Occupied", "Occupancy_Percent", "AM_Rooms_Cleaned", "PM_Rooms_Cleaned", "Rooms_Sold", "Total_Rooms_Cleaned", "Guestroom_Carpets_Cleaned", "Documented_Inspections"};
+		for (int i = 0; i < 8; ++i)
+			readGrid->Cells[1][i] = StringReplace(firstColumnNoDayWeek[i], "_", " ", TReplaceFlags() << rfReplaceAll);
+
+		//continue filling column 1 with headings
+		String roleTypes[3] = {"Actual Hours", "Standard Hours", "% Performance"};
+		columnIndex = 9;
 		for (int i = 0; i < rVector.size(); ++i)
 		{
-			//need to round when appropriate and make it a percentage
 			for (int j = 0; j < 3; ++j)
 			{
-				//if j == 2, these should be percents
-				if (j == 2)
-				{
-					if (Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat != 0)
-						readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat / Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
-					else
-						readGrid->Cells[indexOn][columnIndex++] = "0%";
-					++queryIndex;
-				}
-				else if (j == 1)
-				{
-					//compute productivity man hours
-					manMinutesRoomsCleaned += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-
-					//compute productivity rooms cleaned AM divisor
-					if (queryIndex == productivityAMIndex)
-						productivityRoomsCleanedAM += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-					else if (queryIndex == productivityPMIndex)
-						productivityRoomsCleanedPM += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-					else if (queryIndex == productivityLaundryIndex)
-						productivityLaundry += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-
-					readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
-				}
-				else
-				{
-					if (queryIndex == (productivityAMIndex - 1))
-						productivityNonGoalAM = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-					else if (queryIndex == (productivityPMIndex - 1))
-						productivityNonGoalPM = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-					else if (queryIndex == (productivityLaundryIndex - 1))
-						productivityNonGoalLaundry = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-
-					readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
-				}
+				readGrid->Cells[1][columnIndex++] = roleTypes[j];
 			}
 
-			//skip spaces when appropriate
 			++columnIndex;
 		}
 
-		//fill with overtime, total labor hours, total labor cost
+		//continue filling column 1 with headers
+		String overtimeHeaders[3] = {"Overtime Hours", "Overtime Cost", "Overtime Premium Cost"};
 		for (int i = 0; i < 3; ++i)
 		{
-			for (int j = 0; j < 3; ++j)
-			{
-				if (i == 0)
-				{
-					if (j == 0)
-						readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
-					else
-                        readGrid->Cells[indexOn][columnIndex++] = blank + "$" + nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
-                }
-				else if (i == 1)
-				{
-					//productivity computation
-					if (j == 0)
-						hoursVarianceOne = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-					else if (j == 1)
-                        hoursVarianceTwo = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-
-					if (j == 2)
-					{
-						if (Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat != 0)
-							readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat / Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
-						else
-							readGrid->Cells[indexOn][columnIndex++] = "0%";
-						++queryIndex;
-						//readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
-					}
-					else
-						readGrid->Cells[indexOn][columnIndex++] = nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
-				}
-				else
-				{
-					//productivity computation
-					if (j == 0)
-						costVarianceOne = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-					else if (j == 1)
-						costVarianceTwo = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-
-					if (j == 2)
-					{
-						if (Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat != 0)
-							readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat / Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
-						else
-							readGrid->Cells[indexOn][columnIndex++] = "0%";
-						//readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
-						++queryIndex;
-					}
-					else
-						readGrid->Cells[indexOn][columnIndex++] = blank + "$" + commas(IntToStr(nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat)));
-				}
-			}
-
-			//skip spaces when appropriate
-			++columnIndex;
+	       	readGrid->Cells[1][columnIndex++] = overtimeHeaders[i];
 		}
+		++columnIndex;
 
-		//keep running total for productivity goal computation
-		totalRoomsCleaned += Form3->SQLQuery2->Fields->Fields[6]->AsInteger;
-		totalRoomsCleanedSingleInstance = Form3->SQLQuery2->Fields->Fields[6]->AsInteger;
-		roomsCleanedAM += Form3->SQLQuery2->Fields->Fields[3]->AsInteger;
-		roomsCleanedAMSingleInstance = Form3->SQLQuery2->Fields->Fields[3]->AsInteger;
-		roomsCleanedPM += Form3->SQLQuery2->Fields->Fields[4]->AsInteger;
-		roomsCleanedPMSingleInstance = Form3->SQLQuery2->Fields->Fields[4]->AsInteger;
+		//continue filling column 1 with headers
+		for (int i = 0; i < 3; ++i)
+		{
+			readGrid->Cells[1][columnIndex++] = roleTypes[i];
+		}
+		++columnIndex;
 
-		//fill in all productivity things for each iteration of cursor
-		readGrid->Cells[indexOn][columnIndex++] = nearestDollar(hoursVarianceOne - hoursVarianceTwo);
-		readGrid->Cells[indexOn][columnIndex++] = nearestDollar(costVarianceOne - costVarianceTwo);
-		if (totalRoomsCleanedSingleInstance == 0)
-			readGrid->Cells[indexOn][columnIndex++] = 0;
-		else
-			readGrid->Cells[indexOn][columnIndex++] = roundTwo((hoursVarianceOne * 60.0) / totalRoomsCleanedSingleInstance);
-		productivityNonGoalAM /= 8.0;
-		if (productivityNonGoalAM == 0)
-			readGrid->Cells[indexOn][columnIndex++] = 0;
-		else
-			readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) roomsCleanedAMSingleInstance) / productivityNonGoalAM);
-		productivityNonGoalPM /= 8.0;
-		if (productivityNonGoalPM == 0)
-			readGrid->Cells[indexOn][columnIndex++] = 0;
-		else
-			readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) roomsCleanedPMSingleInstance) / productivityNonGoalPM);
-		productivityNonGoalLaundry /= 7.5;
-		if (productivityNonGoalLaundry == 0)
-			readGrid->Cells[indexOn][columnIndex++] = 0;
-		else
-			readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) totalRoomsCleanedSingleInstance) / productivityNonGoalLaundry);
+		//continue filling column 1 with headers
+		for (int i = 0; i < 3; ++i)
+		{
+			readGrid->Cells[1][columnIndex++] = StringReplace(roleTypes[i], "Hours", "Cost", TReplaceFlags() << rfReplaceAll);
+		}
+		readGrid->Cells[1][columnIndex++] = "Productivity Goals";
 
-		//advance cursor (for daily, should only be one iteration of cursor)
-		queryIndex = 9;
+		//get productivity index to be used later
+	    int productivityStartIndex = columnIndex;
+
+		//create index indicating which column I am currently filling
+		int indexOn = 2;
+
+		//iterate through cursor until empty
 		columnIndex = 0;
-		Form3->SQLQuery2->Next();
-	}
+		String blank = "";
 
-	//get what the productivity column is (probably ok to stay hardcoded)
-	int productivityColumn = 1;
+		//index indicating where in query cursor you currently are (i.e. which field)
+		//just hardcoded for now but could be size of a return of another query
+		int queryIndex = 9;
 
-	//change first two productivity things to 0.00
-	readGrid->Cells[productivityColumn][productivityStartIndex++] = "0.00";
-	readGrid->Cells[productivityColumn][productivityStartIndex++] = "0.00";
+		//running calculations for productivity goals
+		double manMinutesRoomsCleaned = 0;
+		int roomsCleanedAM = 0;
+		int roomsCleanedPM = 0;
+		int roomsCleanedAMSingleInstance = 0;
+		int roomsCleanedPMSingleInstance = 0;
+		double productivityRoomsCleanedAM = 0;
+		double productivityRoomsCleanedPM = 0;
+		double productivityLaundry = 0;
+		double productivityNonGoalAM = 0;
+		double productivityNonGoalPM = 0;
+		double productivityNonGoalLaundry = 0;
+		int totalRoomsCleaned = 0;
+		int totalRoomsCleanedSingleInstance = 0;
+		double hoursVarianceOne = 0;
+		double hoursVarianceTwo = 0;
+		double costVarianceOne = 0;
+		double costVarianceTwo = 0;
 
-	//compute productivity for man hours
-	if (totalRoomsCleaned != 0)
-		manMinutesRoomsCleaned = roundTwo((manMinutesRoomsCleaned * 60.0) / totalRoomsCleaned);
-	else
-		manMinutesRoomsCleaned = 0;
-	readGrid->Cells[productivityColumn][productivityStartIndex++] = manMinutesRoomsCleaned;
-
-	//compute productivity for roomsCleanedAM
-	productivityRoomsCleanedAM /= 8.0;
-	if (productivityRoomsCleanedAM == 0)
-		productivityRoomsCleanedAM = 0;
-	else
-		productivityRoomsCleanedAM = roundTwo(((double) roomsCleanedAM) / productivityRoomsCleanedAM);
-	readGrid->Cells[productivityColumn][productivityStartIndex++] = productivityRoomsCleanedAM;
-
-	//compute productivity for roomsCleanedPM
-	productivityRoomsCleanedPM /= 8.0;
-	if (productivityRoomsCleanedPM == 0)
-		productivityRoomsCleanedPM = 0;
-	else
-		productivityRoomsCleanedPM = roundTwo(((double) roomsCleanedPM) / productivityRoomsCleanedPM);
-	readGrid->Cells[productivityColumn][productivityStartIndex++] = productivityRoomsCleanedPM;
-
-	//compute productivity for laundryAttendantProductivity
-	productivityLaundry /= 7.5;
-	if (productivityLaundry == 0)
-		productivityLaundry = 0;
-	else
-		productivityLaundry = roundTwo(((double) totalRoomsCleaned) / productivityLaundry);
-	readGrid->Cells[productivityColumn][productivityStartIndex++] = productivityLaundry;
-
-	//populate total column (last one)
-	indexOn = 9;
-	columnIndex = 0;
-	if (SameText(type, "month"))
-	{
-		//get the month name for the header
-		String DayName = "";
-		switch(monthChosen)
+		while (!Form3->SQLQuery2->Eof)
 		{
-			case 1:
-				DayName = L"January";
-				break;
-			case 2:
-				DayName = L"February";
-				break;
-			case 3:
-				DayName = L"March";
-				break;
-			case 4:
-				DayName = L"April";
-				break;
-			case 5:
-				DayName = L"May";
-				break;
-			case 6:
-				DayName = L"June";
-				break;
-			case 7:
-				DayName = L"July";
-				break;
-			case 8:
-				DayName = L"August";
-				break;
-			case 9:
-				DayName = L"September";
-				break;
-			case 10:
-				DayName = L"October";
-				break;
-			case 11:
-				DayName = L"November";
-				break;
-			case 12:
-				DayName = L"December";
-				break;
-		}
+			//set indexOn so that week days appear in correct order (may need to do something in case a specific week day is not returned)
+			if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
+				indexOn = 2;
+			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
+				indexOn = 3;
+			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
+				indexOn = 4;
+			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
+				indexOn = 5;
+			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
+				indexOn = 6;
+			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
+				indexOn = 7;
+			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Friday"))
+				indexOn = 8;
 
-		//make the header the month
-		readGrid->ColumnByIndex(indexOn)->Header = DayName;
-	}
-	else if (SameText(type, "year"))
-	{
-		//make the header the year (monthChosen actuall stores the year in this case)
-		readGrid->ColumnByIndex(indexOn)->Header = monthChosen;
-	}
-	else if (SameText(type, "week"))
-	{
-		//make the header the date range
-        readGrid->ColumnByIndex(indexOn)->Header = privateDayChosenStart + " - " + privateDayChosenEnd;
-	}
+			//populate the header for this column with the day of the week
+			readGrid->ColumnByIndex(indexOn)->Header = Form3->SQLQuery2->Fields->Fields[1]->AsString;
 
-	//fill with top portion (non roles) with totals
-	double totalCounter = 0;
-	double occupancyPercent = 0;
-	double totalRoomsCleanedTotal = 0;
-	double amRoomsCleanedTotal = 0;
-	double pmRoomsCleanedTotal = 0;
-	double offsetRoomsOccupiedTotal = 0;
-	for (columnIndex = 0; columnIndex < 8; ++columnIndex)
-	{
-		for (int j = 2; j < 9; ++j)
-			totalCounter += toDouble(readGrid->Cells[j][columnIndex]);
+			//continue populating items
+			//readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[0]->AsString;
+			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[2]->AsString;
 
-		//compute occupancy percent
-		if (columnIndex == 0)
-		{
+			//compute occupancy percent (involves querying db)
 			if (SameText(type, "month"))
 			{
-				occupancyPercent = totalCounter / 8680.0;
+				readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 1240.0) + " %";
 			}
 			else if (SameText(type, "year"))
 			{
-				occupancyPercent = totalCounter / 104160.0;
-            }
+				readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 14880.0) + " %";
+			}
 			else if (SameText(type, "week") && monthChosen == -1)
 			{
 				//arbitrary range
-				occupancyPercent = -1;
+				readGrid->Cells[indexOn][columnIndex++] = "N/A";
 			}
 			else if (SameText(type, "week"))
 			{
-				occupancyPercent = totalCounter / 2170.0;
+				readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 310.0) + " %";
 			}
-		}
 
-		if (columnIndex == 1)
-			if (occupancyPercent != -1)
-				readGrid->Cells[indexOn][columnIndex] = blank + makePercent(occupancyPercent) + "%";
+			//fill with rest of non role type stuff
+			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[3]->AsString;
+			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[4]->AsString;
+			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[5]->AsString;
+			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[6]->AsString;
+			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[7]->AsString;
+			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[8]->AsString;
+
+			//fill with role items
+			++columnIndex;
+			for (int i = 0; i < rVector.size(); ++i)
+			{
+				//need to round when appropriate and make it a percentage
+				for (int j = 0; j < 3; ++j)
+				{
+					//if j == 2, these should be percents
+					if (j == 2)
+					{
+						if (Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat != 0)
+							readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat / Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
+						else
+							readGrid->Cells[indexOn][columnIndex++] = "0%";
+						++queryIndex;
+					}
+					else if (j == 1)
+					{
+						//compute productivity man hours
+						manMinutesRoomsCleaned += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+
+						//compute productivity rooms cleaned AM divisor
+						if (queryIndex == productivityAMIndex)
+							productivityRoomsCleanedAM += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+						else if (queryIndex == productivityPMIndex)
+							productivityRoomsCleanedPM += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+						else if (queryIndex == productivityLaundryIndex)
+							productivityLaundry += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+
+						readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+					}
+					else
+					{
+						if (queryIndex == (productivityAMIndex - 1))
+							productivityNonGoalAM = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+						else if (queryIndex == (productivityPMIndex - 1))
+							productivityNonGoalPM = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+						else if (queryIndex == (productivityLaundryIndex - 1))
+							productivityNonGoalLaundry = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+
+						readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+					}
+				}
+
+				//skip spaces when appropriate
+				++columnIndex;
+			}
+
+			//fill with overtime, total labor hours, total labor cost
+			for (int i = 0; i < 3; ++i)
+			{
+				for (int j = 0; j < 3; ++j)
+				{
+					if (i == 0)
+					{
+						if (j == 0)
+							readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+						else
+	                        readGrid->Cells[indexOn][columnIndex++] = blank + "$" + nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+	                }
+					else if (i == 1)
+					{
+						//productivity computation
+						if (j == 0)
+							hoursVarianceOne = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+						else if (j == 1)
+	                        hoursVarianceTwo = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+
+						if (j == 2)
+						{
+							if (Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat != 0)
+								readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat / Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
+							else
+								readGrid->Cells[indexOn][columnIndex++] = "0%";
+							++queryIndex;
+							//readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+						}
+						else
+							readGrid->Cells[indexOn][columnIndex++] = nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+					}
+					else
+					{
+						//productivity computation
+						if (j == 0)
+							costVarianceOne = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+						else if (j == 1)
+							costVarianceTwo = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+
+						if (j == 2)
+						{
+							if (Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat != 0)
+								readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat / Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
+							else
+								readGrid->Cells[indexOn][columnIndex++] = "0%";
+							//readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+							++queryIndex;
+						}
+						else
+							readGrid->Cells[indexOn][columnIndex++] = blank + "$" + commas(IntToStr(nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat)));
+					}
+				}
+
+				//skip spaces when appropriate
+				++columnIndex;
+			}
+
+			//keep running total for productivity goal computation
+			totalRoomsCleaned += Form3->SQLQuery2->Fields->Fields[6]->AsInteger;
+			totalRoomsCleanedSingleInstance = Form3->SQLQuery2->Fields->Fields[6]->AsInteger;
+			roomsCleanedAM += Form3->SQLQuery2->Fields->Fields[3]->AsInteger;
+			roomsCleanedAMSingleInstance = Form3->SQLQuery2->Fields->Fields[3]->AsInteger;
+			roomsCleanedPM += Form3->SQLQuery2->Fields->Fields[4]->AsInteger;
+			roomsCleanedPMSingleInstance = Form3->SQLQuery2->Fields->Fields[4]->AsInteger;
+
+			//fill in all productivity things for each iteration of cursor
+			readGrid->Cells[indexOn][columnIndex++] = nearestDollar(hoursVarianceOne - hoursVarianceTwo);
+			readGrid->Cells[indexOn][columnIndex++] = nearestDollar(costVarianceOne - costVarianceTwo);
+			if (totalRoomsCleanedSingleInstance == 0)
+				readGrid->Cells[indexOn][columnIndex++] = 0;
 			else
-				readGrid->Cells[indexOn][columnIndex] = "N/A";
-		else
-			readGrid->Cells[indexOn][columnIndex] = totalCounter;
-		totalCounter = 0;
+				readGrid->Cells[indexOn][columnIndex++] = roundTwo((hoursVarianceOne * 60.0) / totalRoomsCleanedSingleInstance);
+			productivityNonGoalAM /= 8.0;
+			if (productivityNonGoalAM == 0)
+				readGrid->Cells[indexOn][columnIndex++] = 0;
+			else
+				readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) roomsCleanedAMSingleInstance) / productivityNonGoalAM);
+			productivityNonGoalPM /= 8.0;
+			if (productivityNonGoalPM == 0)
+				readGrid->Cells[indexOn][columnIndex++] = 0;
+			else
+				readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) roomsCleanedPMSingleInstance) / productivityNonGoalPM);
+			productivityNonGoalLaundry /= 7.5;
+			if (productivityNonGoalLaundry == 0)
+				readGrid->Cells[indexOn][columnIndex++] = 0;
+			else
+				readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) totalRoomsCleanedSingleInstance) / productivityNonGoalLaundry);
 
-		//get some values for productivity calculations at bottom
-		if (SameText(readGrid->Cells[1][columnIndex], "Total Rooms Cleaned"))
-			totalRoomsCleanedTotal = toDouble(readGrid->Cells[indexOn][columnIndex]);
-		else if (SameText(readGrid->Cells[1][columnIndex], "AM Rooms Cleaned"))
-			amRoomsCleanedTotal = toDouble(readGrid->Cells[indexOn][columnIndex]);
-		else if (SameText(readGrid->Cells[1][columnIndex], "PM Rooms Cleaned"))
-			pmRoomsCleanedTotal = toDouble(readGrid->Cells[indexOn][columnIndex]);
-		else if (SameText(readGrid->Cells[1][columnIndex], "Offset Rooms Occupied"))
-			offsetRoomsOccupiedTotal = toDouble(readGrid->Cells[indexOn][columnIndex]);
-	}
-	//fill rest of totals besides productivity (i.e. roles, overtime, totla labor hours, total labor cost)
-	int modThree = 0;
-	double amRoomAttendantsTotal = 0;
-	double pmRoomAttendantsTotal = 0;
-	double laundryAttendantTotal = 0;
-	double actualCostTotal = 0;
-	for (columnIndex; columnIndex < readGrid->RowCount - 7; ++columnIndex)
-	{
-		for (int j = 2; j < 9; ++j)
-		{
-			totalCounter += toDouble(readGrid->Cells[j][columnIndex]);
+			//advance cursor (for daily, should only be one iteration of cursor)
+			queryIndex = 9;
+			columnIndex = 0;
+			Form3->SQLQuery2->Next();
 		}
 
-		if (!SameText(readGrid->Cells[1][columnIndex], ""))
-		{
-			//increase counter
-			++modThree;
+		//get what the productivity column is (probably ok to stay hardcoded)
+		int productivityColumn = 1;
 
-			//fill grid with computed value, if counter multiple of 3 then treat as percent
-			if (SameText(readGrid->Cells[1][columnIndex], "Overtime Premium Cost") || SameText(readGrid->Cells[1][columnIndex], "Overtime Cost"))
-				readGrid->Cells[indexOn][columnIndex] = blank + "$" + totalCounter;
-			else if (SameText(readGrid->Cells[1][columnIndex], "Actual Cost") || SameText(readGrid->Cells[1][columnIndex], "Standard Cost"))
-				readGrid->Cells[indexOn][columnIndex] = blank + "$" + commas(IntToStr(nearestDollar(totalCounter)));
-			else if (modThree % 3 == 0)
-				if (readGrid->Cells[indexOn][columnIndex-2] != 0)
-					readGrid->Cells[indexOn][columnIndex] = blank + makePercent(readGrid->Cells[indexOn][columnIndex-1] / readGrid->Cells[indexOn][columnIndex-2]) + "%";
+		//change first two productivity things to 0.00
+		readGrid->Cells[productivityColumn][productivityStartIndex++] = "0.00";
+		readGrid->Cells[productivityColumn][productivityStartIndex++] = "0.00";
+
+		//compute productivity for man hours
+		if (totalRoomsCleaned != 0)
+			manMinutesRoomsCleaned = roundTwo((manMinutesRoomsCleaned * 60.0) / totalRoomsCleaned);
+		else
+			manMinutesRoomsCleaned = 0;
+		readGrid->Cells[productivityColumn][productivityStartIndex++] = manMinutesRoomsCleaned;
+
+		//compute productivity for roomsCleanedAM
+		productivityRoomsCleanedAM /= 8.0;
+		if (productivityRoomsCleanedAM == 0)
+			productivityRoomsCleanedAM = 0;
+		else
+			productivityRoomsCleanedAM = roundTwo(((double) roomsCleanedAM) / productivityRoomsCleanedAM);
+		readGrid->Cells[productivityColumn][productivityStartIndex++] = productivityRoomsCleanedAM;
+
+		//compute productivity for roomsCleanedPM
+		productivityRoomsCleanedPM /= 8.0;
+		if (productivityRoomsCleanedPM == 0)
+			productivityRoomsCleanedPM = 0;
+		else
+			productivityRoomsCleanedPM = roundTwo(((double) roomsCleanedPM) / productivityRoomsCleanedPM);
+		readGrid->Cells[productivityColumn][productivityStartIndex++] = productivityRoomsCleanedPM;
+
+		//compute productivity for laundryAttendantProductivity
+		productivityLaundry /= 7.5;
+		if (productivityLaundry == 0)
+			productivityLaundry = 0;
+		else
+			productivityLaundry = roundTwo(((double) totalRoomsCleaned) / productivityLaundry);
+		readGrid->Cells[productivityColumn][productivityStartIndex++] = productivityLaundry;
+
+		//populate total column (last one)
+		indexOn = 9;
+		columnIndex = 0;
+		if (SameText(type, "month"))
+		{
+			//get the month name for the header
+			switch(monthChosen)
+			{
+				case 1:
+					DayName = L"January";
+					break;
+				case 2:
+					DayName = L"February";
+					break;
+				case 3:
+					DayName = L"March";
+					break;
+				case 4:
+					DayName = L"April";
+					break;
+				case 5:
+					DayName = L"May";
+					break;
+				case 6:
+					DayName = L"June";
+					break;
+				case 7:
+					DayName = L"July";
+					break;
+				case 8:
+					DayName = L"August";
+					break;
+				case 9:
+					DayName = L"September";
+					break;
+				case 10:
+					DayName = L"October";
+					break;
+				case 11:
+					DayName = L"November";
+					break;
+				case 12:
+					DayName = L"December";
+					break;
+			}
+
+			//make the header the month
+			readGrid->ColumnByIndex(indexOn)->Header = DayName;
+		}
+		else if (SameText(type, "year"))
+		{
+			//make the header the year (monthChosen actuall stores the year in this case)
+			readGrid->ColumnByIndex(indexOn)->Header = monthChosen;
+		}
+		else if (SameText(type, "week"))
+		{
+			//make the header the date range
+	        readGrid->ColumnByIndex(indexOn)->Header = privateDayChosenStart + " - " + privateDayChosenEnd;
+		}
+
+		//fill with top portion (non roles) with totals
+		double totalCounter = 0;
+		double occupancyPercent = 0;
+		double totalRoomsCleanedTotal = 0;
+		double amRoomsCleanedTotal = 0;
+		double pmRoomsCleanedTotal = 0;
+		double offsetRoomsOccupiedTotal = 0;
+		for (columnIndex = 0; columnIndex < 8; ++columnIndex)
+		{
+			for (int j = 2; j < 9; ++j)
+				totalCounter += toDouble(readGrid->Cells[j][columnIndex]);
+
+			//compute occupancy percent
+			if (columnIndex == 0)
+			{
+				if (SameText(type, "month"))
+				{
+					occupancyPercent = totalCounter / 8680.0;
+				}
+				else if (SameText(type, "year"))
+				{
+					occupancyPercent = totalCounter / 104160.0;
+	            }
+				else if (SameText(type, "week") && monthChosen == -1)
+				{
+					//arbitrary range
+					occupancyPercent = -1;
+				}
+				else if (SameText(type, "week"))
+				{
+					occupancyPercent = totalCounter / 2170.0;
+				}
+			}
+
+			if (columnIndex == 1)
+				if (occupancyPercent != -1)
+					readGrid->Cells[indexOn][columnIndex] = blank + makePercent(occupancyPercent) + "%";
 				else
-                   	readGrid->Cells[indexOn][columnIndex] = "0%";
+					readGrid->Cells[indexOn][columnIndex] = "N/A";
 			else
 				readGrid->Cells[indexOn][columnIndex] = totalCounter;
+			totalCounter = 0;
+
+			//get some values for productivity calculations at bottom
+			if (SameText(readGrid->Cells[1][columnIndex], "Total Rooms Cleaned"))
+				totalRoomsCleanedTotal = toDouble(readGrid->Cells[indexOn][columnIndex]);
+			else if (SameText(readGrid->Cells[1][columnIndex], "AM Rooms Cleaned"))
+				amRoomsCleanedTotal = toDouble(readGrid->Cells[indexOn][columnIndex]);
+			else if (SameText(readGrid->Cells[1][columnIndex], "PM Rooms Cleaned"))
+				pmRoomsCleanedTotal = toDouble(readGrid->Cells[indexOn][columnIndex]);
+			else if (SameText(readGrid->Cells[1][columnIndex], "Offset Rooms Occupied"))
+				offsetRoomsOccupiedTotal = toDouble(readGrid->Cells[indexOn][columnIndex]);
+		}
+		//fill rest of totals besides productivity (i.e. roles, overtime, totla labor hours, total labor cost)
+		int modThree = 0;
+		double amRoomAttendantsTotal = 0;
+		double pmRoomAttendantsTotal = 0;
+		double laundryAttendantTotal = 0;
+		double actualCostTotal = 0;
+		for (columnIndex; columnIndex < readGrid->RowCount - 7; ++columnIndex)
+		{
+			for (int j = 2; j < 9; ++j)
+			{
+				totalCounter += toDouble(readGrid->Cells[j][columnIndex]);
+			}
+
+			if (!SameText(readGrid->Cells[1][columnIndex], ""))
+			{
+				//increase counter
+				++modThree;
+
+				//fill grid with computed value, if counter multiple of 3 then treat as percent
+				if (SameText(readGrid->Cells[1][columnIndex], "Overtime Premium Cost") || SameText(readGrid->Cells[1][columnIndex], "Overtime Cost"))
+					readGrid->Cells[indexOn][columnIndex] = blank + "$" + totalCounter;
+				else if (SameText(readGrid->Cells[1][columnIndex], "Actual Cost") || SameText(readGrid->Cells[1][columnIndex], "Standard Cost"))
+					readGrid->Cells[indexOn][columnIndex] = blank + "$" + commas(IntToStr(nearestDollar(totalCounter)));
+				else if (modThree % 3 == 0)
+					if (readGrid->Cells[indexOn][columnIndex-2] != 0)
+						readGrid->Cells[indexOn][columnIndex] = blank + makePercent(readGrid->Cells[indexOn][columnIndex-1] / readGrid->Cells[indexOn][columnIndex-2]) + "%";
+					else
+	                   	readGrid->Cells[indexOn][columnIndex] = "0%";
+				else
+					readGrid->Cells[indexOn][columnIndex] = totalCounter;
+			}
+
+			//get some values for productivity calculations at bottom
+			if (SameText(readGrid->Cells[0][columnIndex], "AM Room Attendants"))
+				amRoomAttendantsTotal = toDouble(readGrid->Cells[indexOn][columnIndex-1]);
+			else if (SameText(readGrid->Cells[0][columnIndex], "PM Room Attendants"))
+				pmRoomAttendantsTotal = toDouble(readGrid->Cells[indexOn][columnIndex-1]);
+			else if (SameText(readGrid->Cells[0][columnIndex], "Laundry Attendant"))
+				laundryAttendantTotal = toDouble(readGrid->Cells[indexOn][columnIndex-1]);
+			else if (SameText(readGrid->Cells[1][columnIndex], "Actual Cost"))
+				actualCostTotal = toDouble(readGrid->Cells[indexOn][columnIndex]);
+
+			totalCounter = 0;
+		}
+		//increase columnIndex for productivity totals
+		++columnIndex;
+
+		//fill productivity for hours variance
+		if (readGrid->Cells[indexOn][columnIndex - 8] == 0)
+			readGrid->Cells[indexOn][columnIndex++] = 0;
+		else
+			readGrid->Cells[indexOn][columnIndex++] = readGrid->Cells[indexOn][columnIndex-8] - readGrid->Cells[indexOn][columnIndex-7];
+
+		//fill productivity for cost variance
+		if (readGrid->Cells[indexOn][columnIndex - 8] == 0)
+			readGrid->Cells[indexOn][columnIndex++] = "$0";
+		else
+			readGrid->Cells[indexOn][columnIndex++] = blank + "$" + commas(IntToStr(nearestDollar(toDouble(readGrid->Cells[indexOn][columnIndex-5]) - toDouble(readGrid->Cells[indexOn][columnIndex-4]))));
+
+		//fill productivity for man minutes per room cleaned
+		if (readGrid->Cells[indexOn][columnIndex - 10] == 0)
+			readGrid->Cells[indexOn][columnIndex++] = 0;
+		else
+		{
+			if (totalRoomsCleanedTotal != 0)
+				readGrid->Cells[indexOn][columnIndex++] = roundTwo((readGrid->Cells[indexOn][columnIndex-10] * 60) / totalRoomsCleanedTotal);
+			else
+	           	readGrid->Cells[indexOn][columnIndex++] = 0;
+		}
+		//fill productivity for rooms cleaned per AM gra
+		if (amRoomAttendantsTotal == 0)
+			readGrid->Cells[indexOn][columnIndex++] = 0;
+		else
+		{
+			if (amRoomAttendantsTotal != 0)
+				readGrid->Cells[indexOn][columnIndex++] = roundTwo(amRoomsCleanedTotal / (amRoomAttendantsTotal / 8.0));
+			else
+				readGrid->Cells[indexOn][columnIndex++] = 0;
 		}
 
-		//get some values for productivity calculations at bottom
-		if (SameText(readGrid->Cells[0][columnIndex], "AM Room Attendants"))
-			amRoomAttendantsTotal = toDouble(readGrid->Cells[indexOn][columnIndex-1]);
-		else if (SameText(readGrid->Cells[0][columnIndex], "PM Room Attendants"))
-			pmRoomAttendantsTotal = toDouble(readGrid->Cells[indexOn][columnIndex-1]);
-		else if (SameText(readGrid->Cells[0][columnIndex], "Laundry Attendant"))
-			laundryAttendantTotal = toDouble(readGrid->Cells[indexOn][columnIndex-1]);
-		else if (SameText(readGrid->Cells[1][columnIndex], "Actual Cost"))
-			actualCostTotal = toDouble(readGrid->Cells[indexOn][columnIndex]);
-
-		totalCounter = 0;
-	}
-	//increase columnIndex for productivity totals
-	++columnIndex;
-
-	//fill productivity for hours variance
-	if (readGrid->Cells[indexOn][columnIndex - 8] == 0)
-		readGrid->Cells[indexOn][columnIndex++] = 0;
-	else
-		readGrid->Cells[indexOn][columnIndex++] = readGrid->Cells[indexOn][columnIndex-8] - readGrid->Cells[indexOn][columnIndex-7];
-
-	//fill productivity for cost variance
-	if (readGrid->Cells[indexOn][columnIndex - 8] == 0)
-		readGrid->Cells[indexOn][columnIndex++] = "$0";
-	else
-		readGrid->Cells[indexOn][columnIndex++] = blank + "$" + commas(IntToStr(nearestDollar(toDouble(readGrid->Cells[indexOn][columnIndex-5]) - toDouble(readGrid->Cells[indexOn][columnIndex-4]))));
-
-	//fill productivity for man minutes per room cleaned
-	if (readGrid->Cells[indexOn][columnIndex - 10] == 0)
-		readGrid->Cells[indexOn][columnIndex++] = 0;
-	else
-	{
-		if (totalRoomsCleanedTotal != 0)
-			readGrid->Cells[indexOn][columnIndex++] = roundTwo((readGrid->Cells[indexOn][columnIndex-10] * 60) / totalRoomsCleanedTotal);
-		else
-           	readGrid->Cells[indexOn][columnIndex++] = 0;
-	}
-	//fill productivity for rooms cleaned per AM gra
-	if (amRoomAttendantsTotal == 0)
-		readGrid->Cells[indexOn][columnIndex++] = 0;
-	else
-	{
-		if (amRoomAttendantsTotal != 0)
-			readGrid->Cells[indexOn][columnIndex++] = roundTwo(amRoomsCleanedTotal / (amRoomAttendantsTotal / 8.0));
-		else
+		//fill productivity for rooms cleaned per PM gra
+		if (pmRoomAttendantsTotal == 0)
 			readGrid->Cells[indexOn][columnIndex++] = 0;
-	}
-
-	//fill productivity for rooms cleaned per PM gra
-	if (pmRoomAttendantsTotal == 0)
-		readGrid->Cells[indexOn][columnIndex++] = 0;
-	else
-	{
-		if (pmRoomAttendantsTotal != 0)
-			readGrid->Cells[indexOn][columnIndex++] = roundTwo(pmRoomsCleanedTotal / (pmRoomAttendantsTotal / 8.0));
 		else
+		{
+			if (pmRoomAttendantsTotal != 0)
+				readGrid->Cells[indexOn][columnIndex++] = roundTwo(pmRoomsCleanedTotal / (pmRoomAttendantsTotal / 8.0));
+			else
+				readGrid->Cells[indexOn][columnIndex++] = 0;
+		}
+		//fill productivity for rooms per laundry attendant
+		if (laundryAttendantTotal == 0)
 			readGrid->Cells[indexOn][columnIndex++] = 0;
-	}
-	//fill productivity for rooms per laundry attendant
-	if (laundryAttendantTotal == 0)
-		readGrid->Cells[indexOn][columnIndex++] = 0;
-	else
-	{
-		if (laundryAttendantTotal != 0)
-			readGrid->Cells[indexOn][columnIndex++] = roundTwo(totalRoomsCleanedTotal / (laundryAttendantTotal / 7.5));
 		else
-			readGrid->Cells[indexOn][columnIndex++] = 0;
-	}
-	//fill cells in top left with extra statistics
-	readGrid->Cells[0][0] = "$12.96 Budget";
-	if (actualCostTotal < 0)
-	{
-		if (offsetRoomsOccupiedTotal != 0)
-			readGrid->Cells[0][2] = blank + "$" + roundTwo((actualCostTotal * -1) / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+		{
+			if (laundryAttendantTotal != 0)
+				readGrid->Cells[indexOn][columnIndex++] = roundTwo(totalRoomsCleanedTotal / (laundryAttendantTotal / 7.5));
+			else
+				readGrid->Cells[indexOn][columnIndex++] = 0;
+		}
+		//fill cells in top left with extra statistics
+		readGrid->Cells[0][0] = "$12.96 Budget";
+		if (actualCostTotal < 0)
+		{
+			if (offsetRoomsOccupiedTotal != 0)
+				readGrid->Cells[0][2] = blank + "$" + roundTwo((actualCostTotal * -1) / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+			else
+				readGrid->Cells[0][2] = "$0 Payroll cost to clean room";
+		}
 		else
-			readGrid->Cells[0][2] = "$0 Payroll cost to clean room";
-	}
-	else
-	{
-		if (offsetRoomsOccupiedTotal != 0)
-			readGrid->Cells[0][2] = blank + "$" + roundTwo(actualCostTotal / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+		{
+			if (offsetRoomsOccupiedTotal != 0)
+				readGrid->Cells[0][2] = blank + "$" + roundTwo(actualCostTotal / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+			else
+				readGrid->Cells[0][2] = "$0 Payroll cost to clean room";
+		}
+		if (toDouble(readGrid->Cells[0][2]) < 0)
+			readGrid->Cells[0][1] = blank + "$" + roundTwo((toDouble(readGrid->Cells[0][2])*-1) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
 		else
-			readGrid->Cells[0][2] = "$0 Payroll cost to clean room";
-	}
-	if (toDouble(readGrid->Cells[0][2]) < 0)
-		readGrid->Cells[0][1] = blank + "$" + roundTwo((toDouble(readGrid->Cells[0][2])*-1) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
-	else
-		readGrid->Cells[0][1] = blank + "$" + roundTwo(toDouble(readGrid->Cells[0][2]) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
-	readGrid->Cells[0][3] = "$76,995 Accounting";
-	if (toDouble(readGrid->Cells[0][3]) < 0)
-		readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar((toDouble(readGrid->Cells[0][3])*-1) - actualCostTotal))) + " Variance";
-	else
-		readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar(toDouble(readGrid->Cells[0][3]) - actualCostTotal))) + " Variance";
+			readGrid->Cells[0][1] = blank + "$" + roundTwo(toDouble(readGrid->Cells[0][2]) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
+		readGrid->Cells[0][3] = "$76,995 Accounting";
+		if (toDouble(readGrid->Cells[0][3]) < 0)
+			readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar((toDouble(readGrid->Cells[0][3])*-1) - actualCostTotal))) + " Variance";
+		else
+			readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar(toDouble(readGrid->Cells[0][3]) - actualCostTotal))) + " Variance";
 
-	//make grid visible to user
-	readGrid->Visible = true;
+		//make grid visible to user
+		readGrid->Visible = true;
 
-	//call display filters
-	displayFilters(type, monthChosen);
+		//call display filters
+		displayFilters(type, monthChosen);
+
+		//make extra buttons display when grid is visible
+		printButtonImage->Visible=true;
+		viewButtonImage->Visible=true;
+		filtersLabel->Visible = false;
+		arrowDay->Visible=false;
+		pickerArrow->Visible=false;
+		whichMonthImage->Visible=false;
+		whichYearImage->Visible=false;
+		whichDayImage->Visible=false;
+		whichWeekImage->Visible=false;
+		pickStartImage->Visible=false;
+		pickEndImage->Visible=false;
+		arrowRange->Visible=false;
+		arrowYear->Visible=false;
+		roleListBox->Enabled=true;
+		selectAllButton->Enabled=true;
+		radioButtons(1);
+		rangeTabContainer->Tabs[0]->Enabled=true;
+		rangeTabContainer->Tabs[1]->Enabled=true;
+
+		//hide error label upon successful entry of data
+		errorLabel->Visible = false;
+	}
 }
 
 //populate grid for when viewing by day
@@ -870,6 +961,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 	String percentPerformance = "";
 	String withUnderscores = "";
 	String select = "";
+	String spaceTaker = "";
 	int columnIndex = 0;
 
 	//hide columns that will not be used
@@ -941,308 +1033,343 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 	//construct actual query
 	Form3->SQLQuery2->SQL->Text = "SELECT " + select + " FROM baldwins_hotel_data." + readTable + " WHERE Date = '" + currentDate + "';";
 	Form3->SQLQuery2->Open();
-	if (!Form3->SQLQuery2->Eof)
-		Form3->SQLQuery2->First();
+	if (Form3->SQLQuery2->Eof)
+	{
+		//temporarily change user read level to basic if advanced (only locally, not at db level)
+		Form1->setReadLevel("0");
+
+		//make basic read appear
+		homeImageButton4->OnClick(NULL);
+		Form2->readButtonImageClick(NULL);
+
+		//show week/range error message
+		errorLabel->Text = spaceTaker + "Error: no data currently exists for the day " + privateDBDayChosen + ". Please try again...";
+		errorLabel->Visible = true;
+	}
 	else
 	{
-		//show error message here (floating point error)
-		return;
-	}
+		//go to first item of cursor and continue with code as normal
+		Form3->SQLQuery2->First();
 
-	//start filling column 1
-	String firstColumnNoDayWeek[9] = {"Date", "Offset_Rooms_Occupied", "Occupancy_Percent", "AM_Rooms_Cleaned", "PM_Rooms_Cleaned", "Rooms_Sold", "Total_Rooms_Cleaned", "Guestroom_Carpets_Cleaned", "Documented_Inspections"};
-	for (int i = 0; i < 9; ++i)
-		readGrid->Cells[1][i] = StringReplace(firstColumnNoDayWeek[i], "_", " ", TReplaceFlags() << rfReplaceAll);
+		//start filling column 1
+		String firstColumnNoDayWeek[9] = {"Date", "Offset_Rooms_Occupied", "Occupancy_Percent", "AM_Rooms_Cleaned", "PM_Rooms_Cleaned", "Rooms_Sold", "Total_Rooms_Cleaned", "Guestroom_Carpets_Cleaned", "Documented_Inspections"};
+		for (int i = 0; i < 9; ++i)
+			readGrid->Cells[1][i] = StringReplace(firstColumnNoDayWeek[i], "_", " ", TReplaceFlags() << rfReplaceAll);
 
-	//continue filling column 1 with headings
-	String roleTypes[3] = {"Actual Hours", "Standard Hours", "% Performance"};
-	columnIndex = 10;
-	for (int i = 0; i < rVector.size(); ++i)
-	{
-		for (int j = 0; j < 3; ++j)
-		{
-			readGrid->Cells[1][columnIndex++] = roleTypes[j];
-		}
-
-		++columnIndex;
-	}
-
-	//continue filling column 1 with headers
-	String overtimeHeaders[3] = {"Overtime Hours", "Overtime Cost", "Overtime Premium Cost"};
-	for (int i = 0; i < 3; ++i)
-	{
-       	readGrid->Cells[1][columnIndex++] = overtimeHeaders[i];
-	}
-	++columnIndex;
-
-	//continue filling column 1 with headers
-	for (int i = 0; i < 3; ++i)
-	{
-		readGrid->Cells[1][columnIndex++] = roleTypes[i];
-	}
-	++columnIndex;
-
-	//continue filling column 1 with headers
-	for (int i = 0; i < 3; ++i)
-	{
-		readGrid->Cells[1][columnIndex++] = StringReplace(roleTypes[i], "Hours", "Cost", TReplaceFlags() << rfReplaceAll);
-	}
-	readGrid->Cells[1][columnIndex++] = "Productivity Goals";
-
-	//get productivity index to be used later
-    int productivityStartIndex = columnIndex;
-
-	//create index indicating which column I am currently filling
-	int indexOn = 2;
-
-	//iterate through cursor until empty
-	columnIndex = 0;
-	String blank = "";
-
-	//index indicating where in query cursor you currently are (i.e. which field)
-	//just hardcoded for now but could be size of a return of another query
-	int queryIndex = 9;
-
-	//running calculations for productivity goals
-	double manMinutesRoomsCleaned = 0;
-	int roomsCleanedAM = 0;
-	int roomsCleanedPM = 0;
-	int roomsCleanedAMSingleInstance = 0;
-	int roomsCleanedPMSingleInstance = 0;
-	double productivityRoomsCleanedAM = 0;
-	double productivityRoomsCleanedPM = 0;
-	double productivityLaundry = 0;
-	double productivityNonGoalAM = 0;
-	double productivityNonGoalPM = 0;
-	double productivityNonGoalLaundry = 0;
-	int totalRoomsCleaned = 0;
-	int totalRoomsCleanedSingleInstance = 0;
-	double hoursVarianceOne = 0;
-	double hoursVarianceTwo = 0;
-	double costVarianceOne = 0;
-	double costVarianceTwo = 0;
-	double actualCostTotal = 0;
-	double offsetRoomsOccupiedTotal = 0;
-
-	while (!Form3->SQLQuery2->Eof)
-	{
-		//populate the header for this column with the day of the week
-		readGrid->ColumnByIndex(indexOn)->Header = Form3->SQLQuery2->Fields->Fields[1]->AsString;
-
-		//continue populating items
-		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[0]->AsString;
-		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[2]->AsString;
-		offsetRoomsOccupiedTotal = Form3->SQLQuery2->Fields->Fields[2]->AsFloat;
-		readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 310.0) + " %";
-
-		//fill with rest of non role type stuff
-		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[3]->AsString;
-		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[4]->AsString;
-		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[5]->AsString;
-		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[6]->AsString;
-		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[7]->AsString;
-		readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[8]->AsString;
-
-		//fill with role items
-		++columnIndex;
+		//continue filling column 1 with headings
+		String roleTypes[3] = {"Actual Hours", "Standard Hours", "% Performance"};
+		columnIndex = 10;
 		for (int i = 0; i < rVector.size(); ++i)
 		{
-			//need to round when appropriate and make it a percentage
 			for (int j = 0; j < 3; ++j)
 			{
-				//if j == 2, these should be percents
-				if (j == 2)
-					readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
-				else if (j == 1)
-				{
-					//compute productivity man hours
-					manMinutesRoomsCleaned += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-
-					//compute productivity rooms cleaned AM divisor
-					if (queryIndex == productivityAMIndex)
-						productivityRoomsCleanedAM += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-					else if (queryIndex == productivityPMIndex)
-						productivityRoomsCleanedPM += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-					else if (queryIndex == productivityLaundryIndex)
-						productivityLaundry += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-
-					readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
-				}
-				else
-				{
-					if (queryIndex == (productivityAMIndex - 1))
-						productivityNonGoalAM = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-					else if (queryIndex == (productivityPMIndex - 1))
-						productivityNonGoalPM = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-					else if (queryIndex == (productivityLaundryIndex - 1))
-						productivityNonGoalLaundry = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-
-					readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
-				}
+				readGrid->Cells[1][columnIndex++] = roleTypes[j];
 			}
 
-			//skip spaces when appropriate
 			++columnIndex;
 		}
 
-		//fill with overtime, total labor hours, total labor cost
+		//continue filling column 1 with headers
+		String overtimeHeaders[3] = {"Overtime Hours", "Overtime Cost", "Overtime Premium Cost"};
 		for (int i = 0; i < 3; ++i)
 		{
-			for (int j = 0; j < 3; ++j)
+			readGrid->Cells[1][columnIndex++] = overtimeHeaders[i];
+		}
+		++columnIndex;
+
+		//continue filling column 1 with headers
+		for (int i = 0; i < 3; ++i)
+		{
+			readGrid->Cells[1][columnIndex++] = roleTypes[i];
+		}
+		++columnIndex;
+
+		//continue filling column 1 with headers
+		for (int i = 0; i < 3; ++i)
+		{
+			readGrid->Cells[1][columnIndex++] = StringReplace(roleTypes[i], "Hours", "Cost", TReplaceFlags() << rfReplaceAll);
+		}
+		readGrid->Cells[1][columnIndex++] = "Productivity Goals";
+
+		//get productivity index to be used later
+	    int productivityStartIndex = columnIndex;
+
+		//create index indicating which column I am currently filling
+		int indexOn = 2;
+
+		//iterate through cursor until empty
+		columnIndex = 0;
+		String blank = "";
+
+		//index indicating where in query cursor you currently are (i.e. which field)
+		//just hardcoded for now but could be size of a return of another query
+		int queryIndex = 9;
+
+		//running calculations for productivity goals
+		double manMinutesRoomsCleaned = 0;
+		int roomsCleanedAM = 0;
+		int roomsCleanedPM = 0;
+		int roomsCleanedAMSingleInstance = 0;
+		int roomsCleanedPMSingleInstance = 0;
+		double productivityRoomsCleanedAM = 0;
+		double productivityRoomsCleanedPM = 0;
+		double productivityLaundry = 0;
+		double productivityNonGoalAM = 0;
+		double productivityNonGoalPM = 0;
+		double productivityNonGoalLaundry = 0;
+		int totalRoomsCleaned = 0;
+		int totalRoomsCleanedSingleInstance = 0;
+		double hoursVarianceOne = 0;
+		double hoursVarianceTwo = 0;
+		double costVarianceOne = 0;
+		double costVarianceTwo = 0;
+		double actualCostTotal = 0;
+		double offsetRoomsOccupiedTotal = 0;
+
+		while (!Form3->SQLQuery2->Eof)
+		{
+			//populate the header for this column with the day of the week
+			readGrid->ColumnByIndex(indexOn)->Header = Form3->SQLQuery2->Fields->Fields[1]->AsString;
+
+			//continue populating items
+			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[0]->AsString;
+			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[2]->AsString;
+			offsetRoomsOccupiedTotal = Form3->SQLQuery2->Fields->Fields[2]->AsFloat;
+			readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 310.0) + " %";
+
+			//fill with rest of non role type stuff
+			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[3]->AsString;
+			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[4]->AsString;
+			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[5]->AsString;
+			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[6]->AsString;
+			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[7]->AsString;
+			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[8]->AsString;
+
+			//fill with role items
+			++columnIndex;
+			for (int i = 0; i < rVector.size(); ++i)
 			{
-				if (i == 0)
+				//need to round when appropriate and make it a percentage
+				for (int j = 0; j < 3; ++j)
 				{
-					if (j == 0)
+					//if j == 2, these should be percents
+					if (j == 2)
+						readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+					else if (j == 1)
+					{
+						//compute productivity man hours
+						manMinutesRoomsCleaned += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+
+						//compute productivity rooms cleaned AM divisor
+						if (queryIndex == productivityAMIndex)
+							productivityRoomsCleanedAM += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+						else if (queryIndex == productivityPMIndex)
+							productivityRoomsCleanedPM += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+						else if (queryIndex == productivityLaundryIndex)
+							productivityLaundry += Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+
 						readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+					}
 					else
-                        readGrid->Cells[indexOn][columnIndex++] = blank + "$" + nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
-                }
-				else if (i == 1)
-				{
-					//productivity computation
-					if (j == 0)
-						hoursVarianceOne = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-					else if (j == 1)
-                        hoursVarianceTwo = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+					{
+						if (queryIndex == (productivityAMIndex - 1))
+							productivityNonGoalAM = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+						else if (queryIndex == (productivityPMIndex - 1))
+							productivityNonGoalPM = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+						else if (queryIndex == (productivityLaundryIndex - 1))
+							productivityNonGoalLaundry = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
 
-					if (j == 2)
-						readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
-					else
-						readGrid->Cells[indexOn][columnIndex++] = nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
-				}
-				else
-				{
-					//productivity computation
-					if (j == 0)
-						costVarianceOne = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-					else if (j == 1)
-						costVarianceTwo = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
-
-					if (j == 2)
-						readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
-					else
-						readGrid->Cells[indexOn][columnIndex++] = blank + "$" + commas(IntToStr(nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat)));
+						readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+					}
 				}
 
-				if (SameText(readGrid->Cells[1][columnIndex-1], "Actual Cost"))
-					actualCostTotal = toDouble(readGrid->Cells[indexOn][columnIndex-1]);
+				//skip spaces when appropriate
+				++columnIndex;
 			}
 
-			//skip spaces when appropriate
-			++columnIndex;
+			//fill with overtime, total labor hours, total labor cost
+			for (int i = 0; i < 3; ++i)
+			{
+				for (int j = 0; j < 3; ++j)
+				{
+					if (i == 0)
+					{
+						if (j == 0)
+							readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+						else
+	                        readGrid->Cells[indexOn][columnIndex++] = blank + "$" + nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+					}
+					else if (i == 1)
+					{
+						//productivity computation
+						if (j == 0)
+							hoursVarianceOne = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+						else if (j == 1)
+	                        hoursVarianceTwo = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+
+						if (j == 2)
+							readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+						else
+							readGrid->Cells[indexOn][columnIndex++] = nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+					}
+					else
+					{
+						//productivity computation
+						if (j == 0)
+							costVarianceOne = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+						else if (j == 1)
+							costVarianceTwo = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
+
+						if (j == 2)
+							readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+						else
+							readGrid->Cells[indexOn][columnIndex++] = blank + "$" + commas(IntToStr(nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat)));
+					}
+
+					if (SameText(readGrid->Cells[1][columnIndex-1], "Actual Cost"))
+						actualCostTotal = toDouble(readGrid->Cells[indexOn][columnIndex-1]);
+				}
+
+				//skip spaces when appropriate
+				++columnIndex;
+			}
+
+			//keep running total for productivity goal computation
+			totalRoomsCleaned += Form3->SQLQuery2->Fields->Fields[6]->AsInteger;
+			totalRoomsCleanedSingleInstance = Form3->SQLQuery2->Fields->Fields[6]->AsInteger;
+			roomsCleanedAM += Form3->SQLQuery2->Fields->Fields[3]->AsInteger;
+			roomsCleanedAMSingleInstance = Form3->SQLQuery2->Fields->Fields[3]->AsInteger;
+			roomsCleanedPM += Form3->SQLQuery2->Fields->Fields[4]->AsInteger;
+			roomsCleanedPMSingleInstance = Form3->SQLQuery2->Fields->Fields[4]->AsInteger;
+
+			//fill in all productivity things for each iteration of cursor
+			readGrid->Cells[indexOn][columnIndex++] = nearestDollar(hoursVarianceOne - hoursVarianceTwo);
+			readGrid->Cells[indexOn][columnIndex++] = nearestDollar(costVarianceOne - costVarianceTwo);
+			if (totalRoomsCleanedSingleInstance == 0)
+				readGrid->Cells[indexOn][columnIndex++] = 0;
+			else
+				readGrid->Cells[indexOn][columnIndex++] = roundTwo((hoursVarianceOne * 60.0) / totalRoomsCleanedSingleInstance);
+			productivityNonGoalAM /= 8.0;
+			if (productivityNonGoalAM == 0)
+				readGrid->Cells[indexOn][columnIndex++] = 0;
+			else
+				readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) roomsCleanedAMSingleInstance) / productivityNonGoalAM);
+			productivityNonGoalPM /= 8.0;
+			if (productivityNonGoalPM == 0)
+				readGrid->Cells[indexOn][columnIndex++] = 0;
+			else
+				readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) roomsCleanedPMSingleInstance) / productivityNonGoalPM);
+			productivityNonGoalLaundry /= 7.5;
+			if (productivityNonGoalLaundry == 0)
+				readGrid->Cells[indexOn][columnIndex++] = 0;
+			else
+				readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) totalRoomsCleanedSingleInstance) / productivityNonGoalLaundry);
+
+			//advance cursor (for daily, should only be one iteration of cursor)
+			++indexOn;
+			Form3->SQLQuery2->Next();
 		}
 
-		//keep running total for productivity goal computation
-		totalRoomsCleaned += Form3->SQLQuery2->Fields->Fields[6]->AsInteger;
-		totalRoomsCleanedSingleInstance = Form3->SQLQuery2->Fields->Fields[6]->AsInteger;
-		roomsCleanedAM += Form3->SQLQuery2->Fields->Fields[3]->AsInteger;
-		roomsCleanedAMSingleInstance = Form3->SQLQuery2->Fields->Fields[3]->AsInteger;
-		roomsCleanedPM += Form3->SQLQuery2->Fields->Fields[4]->AsInteger;
-		roomsCleanedPMSingleInstance = Form3->SQLQuery2->Fields->Fields[4]->AsInteger;
+		//get what the productivity column is (probably ok to stay hardcoded)
+		int productivityColumn = 1;
 
-		//fill in all productivity things for each iteration of cursor
-		readGrid->Cells[indexOn][columnIndex++] = nearestDollar(hoursVarianceOne - hoursVarianceTwo);
-		readGrid->Cells[indexOn][columnIndex++] = nearestDollar(costVarianceOne - costVarianceTwo);
-		if (totalRoomsCleanedSingleInstance == 0)
-			readGrid->Cells[indexOn][columnIndex++] = 0;
-		else
-			readGrid->Cells[indexOn][columnIndex++] = roundTwo((hoursVarianceOne * 60.0) / totalRoomsCleanedSingleInstance);
-		productivityNonGoalAM /= 8.0;
-		if (productivityNonGoalAM == 0)
-			readGrid->Cells[indexOn][columnIndex++] = 0;
-		else
-			readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) roomsCleanedAMSingleInstance) / productivityNonGoalAM);
-		productivityNonGoalPM /= 8.0;
-		if (productivityNonGoalPM == 0)
-			readGrid->Cells[indexOn][columnIndex++] = 0;
-		else
-			readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) roomsCleanedPMSingleInstance) / productivityNonGoalPM);
-		productivityNonGoalLaundry /= 7.5;
-		if (productivityNonGoalLaundry == 0)
-			readGrid->Cells[indexOn][columnIndex++] = 0;
-		else
-			readGrid->Cells[indexOn][columnIndex++] = roundTwo(((double) totalRoomsCleanedSingleInstance) / productivityNonGoalLaundry);
+		//change first two productivity things to 0.00
+		readGrid->Cells[productivityColumn][productivityStartIndex++] = "0.00";
+		readGrid->Cells[productivityColumn][productivityStartIndex++] = "0.00";
 
-		//advance cursor (for daily, should only be one iteration of cursor)
-		++indexOn;
-		Form3->SQLQuery2->Next();
+		//compute productivity for man hours
+		if (totalRoomsCleaned != 0)
+			manMinutesRoomsCleaned = roundTwo((manMinutesRoomsCleaned * 60.0) / totalRoomsCleaned);
+		else
+			manMinutesRoomsCleaned = 0;
+		readGrid->Cells[productivityColumn][productivityStartIndex++] = manMinutesRoomsCleaned;
+
+		//compute productivity for roomsCleanedAM
+		productivityRoomsCleanedAM /= 8.0;
+		if (productivityRoomsCleanedAM == 0)
+			productivityRoomsCleanedAM = 0;
+		else
+			productivityRoomsCleanedAM = roundTwo(((double) roomsCleanedAM) / productivityRoomsCleanedAM);
+		readGrid->Cells[productivityColumn][productivityStartIndex++] = productivityRoomsCleanedAM;
+
+		//compute productivity for roomsCleanedPM
+		productivityRoomsCleanedPM /= 8.0;
+		if (productivityRoomsCleanedPM == 0)
+			productivityRoomsCleanedPM = 0;
+		else
+			productivityRoomsCleanedPM = roundTwo(((double) roomsCleanedPM) / productivityRoomsCleanedPM);
+		readGrid->Cells[productivityColumn][productivityStartIndex++] = productivityRoomsCleanedPM;
+
+		//compute productivity for laundryAttendantProductivity
+		productivityLaundry /= 7.5;
+		if (productivityLaundry == 0)
+			productivityLaundry = 0;
+		else
+			productivityLaundry = roundTwo(((double) totalRoomsCleaned) / productivityLaundry);
+		readGrid->Cells[productivityColumn][productivityStartIndex++] = productivityLaundry;
+
+		//fill cells in top left with extra statistics
+		readGrid->Cells[0][0] = "$12.96 Budget";
+		if (actualCostTotal < 0)
+		{
+			if (offsetRoomsOccupiedTotal != 0)
+				readGrid->Cells[0][2] = blank + "$" + roundTwo((actualCostTotal * -1) / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+			else
+				readGrid->Cells[0][2] = "$0 Payroll cost to clean room";
+		}
+		else
+		{
+			if (offsetRoomsOccupiedTotal != 0)
+				readGrid->Cells[0][2] = blank + "$" + roundTwo(actualCostTotal / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
+			else
+				readGrid->Cells[0][2] = "$0 Payroll cost to clean room";
+		}
+		if (toDouble(readGrid->Cells[0][2]) < 0)
+			readGrid->Cells[0][1] = blank + "$" + roundTwo((toDouble(readGrid->Cells[0][2])*-1) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
+		else
+			readGrid->Cells[0][1] = blank + "$" + roundTwo(toDouble(readGrid->Cells[0][2]) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
+		readGrid->Cells[0][3] = "$76,995 Accounting";
+		if (toDouble(readGrid->Cells[0][3]) < 0)
+			readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar((toDouble(readGrid->Cells[0][3])*-1) - actualCostTotal))) + " Variance";
+		else
+			readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar(toDouble(readGrid->Cells[0][3]) - actualCostTotal))) + " Variance";
+
+		//make grid visible
+		readGrid->Visible = true;
+
+		//call display filters
+		displayFilters("day", 0);
+
+		//make extra buttons display when grid is visible
+		printButtonImage->Visible=true;
+		viewButtonImage->Visible=true;
+		filtersLabel->Visible = false;
+		arrowDay->Visible=false;
+		pickerArrow->Visible=false;
+		whichMonthImage->Visible=false;
+		whichYearImage->Visible=false;
+		whichDayImage->Visible=false;
+		whichWeekImage->Visible=false;
+		pickStartImage->Visible=false;
+		pickEndImage->Visible=false;
+		arrowRange->Visible=false;
+		arrowYear->Visible=false;
+		roleListBox->Enabled=true;
+		selectAllButton->Enabled=true;
+		radioButtons(1);
+		rangeTabContainer->Tabs[0]->Enabled=true;
+		rangeTabContainer->Tabs[1]->Enabled=true;
+
+		//hide error label upon successful entry of data
+		errorLabel->Visible = false;
 	}
-
-	//get what the productivity column is (probably ok to stay hardcoded)
-	int productivityColumn = 1;
-
-	//change first two productivity things to 0.00
-	readGrid->Cells[productivityColumn][productivityStartIndex++] = "0.00";
-	readGrid->Cells[productivityColumn][productivityStartIndex++] = "0.00";
-
-	//compute productivity for man hours
-	if (totalRoomsCleaned != 0)
-		manMinutesRoomsCleaned = roundTwo((manMinutesRoomsCleaned * 60.0) / totalRoomsCleaned);
-	else
-		manMinutesRoomsCleaned = 0;
-	readGrid->Cells[productivityColumn][productivityStartIndex++] = manMinutesRoomsCleaned;
-
-	//compute productivity for roomsCleanedAM
-	productivityRoomsCleanedAM /= 8.0;
-	if (productivityRoomsCleanedAM == 0)
-		productivityRoomsCleanedAM = 0;
-	else
-		productivityRoomsCleanedAM = roundTwo(((double) roomsCleanedAM) / productivityRoomsCleanedAM);
-	readGrid->Cells[productivityColumn][productivityStartIndex++] = productivityRoomsCleanedAM;
-
-	//compute productivity for roomsCleanedPM
-	productivityRoomsCleanedPM /= 8.0;
-	if (productivityRoomsCleanedPM == 0)
-		productivityRoomsCleanedPM = 0;
-	else
-		productivityRoomsCleanedPM = roundTwo(((double) roomsCleanedPM) / productivityRoomsCleanedPM);
-	readGrid->Cells[productivityColumn][productivityStartIndex++] = productivityRoomsCleanedPM;
-
-	//compute productivity for laundryAttendantProductivity
-	productivityLaundry /= 7.5;
-	if (productivityLaundry == 0)
-		productivityLaundry = 0;
-	else
-		productivityLaundry = roundTwo(((double) totalRoomsCleaned) / productivityLaundry);
-	readGrid->Cells[productivityColumn][productivityStartIndex++] = productivityLaundry;
-
-    //fill cells in top left with extra statistics
-	readGrid->Cells[0][0] = "$12.96 Budget";
-	if (actualCostTotal < 0)
-	{
-		if (offsetRoomsOccupiedTotal != 0)
-			readGrid->Cells[0][2] = blank + "$" + roundTwo((actualCostTotal * -1) / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
-		else
-			readGrid->Cells[0][2] = "$0 Payroll cost to clean room";
-	}
-	else
-	{
-		if (offsetRoomsOccupiedTotal != 0)
-			readGrid->Cells[0][2] = blank + "$" + roundTwo(actualCostTotal / offsetRoomsOccupiedTotal) + " Payroll cost to clean room";
-		else
-          	readGrid->Cells[0][2] = "$0 Payroll cost to clean room";
-	}
-	if (toDouble(readGrid->Cells[0][2]) < 0)
-		readGrid->Cells[0][1] = blank + "$" + roundTwo((toDouble(readGrid->Cells[0][2])*-1) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
-	else
-		readGrid->Cells[0][1] = blank + "$" + roundTwo(toDouble(readGrid->Cells[0][2]) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
-	readGrid->Cells[0][3] = "$76,995 Accounting";
-	if (toDouble(readGrid->Cells[0][3]) < 0)
-		readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar((toDouble(readGrid->Cells[0][3])*-1) - actualCostTotal))) + " Variance";
-	else
-		readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar(toDouble(readGrid->Cells[0][3]) - actualCostTotal))) + " Variance";
-
-	readGrid->Visible = true;
-
-	//call display filters
-	displayFilters("day", 0);
 }
 
 //hides Form2 from view when this form is shown
 void __fastcall TForm4::FormShow(TObject *Sender)
 {
 	//set homeAlreadyPressed to inially false
-    homeAlreadyPressed = false;
+	homeAlreadyPressed = false;
 
 	//set secondTimeArbitray initialy to false
 	secondTimeArbitrary = false;
@@ -1392,11 +1519,11 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		dbDayChosenEnd = dayChosenEnd.FormatString(L"yyyy-mm-dd");
 		privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
 		privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
+		privateDayChosenStartFull = StrToDate(dayChosenStart).FormatString(L"mm/dd/yyyy");
+		privateDayChosenEndFull = StrToDate(dayChosenEnd).FormatString(L"mm/dd/yyyy");
 
 		//call display function
 		populateGrid(roleVector, 0, dbDayChosenStart, dbDayChosenEnd, "week");
-		printButtonImage->Visible=true;
-		viewButtonImage->Visible=true;
 	}
 }
 //---------------------------------------------------------------------------
@@ -1428,9 +1555,10 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	arrowYear->Visible=false;
 	printButtonImage->Visible=false;
 	viewButtonImage->Visible=false;
+	arrowView->Visible = false;
+	viewByImage->Visible = false;
 
 	radioButtons(1);
-	selectAllButton->Enabled=true;
 	selectAllButton->Enabled=true;
 	nextImageButton2->Visible = false;
 	backImageButton2->Visible = false;
@@ -1452,6 +1580,8 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	roleListBox->Visible = false;
 	roleVector.clear();
 	monthPopupBox->ItemIndex = 0;
+	yearPopupBox->Items->Clear();
+	yearPopupBox->Text = "";
 	yearPopupBox->ItemIndex = 0;
 	monthPopupBox->Visible = false;
 	yearPopupBox->Visible = false;
@@ -1461,6 +1591,7 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	rangeEndCalendar->Visible = false;
 	dayCalendar->Date = Now();
 	rangeEndCalendar->Date = Now();
+	errorLabel->Visible = false;
 
 	//set coordinates back to originals
    /*	selectAllButton->Position->X = selectAllButtonX;
@@ -1492,8 +1623,6 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 			readGrid->Cells[i][j] = "";
 	}
 	readGrid->RowCount = 19;
-
-
 }
 
 //---------------------------------------------------------------------------
@@ -1671,6 +1800,7 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				//get the date selected from the calendar
 				TDateTime dayChosen = dayCalendar->Date;
 				dbDayChosen = StrToDate(dayChosen).FormatString(L"yyyy-mm-dd");
+				privateDBDayChosen = StrToDate(dayChosen).FormatString(L"mm/dd/yyyy");
 
 				//call display function
 				populateGrid(roleVector, dbDayChosen);
@@ -1692,6 +1822,8 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				dbDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"yyyy-mm-dd");
 				privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
 				privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
+				privateDayChosenStartFull = StrToDate(dayChosenStart).FormatString(L"mm/dd/yy");
+				privateDayChosenEndFull = StrToDate(dayChosenEnd).FormatString(L"mm/dd/yy");
 
 				//call display function
 				populateGrid(roleVector, 0, dbDayChosenStart, dbDayChosenEnd, "week");
@@ -1707,6 +1839,8 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				dbDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"yyyy-mm-dd");
 				privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
 				privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
+				privateDayChosenStartFull = StrToDate(dayChosenStart).FormatString(L"mm/dd/yy");
+				privateDayChosenEndFull = StrToDate(dayChosenEnd).FormatString(L"mm/dd/yy");
 
 				//call display function (should work same with week as with arbitrary)
 				populateGrid(roleVector, -1, dbDayChosenStart, dbDayChosenEnd, "week");
@@ -1733,26 +1867,6 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				//call display function
 				populateGrid(roleVector, (int) toDouble(currentYear), "null", "null", "year");
 			}
-
-			//hide things from testing
-			filtersLabel->Visible = false;
-			arrowDay->Visible=false;
-			pickerArrow->Visible=false;
-			whichMonthImage->Visible=false;
-			whichYearImage->Visible=false;
-			whichDayImage->Visible=false;
-			whichWeekImage->Visible=false;
-			pickStartImage->Visible=false;
-			pickEndImage->Visible=false;
-			arrowRange->Visible=false;
-			arrowYear->Visible=false;
-			roleListBox->Enabled=true;
-			selectAllButton->Enabled=true;
-			radioButtons(1);
-			rangeTabContainer->Tabs[0]->Enabled=true;
-			rangeTabContainer->Tabs[1]->Enabled=true;
-			printButtonImage->Visible=true;
-			viewButtonImage->Visible=true;
 
 			break;
 	}
