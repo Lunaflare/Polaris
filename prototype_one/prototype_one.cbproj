@@ -5,7 +5,7 @@
         <FrameworkType>FMX</FrameworkType>
         <MainSource>prototype_one.cpp</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
@@ -37,6 +37,12 @@
     <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
         <Cfg_2>true</Cfg_2>
         <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
@@ -102,6 +108,16 @@
         <Defines>NDEBUG;$(Defines)</Defines>
         <TASM_Debugging>None</TASM_Debugging>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <VerInfo_MinorVer>1</VerInfo_MinorVer>
+        <LinkPackageStatics>rtl.lib;fmx.lib;dbrtl.lib;dbexpress.lib;DbxCommonDriver.lib;DBXMySQLDriver.lib;dsnap.lib</LinkPackageStatics>
+        <Icon_MainIcon>prototype_one_Icon.ico</Icon_MainIcon>
+        <DynamicRTL>false</DynamicRTL>
+        <UsePackages>false</UsePackages>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=Lunaflare;FileDescription=;FileVersion=1.1.0.0;InternalName=;LegalCopyright=2014;LegalTrademarks=;OriginalFilename=;ProductName=Polaris;ProductVersion=1.1.0.0;Comments=http://Lunaflare.com</VerInfo_Keys>
+    </PropertyGroup>
     <ItemGroup>
         <CppCompile Include="prototype.cpp">
             <Form>Form1</Form>
@@ -151,13 +167,13 @@
             <DependentOn>Unit7.h</DependentOn>
             <BuildOrder>8</BuildOrder>
         </CppCompile>
-        <FormResources Include="Unit4.fmx"/>
-        <FormResources Include="Unit3.fmx"/>
-        <FormResources Include="Unit6.fmx"/>
         <FormResources Include="Unit5.fmx"/>
+        <FormResources Include="Unit4.fmx"/>
+        <FormResources Include="Unit7.fmx"/>
+        <FormResources Include="Unit6.fmx"/>
+        <FormResources Include="Unit3.fmx"/>
         <FormResources Include="prototype.fmx"/>
         <FormResources Include="Unit2.fmx"/>
-        <FormResources Include="Unit7.fmx"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -216,6 +232,7 @@
                     <ProjectProperties Name="VerifyPackages">True</ProjectProperties>
                 </ProjectProperties>
                 <Excluded_Packages>
+                    <Excluded_Packages Name="C:\Program Files (x86)\Raize\CS5\Bin\CodeSiteExpressPkg_Design170.bpl">File C:\Program Files (x86)\Raize\CS5\Bin\CodeSiteExpressPkg_Design170.bpl not found</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\bcboffice2k170.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\bcbofficexp170.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k170.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
