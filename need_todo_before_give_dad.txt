@@ -16,3 +16,5 @@
 .need to check against duplicate role names in edit and add role
 	-need to not allow the change of the three specific names of roles associated with extra calculations
 	-need to make list of all role names that shouldn't be name changed b/c of input/read forms
+.slick ass logo for the windows icon
+.decide on a new format for to do lists cuz txt file rlly com on
