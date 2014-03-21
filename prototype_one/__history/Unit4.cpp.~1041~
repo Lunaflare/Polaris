@@ -912,11 +912,6 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 			readGrid->Cells[0][1] = blank + "$" + roundTwo((toDouble(readGrid->Cells[0][2])*-1) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
 		else
 			readGrid->Cells[0][1] = blank + "$" + roundTwo(toDouble(readGrid->Cells[0][2]) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
-		readGrid->Cells[0][3] = "$76,995 Accounting";
-		if (toDouble(readGrid->Cells[0][3]) < 0)
-			readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar((toDouble(readGrid->Cells[0][3])*-1) - actualCostTotal))) + " Variance";
-		else
-			readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar(toDouble(readGrid->Cells[0][3]) - actualCostTotal))) + " Variance";
 
 		//make grid visible to user
 		readGrid->Visible = true;
@@ -1043,7 +1038,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 		Form2->readButtonImageClick(NULL);
 
 		//show week/range error message
-		errorLabel->Text = spaceTaker + "Error: no data currently exists for the day " +  + ". Please try again...";
+		errorLabel->Text = spaceTaker + "Error: no data currently exists for the day " + privateDBDayChosen + ". Please try again...";
 		errorLabel->Visible = true;
 	}
 	else
@@ -1328,11 +1323,22 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 			readGrid->Cells[0][1] = blank + "$" + roundTwo((toDouble(readGrid->Cells[0][2])*-1) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
 		else
 			readGrid->Cells[0][1] = blank + "$" + roundTwo(toDouble(readGrid->Cells[0][2]) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
-		readGrid->Cells[0][3] = "$76,995 Accounting";
-		if (toDouble(readGrid->Cells[0][3]) < 0)
-			readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar((toDouble(readGrid->Cells[0][3])*-1) - actualCostTotal))) + " Variance";
+		if (totalRoomsCleaned < 0)
+		{
+			if (totalRoomsCleaned != 0 && hoursVarianceOne > 0)
+				readGrid->Cells[0][3] = blank + roundTwo(hoursVarianceOne / (totalRoomsCleaned * -1)) + " Total hours to clean room";
+			else if (totalRoomsCleaned != 0 && hoursVarianceOne < 0)
+				readGrid->Cells[0][3] = blank + roundTwo(hoursVarianceOne / totalRoomsCleaned) + " Total hours to clean room";
+			else
+				readGrid->Cells[0][3] = "$0 Total hours to clean room";
+		}
 		else
-			readGrid->Cells[0][4] = blank + "$" + commas(IntToStr(nearestDollar(toDouble(readGrid->Cells[0][3]) - actualCostTotal))) + " Variance";
+		{
+			if (hoursVarianceOne < 0)
+				readGrid->Cells[0][3] = blank + roundTwo(hoursVarianceOne / (totalRoomsCleaned * -1)) + " Total hours to clean room";
+			else
+				readGrid->Cells[0][3] = blank + roundTwo(hoursVarianceOne / totalRoomsCleaned) + " Total hours to clean room";
+		}
 
 		//make grid visible
 		readGrid->Visible = true;
@@ -1519,11 +1525,11 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		dbDayChosenEnd = dayChosenEnd.FormatString(L"yyyy-mm-dd");
 		privateDayChosenStart = StrToDate(dayChosenStart).FormatString(L"mm/dd");
 		privateDayChosenEnd = StrToDate(dayChosenEnd).FormatString(L"mm/dd");
+		privateDayChosenStartFull = StrToDate(dayChosenStart).FormatString(L"mm/dd/yyyy");
+		privateDayChosenEndFull = StrToDate(dayChosenEnd).FormatString(L"mm/dd/yyyy");
 
 		//call display function
 		populateGrid(roleVector, 0, dbDayChosenStart, dbDayChosenEnd, "week");
-		printButtonImage->Visible=true;
-		viewButtonImage->Visible=true;
 	}
 }
 //---------------------------------------------------------------------------
@@ -1800,6 +1806,7 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				//get the date selected from the calendar
 				TDateTime dayChosen = dayCalendar->Date;
 				dbDayChosen = StrToDate(dayChosen).FormatString(L"yyyy-mm-dd");
+				privateDBDayChosen = StrToDate(dayChosen).FormatString(L"mm/dd/yyyy");
 
 				//call display function
 				populateGrid(roleVector, dbDayChosen);
