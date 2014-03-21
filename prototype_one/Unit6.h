@@ -26,6 +26,7 @@ __published:	// IDE-managed Components
 	TEdit *roleWagesEdit;
 	TLabel *roleReferenceLabel;
 	TPopupBox *referencePopupBox;
+	TLabel *errorLabel;
 	void __fastcall backImageButtonClick(TObject *Sender);
 	void __fastcall saveChangesButtonClick(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);

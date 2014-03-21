@@ -117,7 +117,7 @@ void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 //Opens browser with registration form when register button clicked (still need to create form)
 void __fastcall TForm1::loginregisterButtonClick(TObject *Sender)
 {
-	ShellExecute(NULL, L"open", L"http://baldwinserver.com/Lunaflare/generateKey.php", NULL, NULL, SW_SHOWNORMAL);
+	//ShellExecute(NULL, L"open", L"http://baldwinserver.com/Lunaflare/generateKey.php", NULL, NULL, SW_SHOWNORMAL);
 }
 //---------------------------------------------------------------------------
 

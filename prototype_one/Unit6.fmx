@@ -14,7 +14,7 @@ object Form6: TForm6
     DisableFocusEffect = False
     Height = 38.000000000000000000
     Position.X = 280.000000000000000000
-    Position.Y = 264.000000000000000000
+    Position.Y = 288.000000000000000000
     Text = 'Save'
     Width = 105.000000000000000000
     OnClick = saveChangesButtonClick
@@ -990,7 +990,7 @@ object Form6: TForm6
   object roleNameLabel: TLabel
     Height = 15.000000000000000000
     Position.X = 48.000000000000000000
-    Position.Y = 40.000000000000000000
+    Position.Y = 64.000000000000000000
     Text = 'Role Name:'
     Width = 120.000000000000000000
   end
@@ -999,14 +999,14 @@ object Form6: TForm6
     KeyboardType = vktDefault
     Password = False
     Position.X = 216.000000000000000000
-    Position.Y = 32.000000000000000000
+    Position.Y = 56.000000000000000000
     Width = 233.000000000000000000
     Height = 22.000000000000000000
   end
   object roleWagesLabel: TLabel
     Height = 15.000000000000000000
     Position.X = 48.000000000000000000
-    Position.Y = 104.000000000000000000
+    Position.Y = 128.000000000000000000
     Text = 'Role Wages:'
     Width = 120.000000000000000000
   end
@@ -1015,14 +1015,14 @@ object Form6: TForm6
     KeyboardType = vktDefault
     Password = False
     Position.X = 216.000000000000000000
-    Position.Y = 96.000000000000000000
+    Position.Y = 120.000000000000000000
     Width = 233.000000000000000000
     Height = 22.000000000000000000
   end
   object roleReferenceLabel: TLabel
     Height = 15.000000000000000000
     Position.X = 48.000000000000000000
-    Position.Y = 168.000000000000000000
+    Position.Y = 192.000000000000000000
     Text = 'Labor Standards Reference:'
     Width = 161.000000000000000000
   end
@@ -1031,7 +1031,19 @@ object Form6: TForm6
     Height = 22.000000000000000000
     ItemIndex = -1
     Position.X = 216.000000000000000000
-    Position.Y = 160.000000000000000000
+    Position.Y = 184.000000000000000000
     Width = 233.000000000000000000
+  end
+  object errorLabel: TLabel
+    Font.Size = 18.000000000000000000
+    FontColor = claRed
+    StyledSettings = [ssFamily]
+    Height = 41.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 8.000000000000000000
+    Text = 'Error: the role already exists. Please try again...'
+    TextAlign = taCenter
+    Visible = False
+    Width = 625.000000000000000000
   end
 end

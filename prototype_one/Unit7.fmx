@@ -1443,4 +1443,16 @@ object Form7: TForm7
     Width = 81.000000000000000000
     OnClick = nextImageButtonClick
   end
+  object errorLabel: TLabel
+    Font.Size = 18.000000000000000000
+    FontColor = claRed
+    StyledSettings = [ssFamily]
+    Height = 41.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 8.000000000000000000
+    Text = 'Error: the role already exists. Please try again...'
+    TextAlign = taCenter
+    Visible = False
+    Width = 625.000000000000000000
+  end
 end

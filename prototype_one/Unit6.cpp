@@ -28,6 +28,7 @@ void __fastcall TForm6::backImageButtonClick(TObject *Sender)
 	roleWagesEdit->Text = "";
 	referencePopupBox->Items->Clear();
 	referencePopupBox->ItemIndex = 0;
+	errorLabel->Visible = false;
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm6::saveChangesButtonClick(TObject *Sender)
@@ -37,48 +38,71 @@ void __fastcall TForm6::saveChangesButtonClick(TObject *Sender)
 	String roleWages = roleWagesEdit->Text;
 	String roleReference = StringReplace(referencePopupBox->Items->operator [](referencePopupBox->ItemIndex), " ", "_", TReplaceFlags() << rfReplaceAll);
 
-	//get different forms of role name
-	String bareRoleName = StringReplace(roleName, " ", "_", TReplaceFlags() << rfReplaceAll);
-	String roleHoursPaid = bareRoleName + "_Hours_Paid";
-	String roleStandardHours = bareRoleName + "_Standard_Hours";
-	String rolePercentPerformance = bareRoleName + "_Percent_Performance";
-
-	//add to role table
-	String roleValues = "'" + currentHotelID + "', '" + roleHoursPaid + "', '" + bareRoleName + "', '" + roleWages + "', '" + roleReference + "'";
-	Form3->SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data.role_table (hotelID, Role_Name, Bare_Role_Name, Role_Wages, Standard_Hours_Reference) VALUES ("+roleValues+");";
-	Form3->SQLQuery2->ExecSQL();
-
-	//add to input table
-	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+inputTable+" ADD COLUMN "+roleHoursPaid+" DOUBLE NOT NULL AFTER Director_And_Two_Managers_Hours_Paid;";
-	Form3->SQLQuery2->ExecSQL();
-
-	//add to read table
-	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+readTable+" ADD COLUMN "+roleHoursPaid+" DOUBLE NOT NULL AFTER Director_And_Two_Managers_Percent_Performance, ADD COLUMN "+roleStandardHours+" DOUBLE NOT NULL AFTER "+roleHoursPaid+", ADD COLUMN "+rolePercentPerformance+" DOUBLE NOT NULL AFTER "+roleStandardHours+";";
-    Form3->SQLQuery2->ExecSQL();
-
-	//recalculate Average_Pay_Per_Hourour and Overtime_Per_Hour int hotel ref table to accommodate new role's wages
-	String empty = "";
-	double wagesTotal = 0.0;
-	double numWages = 0.0;
-	Form3->SQLQuery2->SQL->Text = "SELECT Role_Wages FROM role_table WHERE hotelID = '"+currentHotelID+"';";
+	//get all existing role names and compare to name chosen
+	bool halt = false;
+	Form3->SQLQuery2->SQL->Text = "SELECT Bare_Role_Name FROM role_table WHERE hotelID = '"+currentHotelID+"';";
 	Form3->SQLQuery2->Open();
 	Form3->SQLQuery2->First();
 	while (!Form3->SQLQuery2->Eof)
 	{
-		++numWages;
-		wagesTotal += Form3->SQLQuery2->Fields->Fields[0]->AsFloat;
+		if (SameText(StringReplace(roleName, " ", "_", TReplaceFlags() << rfReplaceAll), Form3->SQLQuery2->Fields->Fields[0]->AsString))
+			halt = true;
 
-		Form3->SQLQuery2->Next();
+        Form3->SQLQuery2->Next();
 	}
-	double avgPayPerHour = wagesTotal / numWages;
-	double overtimePerHour = avgPayPerHour * 1.5;
 
-	//update hotel_ref with new values
-	Form3->SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data.hotel_ref SET Average_Pay_Per_Hour = '"+empty+avgPayPerHour+"', Overtime_Per_Hour = '"+empty+overtimePerHour+"' WHERE hotelID = '"+currentHotelID+"';";
-	Form3->SQLQuery2->ExecSQL();
+	//check if name is already in db
+	if (!halt)
+	{
+		//get different forms of role name
+		String bareRoleName = StringReplace(roleName, " ", "_", TReplaceFlags() << rfReplaceAll);
+		String roleHoursPaid = bareRoleName + "_Hours_Paid";
+		String roleStandardHours = bareRoleName + "_Standard_Hours";
+		String rolePercentPerformance = bareRoleName + "_Percent_Performance";
 
-	//take back to settings page
-	backImageButton->OnClick(NULL);
+		//add to role table
+		String roleValues = "'" + currentHotelID + "', '" + roleHoursPaid + "', '" + bareRoleName + "', '" + roleWages + "', '" + roleReference + "'";
+		Form3->SQLQuery2->SQL->Text = "INSERT INTO baldwins_hotel_data.role_table (hotelID, Role_Name, Bare_Role_Name, Role_Wages, Standard_Hours_Reference) VALUES ("+roleValues+");";
+		Form3->SQLQuery2->ExecSQL();
+
+		//add to input table
+		Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+inputTable+" ADD COLUMN "+roleHoursPaid+" DOUBLE NOT NULL AFTER Director_And_Two_Managers_Hours_Paid;";
+		Form3->SQLQuery2->ExecSQL();
+
+		//add to read table
+		Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+readTable+" ADD COLUMN "+roleHoursPaid+" DOUBLE NOT NULL AFTER Director_And_Two_Managers_Percent_Performance, ADD COLUMN "+roleStandardHours+" DOUBLE NOT NULL AFTER "+roleHoursPaid+", ADD COLUMN "+rolePercentPerformance+" DOUBLE NOT NULL AFTER "+roleStandardHours+";";
+	    Form3->SQLQuery2->ExecSQL();
+
+		//recalculate Average_Pay_Per_Hourour and Overtime_Per_Hour int hotel ref table to accommodate new role's wages
+		String empty = "";
+		double wagesTotal = 0.0;
+		double numWages = 0.0;
+		Form3->SQLQuery2->SQL->Text = "SELECT Role_Wages FROM role_table WHERE hotelID = '"+currentHotelID+"';";
+		Form3->SQLQuery2->Open();
+		Form3->SQLQuery2->First();
+		while (!Form3->SQLQuery2->Eof)
+		{
+			++numWages;
+			wagesTotal += Form3->SQLQuery2->Fields->Fields[0]->AsFloat;
+
+			Form3->SQLQuery2->Next();
+		}
+		double avgPayPerHour = wagesTotal / numWages;
+		double overtimePerHour = avgPayPerHour * 1.5;
+
+		//update hotel_ref with new values
+		Form3->SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data.hotel_ref SET Average_Pay_Per_Hour = '"+empty+avgPayPerHour+"', Overtime_Per_Hour = '"+empty+overtimePerHour+"' WHERE hotelID = '"+currentHotelID+"';";
+		Form3->SQLQuery2->ExecSQL();
+
+		//take back to settings page
+		backImageButton->OnClick(NULL);
+	}
+	else
+	{
+		//display error message and stay at form
+		errorLabel->Text = "Error: the role " + roleName + " already exists. Please try again...";
+        errorLabel->Visible = true;
+    }
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm6::FormClose(TObject *Sender, TCloseAction &Action)
@@ -97,6 +121,7 @@ void __fastcall TForm6::homeImageButton6Click(TObject *Sender)
 	roleWagesEdit->Text = "";
 	referencePopupBox->Items->Clear();
 	referencePopupBox->ItemIndex = 0;
+	errorLabel->Visible = false;
 }
 //---------------------------------------------------------------------------
 

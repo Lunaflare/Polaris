@@ -24,6 +24,7 @@ __published:	// IDE-managed Components
 	TImage *backImageButton;
 	TButton *saveChangesButton;
 	TImage *nextImageButton;
+	TLabel *errorLabel;
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall homeImageButton7Click(TObject *Sender);

@@ -42,14 +42,24 @@ void __fastcall TForm7::FormShow(TObject *Sender)
 	}
 
 	//populate rolePopupBox from role_table
+	bool noAdd = false;
+	String nonEditableRoles[3] = {"AM_Room_Attendants", "PM_Room_Attendants", "Laundry_Attendant"};
 	Form3->SQLQuery2->SQL->Text = "SELECT Bare_Role_Name FROM role_table WHERE hotelID = '"+currentHotelID+"';";
 	Form3->SQLQuery2->Open();
 	Form3->SQLQuery2->First();
 	while (!Form3->SQLQuery2->Eof)
 	{
-		rolePopupBox->Items->Add(StringReplace(Form3->SQLQuery2->Fields->Fields[0]->AsString, "_", " ", TReplaceFlags() << rfReplaceAll));
+		for (int i = 0; i < 3; ++i)
+			if (SameText(nonEditableRoles[i], Form3->SQLQuery2->Fields->Fields[0]->AsString))
+				noAdd = true;
+
+		if (!noAdd)
+			rolePopupBox->Items->Add(StringReplace(Form3->SQLQuery2->Fields->Fields[0]->AsString, "_", " ", TReplaceFlags() << rfReplaceAll));
+
 		Form3->SQLQuery2->Next();
+		noAdd = false;
 	}
+
 	rolePopupBox->ItemIndex = 0;
 	rolePopupBox->Text = rolePopupBox->Items->operator [](rolePopupBox->ItemIndex);
 }
@@ -64,10 +74,14 @@ void __fastcall TForm7::homeImageButton7Click(TObject *Sender)
 	rolePopupBox->Items->Clear();
 	rolePopupBox->ItemIndex = 0;
 	rolePopupBox->Text = "";
+	rolePopupBox->Visible = true;
 	roleNameLabel->Visible = false;
 	roleNameEdit->Visible = false;
 	roleWagesLabel->Visible = false;
 	roleWagesEdit->Visible = false;
+	errorLabel->Visible = false;
+	saveChangesButton->Visible = false;
+	nextImageButton->Visible = true;
 }
 //---------------------------------------------------------------------------
 
@@ -97,6 +111,7 @@ void __fastcall TForm7::backImageButtonClick(TObject *Sender)
 		roleNameEdit->Visible = false;
 		roleWagesLabel->Visible = false;
 		roleWagesEdit->Visible = false;
+		errorLabel->Visible = false;
 	}
 }
 //---------------------------------------------------------------------------
@@ -139,52 +154,74 @@ void __fastcall TForm7::saveChangesButtonClick(TObject *Sender)
 	String roleNameNew = roleNameEdit->Text;
 	String roleWagesNew = roleWagesEdit->Text;
 
-	//construct strings useful in update queries below
-	String roleNameNewUnderScores = StringReplace(roleNameNew, " ", "_", TReplaceFlags() << rfReplaceAll);
-	String roleNameNewHoursPaid = roleNameNewUnderScores + "_Hours_Paid";
-	String roleNameNewStandardHours = roleNameNewUnderScores + "_Standard_Hours";
-	String roleNamePercentPerformance = roleNameNewUnderScores + "_Percent_Performance";
-
-	//update query for role table
-	Form3->SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data.role_table SET Role_Name = '"+roleNameNewHoursPaid+"', Bare_Role_Name = '"+roleNameNewUnderScores+"', Role_Wages = '"+roleWagesNew+"' WHERE hotelID = '"+currentHotelID+"' AND Bare_Role_Name = '"+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll)+"';";
-	Form3->SQLQuery2->ExecSQL();
-
-	//update query for labor standards table
-	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+laborTable+" CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll)+" "+roleNameNewUnderScores+" DOUBLE NOT NULL;";
-	Form3->SQLQuery2->ExecSQL();
-
-	//update query for read table
-	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+readTable+" CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll) + "_Hours_Paid"+" "+roleNameNewHoursPaid+" DOUBLE NOT NULL, CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll) + "_Standard_Hours"+" "+roleNameNewStandardHours+" DOUBLE NOT NULL, CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll) + "_Percent_Performance"+" "+roleNamePercentPerformance+" DOUBLE NOT NULL;";
-	Form3->SQLQuery2->ExecSQL();
-
-	//update query for input table
-	Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+inputTable+" CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll) + "_Hours_Paid"+" "+roleNameNewHoursPaid+" DOUBLE NOT NULL;";
-	Form3->SQLQuery2->ExecSQL();
-
-	//recalculate Average_Pay_Per_Hourour and Overtime_Per_Hour int hotel ref table to accommodate new role's wages
-	String empty = "";
-	double wagesTotal = 0.0;
-	double numWages = 0.0;
-	Form3->SQLQuery2->SQL->Text = "SELECT Role_Wages FROM role_table WHERE hotelID = '"+currentHotelID+"';";
+	//get all existing role names and compare to name chosen
+	bool halt = false;
+	Form3->SQLQuery2->SQL->Text = "SELECT Bare_Role_Name FROM role_table WHERE hotelID = '"+currentHotelID+"';";
 	Form3->SQLQuery2->Open();
 	Form3->SQLQuery2->First();
 	while (!Form3->SQLQuery2->Eof)
 	{
-		++numWages;
-		wagesTotal += Form3->SQLQuery2->Fields->Fields[0]->AsFloat;
+		if (SameText(StringReplace(roleNameNew, " ", "_", TReplaceFlags() << rfReplaceAll), Form3->SQLQuery2->Fields->Fields[0]->AsString) && !SameText(roleNameNew, roleChosen))
+			halt = true;
 
 		Form3->SQLQuery2->Next();
 	}
-	double avgPayPerHour = wagesTotal / numWages;
-	double overtimePerHour = avgPayPerHour * 1.5;
 
-	//update hotel_ref with new values
-	Form3->SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data.hotel_ref SET Average_Pay_Per_Hour = '"+empty+avgPayPerHour+"', Overtime_Per_Hour = '"+empty+overtimePerHour+"' WHERE hotelID = '"+currentHotelID+"';";
-	Form3->SQLQuery2->ExecSQL();
+	//check if name already exists in db
+	if (!halt)
+	{
+		//construct strings useful in update queries below
+		String roleNameNewUnderScores = StringReplace(roleNameNew, " ", "_", TReplaceFlags() << rfReplaceAll);
+		String roleNameNewHoursPaid = roleNameNewUnderScores + "_Hours_Paid";
+		String roleNameNewStandardHours = roleNameNewUnderScores + "_Standard_Hours";
+		String roleNamePercentPerformance = roleNameNewUnderScores + "_Percent_Performance";
 
-	//take back to settings page (intentionally called twice)
-	backImageButton->OnClick(NULL);
-	backImageButton->OnClick(NULL);
+		//update query for role table
+		Form3->SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data.role_table SET Role_Name = '"+roleNameNewHoursPaid+"', Bare_Role_Name = '"+roleNameNewUnderScores+"', Role_Wages = '"+roleWagesNew+"' WHERE hotelID = '"+currentHotelID+"' AND Bare_Role_Name = '"+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll)+"';";
+		Form3->SQLQuery2->ExecSQL();
+
+		//update query for labor standards table
+		Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+laborTable+" CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll)+" "+roleNameNewUnderScores+" DOUBLE NOT NULL;";
+		Form3->SQLQuery2->ExecSQL();
+
+		//update query for read table
+		Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+readTable+" CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll) + "_Hours_Paid"+" "+roleNameNewHoursPaid+" DOUBLE NOT NULL, CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll) + "_Standard_Hours"+" "+roleNameNewStandardHours+" DOUBLE NOT NULL, CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll) + "_Percent_Performance"+" "+roleNamePercentPerformance+" DOUBLE NOT NULL;";
+		Form3->SQLQuery2->ExecSQL();
+
+		//update query for input table
+		Form3->SQLQuery2->SQL->Text = "ALTER TABLE baldwins_hotel_data."+inputTable+" CHANGE COLUMN "+StringReplace(roleChosen, " ", "_", TReplaceFlags() << rfReplaceAll) + "_Hours_Paid"+" "+roleNameNewHoursPaid+" DOUBLE NOT NULL;";
+		Form3->SQLQuery2->ExecSQL();
+
+		//recalculate Average_Pay_Per_Hourour and Overtime_Per_Hour int hotel ref table to accommodate new role's wages
+		String empty = "";
+		double wagesTotal = 0.0;
+		double numWages = 0.0;
+		Form3->SQLQuery2->SQL->Text = "SELECT Role_Wages FROM role_table WHERE hotelID = '"+currentHotelID+"';";
+		Form3->SQLQuery2->Open();
+		Form3->SQLQuery2->First();
+		while (!Form3->SQLQuery2->Eof)
+		{
+			++numWages;
+			wagesTotal += Form3->SQLQuery2->Fields->Fields[0]->AsFloat;
+
+			Form3->SQLQuery2->Next();
+		}
+		double avgPayPerHour = wagesTotal / numWages;
+		double overtimePerHour = avgPayPerHour * 1.5;
+
+		//update hotel_ref with new values
+		Form3->SQLQuery2->SQL->Text = "UPDATE baldwins_hotel_data.hotel_ref SET Average_Pay_Per_Hour = '"+empty+avgPayPerHour+"', Overtime_Per_Hour = '"+empty+overtimePerHour+"' WHERE hotelID = '"+currentHotelID+"';";
+		Form3->SQLQuery2->ExecSQL();
+
+		//take back to settings page (intentionally called twice)
+		backImageButton->OnClick(NULL);
+		backImageButton->OnClick(NULL);
+	}
+	else
+	{
+		errorLabel->Text = "Error: the role " + roleNameNew + " already exists. Please try again...";
+		errorLabel->Visible = true;
+    }
 }
 
 //---------------------------------------------------------------------------
