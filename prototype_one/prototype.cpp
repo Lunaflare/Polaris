@@ -171,7 +171,29 @@ TRegistry* reg = new TRegistry(KEY_READ);
 
 void __fastcall TForm1::FormClose(TObject *Sender, TCloseAction &Action)
 {
+	//terminate the app
 	Application->Terminate();
+
+	//loop until get confirmation from windows that the app has terminated
+	int a = 12;
+	int b = 40;
+	int c = 1;
+	for (int x = 0; x < 1000000; ++x)
+	{
+		//pointless calculation to extend timeeframe
+		a = a * b * c + x;
+		b = a + c + x;
+		c = a + b;
+
+		// check if need to exit
+		Application->ProcessMessages();
+		if (Application->Terminated)
+		{
+			break;
+		}
+	}
+
+    //completely exit with good status to avoid windows errors
 	exit(0);
 }
 //---------------------------------------------------------------------------
