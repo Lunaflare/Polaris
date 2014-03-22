@@ -82,11 +82,21 @@ void __fastcall TForm7::homeImageButton7Click(TObject *Sender)
 	errorLabel->Visible = false;
 	saveChangesButton->Visible = false;
 	nextImageButton->Visible = true;
+	dollaSign->Visible=false;
+	roleExistsLabel->Visible=false;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm7::backImageButtonClick(TObject *Sender)
 {
+	editRoleLabel->Visible=true;
+		//fade out Error images
+	checkInputImage->Visible=false;
+	 errorLabel->Visible=false;
+	 inputCallout->Visible=false;
+	 wagesCallout->Visible=false;
+	 selectCallout->Visible=false;
+
 	//should run this when in phase 0
 	if (state == 0)
 	{
@@ -112,11 +122,14 @@ void __fastcall TForm7::backImageButtonClick(TObject *Sender)
 		roleWagesLabel->Visible = false;
 		roleWagesEdit->Visible = false;
 		errorLabel->Visible = false;
+		dollaSign->Visible=false;
+		roleExistsLabel->Visible=false;
 	}
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm7::nextImageButtonClick(TObject *Sender)
 {
+    editRoleLabel->Visible=true;
 	//hide/make visible certain buttons
 	nextImageButton->Visible = false;
 	saveChangesButton->Visible = true;
@@ -125,6 +138,14 @@ void __fastcall TForm7::nextImageButtonClick(TObject *Sender)
 	roleNameEdit->Visible = true;
 	roleWagesLabel->Visible = true;
 	roleWagesEdit->Visible = true;
+	dollaSign->Visible=true;
+	roleExistsLabel->Visible=false;
+		//fade out Error images
+	checkInputImage->Visible=false;
+	 errorLabel->Visible=false;
+	 inputCallout->Visible=false;
+	 wagesCallout->Visible=false;
+	 selectCallout->Visible=false;
 
 	//change state value
 	state++;
@@ -150,6 +171,139 @@ void __fastcall TForm7::nextImageButtonClick(TObject *Sender)
 
 void __fastcall TForm7::saveChangesButtonClick(TObject *Sender)
 {
+
+	//fade out Error images
+	checkInputImage->Visible=false;
+	 errorLabel->Visible=false;
+	 inputCallout->Visible=false;
+	 wagesCallout->Visible=false;
+	 selectCallout->Visible=false;
+
+
+		//check to see if string contains only digits and one decimal
+		int numDecimals=0;
+			//check for blank input
+		if(roleWagesEdit->Text.IsEmpty() || roleNameEdit->Text.IsEmpty())
+		{
+			editRoleLabel->Visible=false;
+			checkInputImage->Visible=true;
+			return;
+		}
+
+		//check name input
+		string inputString=AnsiString(roleNameEdit->Text).c_str();
+		for (int i = 0; i < inputString.length(); i++)
+		{
+
+			//check to see if the character is within the a-Z range
+			if(inputString[i]>=65 || 122<=inputString[i])
+			{
+			  if(90<inputString[i] && inputString[i]<97)
+				{
+				  inputCalloutLabel->Text="Can only contain letters!";
+				  inputCallout->Visible=true;
+				  checkInputImage->Visible=true;
+				  editRoleLabel->Visible=false;
+				  return;
+				}
+			}
+			else if(inputString[i]==32)
+				{
+					//do not allow to start with space
+					if(i==0)
+						{
+							inputCalloutLabel->Text="Cannot begin with a space!";
+							inputCallout->Visible=true;
+							checkInputImage->Visible=true;
+							editRoleLabel->Visible=false;
+							return;
+						}
+
+					//or end with a space
+					if(i==inputString.size()-1)
+					{
+					  inputCalloutLabel->Text="Cannot end with a space!";
+					  inputCallout->Visible=true;
+					  checkInputImage->Visible=true;
+					  editRoleLabel->Visible=false;
+							return;
+                    }
+
+					//make sure it's not a double space
+					if(inputString[i+1]==32)
+						{
+							inputCalloutLabel->Text="Cannot contain double space!";
+							inputCallout->Visible=true;
+							checkInputImage->Visible=true;
+							editRoleLabel->Visible=false;
+							return;
+                        }
+				}
+			else
+			{
+				inputCalloutLabel->Text="Can only contain letters!";
+				inputCallout->Visible=true;
+				checkInputImage->Visible=true;
+				editRoleLabel->Visible=false;
+				return;
+			}
+
+		}
+		//check wages input
+		inputString=AnsiString(roleWagesEdit->Text).c_str();
+		for (int i = 0; i < inputString.length(); i++)
+		{
+
+			//check to see if the character is 0-9 or a decimal
+			if(inputString[i]<48 || inputString[i]>57)
+			{
+				if(inputString[i]==46)
+				{
+					numDecimals++;
+					if(numDecimals>1)
+					{
+						roleWagesEdit->Text="";
+						editRoleLabel->Visible=false;
+						checkInputImage->Visible=true;
+						wagesCallout->Visible=true;
+						return;
+					}
+					if(inputString[i+1]<48 || inputString[i+1]>57)
+					{
+						roleWagesEdit->Text="";
+						editRoleLabel->Visible=false;
+						checkInputImage->Visible=true;
+						wagesCallout->Visible=true;
+						return;
+					}
+				}
+				else
+				{
+						roleWagesEdit->Text="";
+						editRoleLabel->Visible=false;
+						checkInputImage->Visible=true;
+						wagesCallout->Visible=true;
+						return;
+				}
+
+			}
+		}
+
+	//check to make sure one of the drop down choices have been selected
+	if(rolePopupBox->ItemIndex<0)
+	{
+		editRoleLabel->Visible=false;
+		checkInputImage->Visible=true;
+		selectCallout->Visible=true;
+		return;
+	}
+	else
+	{
+		//store info
+	   //	roleReference = StringReplace(rolePopupBox->Items->operator [](referencePopupBox->ItemIndex), " ", "_", TReplaceFlags() << rfReplaceAll);
+	}
+
+
 	//get values from edit boxes
 	String roleNameNew = roleNameEdit->Text;
 	String roleWagesNew = roleWagesEdit->Text;
@@ -219,9 +373,65 @@ void __fastcall TForm7::saveChangesButtonClick(TObject *Sender)
 	}
 	else
 	{
-		errorLabel->Text = "Error: the role " + roleNameNew + " already exists. Please try again...";
-		errorLabel->Visible = true;
+		//errorLabel->Text = "Error: the role " + roleNameNew + " already exists. Please try again...";
+		//errorLabel->Visible = true;
+		roleExistsLabel->Visible=true;
     }
 }
 
 //---------------------------------------------------------------------------
+void __fastcall TForm7::homeImageButton7MouseEnter(TObject *Sender)
+{
+swapImage->Bitmap=homeImageButton7->Bitmap;
+homeImageButton7->Bitmap=homeOverImage->Bitmap;
+homeShadow->Visible=true;
+homeLabel->Visible=true;
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm7::homeImageButton7MouseLeave(TObject *Sender)
+{
+homeImageButton7->Bitmap=swapImage->Bitmap;
+homeShadow->Visible=false;
+homeLabel->Visible=false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm7::backImageButtonMouseEnter(TObject *Sender)
+{
+swapImage->Bitmap=backImageButton->Bitmap;
+backImageButton->Bitmap=backOverImage->Bitmap;
+
+
+backLabel->Visible=true;
+backShadow->Visible=true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm7::backImageButtonMouseLeave(TObject *Sender)
+{
+backImageButton->Bitmap=swapImage->Bitmap;
+backShadow->Visible=false;
+backLabel->Visible=false;
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm7::nextImageButtonMouseEnter(TObject *Sender)
+{
+swapImage->Bitmap=nextImageButton->Bitmap;
+nextImageButton->Bitmap=nextOverImage->Bitmap;
+nextShadow->Visible=true;
+nextLabel->Visible=true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm7::nextImageButtonMouseLeave(TObject *Sender)
+{
+nextImageButton->Bitmap=swapImage->Bitmap;
+nextShadow->Visible=false;
+nextLabel->Visible=false;
+}
+//---------------------------------------------------------------------------
+
