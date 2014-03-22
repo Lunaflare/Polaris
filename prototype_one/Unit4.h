@@ -142,6 +142,8 @@ __published:	// IDE-managed Components
 	TImage *viewLabel;
 	TFloatAnimation *FloatAnimation32;
 	TFloatAnimation *FloatAnimation33;
+	TImage *errorLabelImage;
+	TFloatAnimation *FloatAnimation34;
 	TLabel *errorLabel;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);

@@ -79,19 +79,26 @@ void __fastcall TForm7::homeImageButton7Click(TObject *Sender)
 	roleNameEdit->Visible = false;
 	roleWagesLabel->Visible = false;
 	roleWagesEdit->Visible = false;
+	wagesCallout->Visible=false;
+	inputCallout->Visible=false;
+	selectCallout->Visible=false;
 	errorLabel->Visible = false;
 	saveChangesButton->Visible = false;
 	nextImageButton->Visible = true;
 	dollaSign->Visible=false;
+
 	roleExistsLabel->Visible=false;
+	checkInputImage->Visible=false;
+	editRoleLabel->Visible=true;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm7::backImageButtonClick(TObject *Sender)
 {
+	roleExistsLabel->Visible=false;
+	checkInputImage->Visible=false;
 	editRoleLabel->Visible=true;
 		//fade out Error images
-	checkInputImage->Visible=false;
 	 errorLabel->Visible=false;
 	 inputCallout->Visible=false;
 	 wagesCallout->Visible=false;
@@ -129,7 +136,9 @@ void __fastcall TForm7::backImageButtonClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TForm7::nextImageButtonClick(TObject *Sender)
 {
-    editRoleLabel->Visible=true;
+roleExistsLabel->Visible=false;
+	checkInputImage->Visible=false;
+	editRoleLabel->Visible=true;
 	//hide/make visible certain buttons
 	nextImageButton->Visible = false;
 	saveChangesButton->Visible = true;
@@ -141,7 +150,6 @@ void __fastcall TForm7::nextImageButtonClick(TObject *Sender)
 	dollaSign->Visible=true;
 	roleExistsLabel->Visible=false;
 		//fade out Error images
-	checkInputImage->Visible=false;
 	 errorLabel->Visible=false;
 	 inputCallout->Visible=false;
 	 wagesCallout->Visible=false;
