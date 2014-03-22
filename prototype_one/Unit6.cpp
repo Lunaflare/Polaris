@@ -303,6 +303,7 @@ void __fastcall TForm6::homeImageButton6MouseEnter(TObject *Sender)
 swapImage->Bitmap=homeImageButton6->Bitmap;
 homeImageButton6->Bitmap=homeOverImage->Bitmap;
 homeShadow->Visible=true;
+homeLabel->Visible=true;
 }
 //---------------------------------------------------------------------------
 
@@ -311,6 +312,7 @@ void __fastcall TForm6::backImageButtonMouseEnter(TObject *Sender)
 swapImage->Bitmap=backImageButton->Bitmap;
 backImageButton->Bitmap=backOverImage->Bitmap;
 backShadow->Visible=true;
+backLabel->Visible=true;
 }
 //---------------------------------------------------------------------------
 
@@ -318,6 +320,7 @@ void __fastcall TForm6::backImageButtonMouseLeave(TObject *Sender)
 {
 backImageButton->Bitmap=swapImage->Bitmap;
 backShadow->Visible=false;
+backLabel->Visible=false;
 }
 //---------------------------------------------------------------------------
 
@@ -325,6 +328,7 @@ void __fastcall TForm6::homeImageButton6MouseLeave(TObject *Sender)
 {
 homeImageButton6->Bitmap=swapImage->Bitmap;
 homeShadow->Visible=false;
+homeLabel->Visible=false;
 }
 //---------------------------------------------------------------------------
 

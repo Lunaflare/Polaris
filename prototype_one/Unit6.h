@@ -50,6 +50,10 @@ __published:	// IDE-managed Components
 	TLabel *dollarSignLabel;
 	TCalloutPanel *selectCallout;
 	TLabel *selectLabel;
+	TImage *homeLabel;
+	TImage *backLabel;
+	TFloatAnimation *FloatAnimation7;
+	TFloatAnimation *FloatAnimation8;
 	void __fastcall backImageButtonClick(TObject *Sender);
 	void __fastcall saveChangesButtonClick(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
