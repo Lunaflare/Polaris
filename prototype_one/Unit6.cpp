@@ -29,6 +29,10 @@ void __fastcall TForm6::backImageButtonClick(TObject *Sender)
 	referencePopupBox->Items->Clear();
 	referencePopupBox->ItemIndex = 0;
 	errorLabel->Visible = false;
+	checkInputImage->Visible=false;
+	inputCallout->Visible=false;
+	 wagesCallout->Visible=false;
+	 selectCallout->Visible=false;
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm6::saveChangesButtonClick(TObject *Sender)
@@ -36,7 +40,137 @@ void __fastcall TForm6::saveChangesButtonClick(TObject *Sender)
 	//get info from edit boxes and popup box
 	String roleName = roleNameEdit->Text;
 	String roleWages = roleWagesEdit->Text;
-	String roleReference = StringReplace(referencePopupBox->Items->operator [](referencePopupBox->ItemIndex), " ", "_", TReplaceFlags() << rfReplaceAll);
+	String roleReference="";
+
+	//fade out Error images
+	checkInputImage->Visible=false;
+	 errorLabel->Visible=false;
+	 inputCallout->Visible=false;
+	 wagesCallout->Visible=false;
+	 selectCallout->Visible=false;
+
+		//check to see if string contains only digits and one decimal
+		int numDecimals=0;
+			//check for blank input
+		if(roleWagesEdit->Text.IsEmpty() || roleNameEdit->Text.IsEmpty())
+		{
+			addRoleLabel->Visible=false;
+			checkInputImage->Visible=true;
+			return;
+		}
+
+		//check name input
+		string inputString=AnsiString(roleNameEdit->Text).c_str();
+		for (int i = 0; i < inputString.length(); i++)
+		{
+
+			//check to see if the character is within the a-Z range
+			if(inputString[i]>=65 || 122<=inputString[i])
+			{
+			  if(90<inputString[i] && inputString[i]<97)
+				{
+				  inputCalloutLabel->Text="Can only contain letters!";
+				  inputCallout->Visible=true;
+				  checkInputImage->Visible=true;
+				  addRoleLabel->Visible=false;
+				  return;
+				}
+			}
+			else if(inputString[i]==32)
+				{
+					//do not allow to start with space
+					if(i==0)
+						{
+							inputCalloutLabel->Text="Cannot begin with a space!";
+							inputCallout->Visible=true;
+							checkInputImage->Visible=true;
+							addRoleLabel->Visible=false;
+							return;
+						}
+
+					//or end with a space
+					if(i==inputString.size()-1)
+					{
+					  inputCalloutLabel->Text="Cannot end with a space!";
+					  inputCallout->Visible=true;
+					  checkInputImage->Visible=true;
+					  addRoleLabel->Visible=false;
+							return;
+                    }
+
+					//make sure it's not a double space
+					if(inputString[i+1]==32)
+						{
+							inputCalloutLabel->Text="Cannot contain double space!";
+							inputCallout->Visible=true;
+							checkInputImage->Visible=true;
+							addRoleLabel->Visible=false;
+							return;
+                        }
+				}
+			else
+			{
+				inputCalloutLabel->Text="Can only contain letters!";
+				inputCallout->Visible=true;
+				checkInputImage->Visible=true;
+				addRoleLabel->Visible=false;
+				return;
+			}
+
+		}
+		//check wages input
+		inputString=AnsiString(roleWagesEdit->Text).c_str();
+		for (int i = 0; i < inputString.length(); i++)
+		{
+
+			//check to see if the character is 0-9 or a decimal
+			if(inputString[i]<48 || inputString[i]>57)
+			{
+				if(inputString[i]==46)
+				{
+					numDecimals++;
+					if(numDecimals>1)
+					{
+						roleWagesEdit->Text="";
+						addRoleLabel->Visible=false;
+						checkInputImage->Visible=true;
+						wagesCallout->Visible=true;
+						return;
+					}
+					if(inputString[i+1]<48 || inputString[i+1]>57)
+					{
+						roleWagesEdit->Text="";
+						addRoleLabel->Visible=false;
+						checkInputImage->Visible=true;
+						wagesCallout->Visible=true;
+						return;
+					}
+				}
+				else
+				{
+						roleWagesEdit->Text="";
+						addRoleLabel->Visible=false;
+						checkInputImage->Visible=true;
+						wagesCallout->Visible=true;
+						return;
+				}
+
+			}
+		}
+
+	//check to make sure one of the drop down choices have been selected
+	if(referencePopupBox->ItemIndex<0)
+	{
+		addRoleLabel->Visible=false;
+		checkInputImage->Visible=true;
+		selectCallout->Visible=true;
+		return;
+	}
+	else
+	{
+		//store info
+		roleReference = StringReplace(referencePopupBox->Items->operator [](referencePopupBox->ItemIndex), " ", "_", TReplaceFlags() << rfReplaceAll);
+	}
 
 	//get all existing role names and compare to name chosen
 	bool halt = false;
@@ -48,7 +182,7 @@ void __fastcall TForm6::saveChangesButtonClick(TObject *Sender)
 		if (SameText(StringReplace(roleName, " ", "_", TReplaceFlags() << rfReplaceAll), Form3->SQLQuery2->Fields->Fields[0]->AsString))
 			halt = true;
 
-        Form3->SQLQuery2->Next();
+		Form3->SQLQuery2->Next();
 	}
 
 	//check if name is already in db
@@ -100,9 +234,10 @@ void __fastcall TForm6::saveChangesButtonClick(TObject *Sender)
 	else
 	{
 		//display error message and stay at form
-		errorLabel->Text = "Error: the role " + roleName + " already exists. Please try again...";
-        errorLabel->Visible = true;
-    }
+		//errorLabel->Text = "Error: the role " + roleName + " already exists. Please try again...";
+		addRoleLabel->Visible=false;
+		errorLabel->Visible = true;
+	}
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm6::FormClose(TObject *Sender, TCloseAction &Action)
@@ -121,7 +256,12 @@ void __fastcall TForm6::homeImageButton6Click(TObject *Sender)
 	roleWagesEdit->Text = "";
 	referencePopupBox->Items->Clear();
 	referencePopupBox->ItemIndex = 0;
+	addRoleLabel->Visible=true;
 	errorLabel->Visible = false;
+	checkInputImage->Visible=false;
+	inputCallout->Visible=false;
+	 wagesCallout->Visible=false;
+	 selectCallout->Visible=false;
 }
 //---------------------------------------------------------------------------
 
@@ -154,6 +294,38 @@ void __fastcall TForm6::FormShow(TObject *Sender)
 	}
 	for (int i = 0; i < 7; ++i)
 		referencePopupBox->Items->Add(StringReplace(referenceVector[i], "_", " ", TReplaceFlags() << rfReplaceAll));
+	addRoleLabel->Visible=true;
 }
 //---------------------------------------------------------------------------
+
+void __fastcall TForm6::homeImageButton6MouseEnter(TObject *Sender)
+{
+swapImage->Bitmap=homeImageButton6->Bitmap;
+homeImageButton6->Bitmap=homeOverImage->Bitmap;
+homeShadow->Visible=true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm6::backImageButtonMouseEnter(TObject *Sender)
+{
+swapImage->Bitmap=backImageButton->Bitmap;
+backImageButton->Bitmap=backOverImage->Bitmap;
+backShadow->Visible=true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm6::backImageButtonMouseLeave(TObject *Sender)
+{
+backImageButton->Bitmap=swapImage->Bitmap;
+backShadow->Visible=false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm6::homeImageButton6MouseLeave(TObject *Sender)
+{
+homeImageButton6->Bitmap=swapImage->Bitmap;
+homeShadow->Visible=false;
+}
+//---------------------------------------------------------------------------
+
 

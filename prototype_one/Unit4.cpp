@@ -1495,6 +1495,9 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 	//otherwise display advanced read form (need to populate role vector also)
 	else
 	{
+		//hide a couple things
+		selectRolesImage->Visible=false;
+		arrowRoles->Visible=false;
 		//simply call populateGrid function passing in today's week and running as week type
 
 		//fill roleVector with all the roles currently possible
