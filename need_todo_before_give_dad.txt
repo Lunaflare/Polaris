@@ -1,4 +1,4 @@
-.change register button on login screen to go to different link (now goes to serial key generation page)
+
 .add 2014 excel data to input and read tables
 .format numbers in read the same way as in excel sheets (newest i.e. 2014)
 	-maybe round to similar number of decimal points also?
@@ -11,8 +11,8 @@
 	-also seems to be some other calculations that could do (total labor hours clean
 	one room, management, extra variance)
 	-just get rid of accounting and such and add budget to hotel ref and do one extra calculation
-.set up updater to send out most recent version in github?
-.set up installer
-.type check in add role and edit role forms
+.set up updater to send out most recent version in github - not plausible 
+
+
 .in read when press home and go back in, some of the animations for errors and labels do not seem to work the second time through
 .decide on a new format for to do lists cuz txt file rlly com on
