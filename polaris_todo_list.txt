@@ -1,4 +1,4 @@
-.change password web stuff should make sure the email address you give is linked to the user's account and not just in the db
+.change password web stuff should make sure the email address you give is linked to the user's account and not just in the db - this is already being done
 .make sure login form buttons go to correct links - ONLY "Register" needs changing
 .add 2014 excel data to input and read tables
 .Add button to remove a date?
@@ -17,11 +17,9 @@
 	-right now these calculations will not be correct because there is a hardcoded number for "accounting"
 .all buttons "stay clicked" when they have been clicked and then you return to the form where they were clicked
 	-may or may not be something to adjust for
-.type check in add role and edit role forms
 .fix read floating point error and instead show error message for user saying that there isn't any data for the query
 	-there is a place for cody to put in error messages (4 locations, 3 in first populateGrid, 1 in second populateGrid)
-.set up updater to send out most recent version in github?
-.set up installer
+.set up updater to send out most recent version in github -(in progress)
 .when add or edit role need to recalculate avg wages and such in hotel_ref
 .add ability to view labor standards from read
 .add ability to print grid from read
