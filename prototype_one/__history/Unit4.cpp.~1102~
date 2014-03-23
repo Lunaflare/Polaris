@@ -242,9 +242,12 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		select += (", SUM(" + hoursPaid + "), SUM(" + standardHours + "), SUM(" + percentPerformance + ")");
 
 		//populate column zero with role name headings
-		columnIndex = 10 + i * 4;
+		columnIndex = 11 + i * 4;
 		readGrid->Cells[0][columnIndex] = rVector[i];
 	}
+
+	//increase column index because added Rooms_Not_Cleaned
+    ++columnIndex;
 
 	//add more static items to column zero headings
 	String nonRoleHeadings[3] = {"Overtime Premium Cost", "Total Labor Hours", "Total Labor Cost"};
@@ -374,13 +377,13 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		Form3->SQLQuery2->First();
 
 		//start filling column 1
-		String firstColumnNoDayWeek[8] = {"Offset_Rooms_Occupied", "Occupancy_Percent", "AM_Rooms_Cleaned", "PM_Rooms_Cleaned", "Rooms_Sold", "Total_Rooms_Cleaned", "Guestroom_Carpets_Cleaned", "Documented_Inspections"};
-		for (int i = 0; i < 8; ++i)
+		String firstColumnNoDayWeek[9] = {"Offset_Rooms_Occupied", "Occupancy_Percent", "AM_Rooms_Cleaned", "PM_Rooms_Cleaned", "Rooms_Sold", "Total_Rooms_Cleaned", "Rooms_Not_Cleaned", "Guestroom_Carpets_Cleaned", "Documented_Inspections"};
+		for (int i = 0; i < 9; ++i)
 			readGrid->Cells[1][i] = StringReplace(firstColumnNoDayWeek[i], "_", " ", TReplaceFlags() << rfReplaceAll);
 
 		//continue filling column 1 with headings
 		String roleTypes[3] = {"Actual Hours", "Standard Hours", "% Performance"};
-		columnIndex = 9;
+		columnIndex = 10;
 		for (int i = 0; i < rVector.size(); ++i)
 		{
 			for (int j = 0; j < 3; ++j)
@@ -495,6 +498,11 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[4]->AsString;
 			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[5]->AsString;
 			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[6]->AsString;
+
+			//fill rooms not cleaned with value
+			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[3]->AsInteger - Form3->SQLQuery2->Fields->Fields[6]->AsInteger;
+
+			//fill with rest of non role type stuff
 			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[7]->AsString;
 			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[8]->AsString;
 
@@ -746,7 +754,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		double amRoomsCleanedTotal = 0;
 		double pmRoomsCleanedTotal = 0;
 		double offsetRoomsOccupiedTotal = 0;
-		for (columnIndex = 0; columnIndex < 8; ++columnIndex)
+		for (columnIndex = 0; columnIndex < 9; ++columnIndex)
 		{
 			for (int j = 2; j < 9; ++j)
 				totalCounter += toDouble(readGrid->Cells[j][columnIndex]);
@@ -856,13 +864,22 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 
 		//fill productivity for man minutes per room cleaned
 		if (readGrid->Cells[indexOn][columnIndex - 10] == 0)
+		{
 			readGrid->Cells[indexOn][columnIndex++] = 0;
+			numerator = 0;
+		}
 		else
 		{
 			if (totalRoomsCleanedTotal != 0)
+			{
+				numerator = toDouble(readGrid->Cells[indexOn][columnIndex-10]);
 				readGrid->Cells[indexOn][columnIndex++] = roundTwo((readGrid->Cells[indexOn][columnIndex-10] * 60) / totalRoomsCleanedTotal);
+			}
 			else
-	           	readGrid->Cells[indexOn][columnIndex++] = 0;
+			{
+				readGrid->Cells[indexOn][columnIndex++] = 0;
+				numerator = 0;
+			}
 		}
 		//fill productivity for rooms cleaned per AM gra
 		if (amRoomAttendantsTotal == 0)
@@ -917,19 +934,19 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 			readGrid->Cells[0][1] = blank + "$" + roundTwo(toDouble(readGrid->Cells[0][2]) - toDouble(readGrid->Cells[0][0])) + " Over/Under per rooom";
 		if (totalRoomsCleanedTotal < 0)
 		{
-			if (totalRoomsCleanedTotal != 0 && hoursVarianceOne > 0)
-				readGrid->Cells[0][3] = blank + roundTwo(hoursVarianceOne / (totalRoomsCleanedTotal * -1)) + " Total hours to clean room";
-			else if (totalRoomsCleanedTotal != 0 && hoursVarianceOne < 0)
-				readGrid->Cells[0][3] = blank + roundTwo(hoursVarianceOne / totalRoomsCleanedTotal) + " Total hours to clean room";
+			if (totalRoomsCleanedTotal != 0 && numerator > 0)
+				readGrid->Cells[0][3] = blank + roundTwo(numerator / (totalRoomsCleanedTotal * -1)) + " Total hours to clean room";
+			else if (totalRoomsCleanedTotal != 0 && numerator < 0)
+				readGrid->Cells[0][3] = blank + roundTwo(numerator / totalRoomsCleanedTotal) + " Total hours to clean room";
 			else
 				readGrid->Cells[0][3] = "$0 Total hours to clean room";
 		}
 		else
 		{
-			if (hoursVarianceOne < 0)
-				readGrid->Cells[0][3] = blank + roundTwo(hoursVarianceOne / (totalRoomsCleanedTotal * -1)) + " Total hours to clean room";
+			if (numerator < 0)
+				readGrid->Cells[0][3] = blank + roundTwo(numerator / (totalRoomsCleanedTotal * -1)) + " Total hours to clean room";
 			else
-				readGrid->Cells[0][3] = blank + roundTwo(hoursVarianceOne / totalRoomsCleanedTotal) + " Total hours to clean room";
+				readGrid->Cells[0][3] = blank + roundTwo(numerator / totalRoomsCleanedTotal) + " Total hours to clean room";
 		}
 
 		//make grid visible to user
@@ -1486,6 +1503,9 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 	//otherwise display advanced read form (need to populate role vector also)
 	else
 	{
+		//hide a couple things
+		selectRolesImage->Visible=false;
+		arrowRoles->Visible=false;
 		//simply call populateGrid function passing in today's week and running as week type
 
 		//fill roleVector with all the roles currently possible

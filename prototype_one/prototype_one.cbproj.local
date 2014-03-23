@@ -3,11 +3,11 @@
 	<Transactions>
     <Transaction>2013/10/10 11:05:45.000.767,=C:\Users\Alex\Documents\RAD Studio\Projects\Project1PCH1.h</Transaction>
     <Transaction>2013/10/10 11:05:47.000.570,=C:\Users\Alex\Documents\RAD Studio\Projects\Unit1.cpp</Transaction>
-    <Transaction>2013/10/10 11:26:20.000.974,C:\Users\Alex\Lunaflare\prototype.fmx=C:\Users\Alex\Documents\RAD Studio\Projects\Unit1.fmx</Transaction>
-    <Transaction>2013/10/10 11:26:20.000.974,C:\Users\Alex\Lunaflare\prototype.cpp=C:\Users\Alex\Documents\RAD Studio\Projects\Unit1.cpp</Transaction>
-    <Transaction>2013/10/10 11:26:20.000.974,C:\Users\Alex\Lunaflare\prototype.h=C:\Users\Alex\Documents\RAD Studio\Projects\Unit1.h</Transaction>
-    <Transaction>2013/10/10 11:27:17.000.380,C:\Users\Alex\Lunaflare\prototype_all.h=C:\Users\Alex\Documents\RAD Studio\Projects\Project1PCH1.h</Transaction>
-    <Transaction>2013/10/10 11:27:31.000.487,C:\Users\Alex\Lunaflare\prototype_one.cbproj=C:\Users\Alex\Documents\RAD Studio\Projects\Project1.cbproj</Transaction>
+    <Transaction>2013/10/10 11:26:20.000.974,C:\Users\Alex\Documents\RAD Studio\Projects\Unit1.cpp=C:\Users\Alex\Lunaflare\prototype.cpp</Transaction>
+    <Transaction>2013/10/10 11:26:20.000.974,C:\Users\Alex\Documents\RAD Studio\Projects\Unit1.h=C:\Users\Alex\Lunaflare\prototype.h</Transaction>
+    <Transaction>2013/10/10 11:26:20.000.974,C:\Users\Alex\Documents\RAD Studio\Projects\Unit1.fmx=C:\Users\Alex\Lunaflare\prototype.fmx</Transaction>
+    <Transaction>2013/10/10 11:27:17.000.380,C:\Users\Alex\Documents\RAD Studio\Projects\Project1PCH1.h=C:\Users\Alex\Lunaflare\prototype_all.h</Transaction>
+    <Transaction>2013/10/10 11:27:31.000.487,C:\Users\Alex\Documents\RAD Studio\Projects\Project1.cbproj=C:\Users\Alex\Lunaflare\prototype_one.cbproj</Transaction>
     <Transaction>2014/01/26 21:40:42.000.491,=C:\Users\Alex\Documents\GitHub\Polaris\prototype_one\Unit2.cpp</Transaction>
     <Transaction>2014/01/29 12:45:05.000.203,=C:\Users\Alex\Documents\GitHub\Polaris\prototype_one\Unit3.cpp</Transaction>
     <Transaction>2014/01/29 14:05:22.000.653,=C:\Users\Alex\Documents\GitHub\Polaris\prototype_one\Unit4.cpp</Transaction>
