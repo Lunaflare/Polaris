@@ -356,6 +356,7 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 				editedHeading = StringReplace(originalHeading, "_", " ",
 					TReplaceFlags() << rfReplaceAll);
 				dbFieldLabel->Text = editedHeading;
+				inputLabelImage->Visible=true;
 				dbFieldLabel->Visible = true;
 				dbFieldEdit->Visible = true;
 				dbFieldEdit->Text = "";
@@ -873,6 +874,7 @@ void __fastcall TForm3::chooseDateImageButtonClick(TObject *Sender)
 		else
 		{
 			//hide/show uneccessary/necessary items from this page
+
 			dbFieldLabel->Visible = true;
 			dbFieldEdit->Visible = true;
 			nextImageButton->Visible = true;
