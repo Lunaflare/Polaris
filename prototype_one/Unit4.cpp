@@ -246,9 +246,6 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		readGrid->Cells[0][columnIndex] = rVector[i];
 	}
 
-	//increase column index because added Rooms_Not_Cleaned
-    ++columnIndex;
-
 	//add more static items to column zero headings
 	String nonRoleHeadings[3] = {"Overtime Premium Cost", "Total Labor Hours", "Total Labor Cost"};
 	for (int i = 0; i < 3; ++i)
@@ -1035,7 +1032,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 		select += (", " + hoursPaid + ", " + standardHours + ", " + percentPerformance);
 
 		//populate column zero with role name headings
-		columnIndex = 11 + i * 4;
+		columnIndex = 12 + i * 4;
 		readGrid->Cells[0][columnIndex] = rVector[i];
 	}
 
@@ -1083,13 +1080,13 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 		Form3->SQLQuery2->First();
 
 		//start filling column 1
-		String firstColumnNoDayWeek[9] = {"Date", "Offset_Rooms_Occupied", "Occupancy_Percent", "AM_Rooms_Cleaned", "PM_Rooms_Cleaned", "Rooms_Sold", "Total_Rooms_Cleaned", "Guestroom_Carpets_Cleaned", "Documented_Inspections"};
-		for (int i = 0; i < 9; ++i)
+		String firstColumnNoDayWeek[10] = {"Date", "Offset_Rooms_Occupied", "Occupancy_Percent", "AM_Rooms_Cleaned", "PM_Rooms_Cleaned", "Rooms_Sold", "Total_Rooms_Cleaned", "Rooms_Not_Cleaned", "Guestroom_Carpets_Cleaned", "Documented_Inspections"};
+		for (int i = 0; i < 10; ++i)
 			readGrid->Cells[1][i] = StringReplace(firstColumnNoDayWeek[i], "_", " ", TReplaceFlags() << rfReplaceAll);
 
 		//continue filling column 1 with headings
 		String roleTypes[3] = {"Actual Hours", "Standard Hours", "% Performance"};
-		columnIndex = 10;
+		columnIndex = 11;
 		for (int i = 0; i < rVector.size(); ++i)
 		{
 			for (int j = 0; j < 3; ++j)
@@ -1173,6 +1170,11 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[4]->AsString;
 			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[5]->AsString;
 			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[6]->AsString;
+
+			//fill Rooms Not Cleaned
+			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[2]->AsInteger - Form3->SQLQuery2->Fields->Fields[6]->AsInteger;
+
+			//fill with rest of non role type stuff
 			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[7]->AsString;
 			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[8]->AsString;
 
@@ -1658,7 +1660,7 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	filterStartCalendar->Date = Now();
 	filterEndCalendar->Date = Now();
 
-	//clear readGrid and set rowCount back to bare minimum (19)
+	//clear readGrid and set rowCount back to bare minimum (20)
 	for (int i = 0; i < 10; ++i)
 	{
 		if (i != 1)
@@ -1667,7 +1669,7 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 		for (int j = 0; j < readGrid->RowCount; ++j)
 			readGrid->Cells[i][j] = "";
 	}
-	readGrid->RowCount = 19;
+	readGrid->RowCount = 20;
 }
 
 //---------------------------------------------------------------------------
@@ -2222,7 +2224,7 @@ void __fastcall TForm4::chooseButtonCode()
 	String dbDayChosenStart = "";
 	String dbDayChosenEnd = "";
 
-	//clear readGrid and set rowCount back to bare minimum (19) and make invisible
+	//clear readGrid and set rowCount back to bare minimum (20) and make invisible
 	readGrid->Visible = false;
 	for (int i = 0; i < 10; ++i)
 	{
@@ -2232,7 +2234,7 @@ void __fastcall TForm4::chooseButtonCode()
 		for (int j = 0; j < readGrid->RowCount; ++j)
 			readGrid->Cells[i][j] = "";
 	}
-	readGrid->RowCount = 19;
+	readGrid->RowCount = 20;
 
 	//check which radio was selected
 	if (dayRadio->IsChecked)

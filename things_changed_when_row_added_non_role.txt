@@ -1,0 +1,6 @@
+(For day only)
+.grid row count
+.add one to column index in construct select query near top
+.add item to firstColumnNoDayWeek string array
+.add one to column index near here
+.change bare minimum row count accordingly
