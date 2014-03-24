@@ -42,7 +42,6 @@ class TForm4 : public TForm
 __published:	// IDE-managed Components
 	TStyleBook *StyleBook2;
 	TImage *homeImageButton4;
-	TLabel *homeLabel4;
 	TImage *nextImageButton2;
 	TLabel *filtersLabel;
 	TImage *backImageButton2;
@@ -88,7 +87,6 @@ __published:	// IDE-managed Components
 	TFloatAnimation *FloatAnimation5;
 	TFloatAnimation *FloatAnimation6;
 	TFloatAnimation *FloatAnimation7;
-	TLabel *chooseOneLabel;
 	TImage *selectRolesImage;
 	TImage *arrowRoles;
 	TFloatAnimation *FloatAnimation8;
@@ -116,6 +114,37 @@ __published:	// IDE-managed Components
 	TImage *arrowRange;
 	TFloatAnimation *FloatAnimation20;
 	TFloatAnimation *FloatAnimation21;
+	TImage *backLabel;
+	TImage *backShadow;
+	TFloatAnimation *FloatAnimation24;
+	TFloatAnimation *FloatAnimation25;
+	TFloatAnimation *FloatAnimation26;
+	TImage *swapImage;
+	TFloatAnimation *FloatAnimation22;
+	TFloatAnimation *FloatAnimation23;
+	TImage *nextShadow;
+	TImage *nextLabelImage;
+	TImage *homeLabel;
+	TImage *homeShadow;
+	TFloatAnimation *FloatAnimation27;
+	TFloatAnimation *FloatAnimation28;
+	TImage *arrowYear;
+	TFloatAnimation *FloatAnimation29;
+	TImage *printButtonImage;
+	TImage *printImageOver;
+	TFloatAnimation *FloatAnimation30;
+	TFloatAnimation *FloatAnimation31;
+	TImage *printLabelImage;
+	TImage *printShadow;
+	TImage *viewButtonImage;
+	TImage *viewImageOver;
+	TImage *viewShadow;
+	TImage *viewLabel;
+	TFloatAnimation *FloatAnimation32;
+	TFloatAnimation *FloatAnimation33;
+	TImage *errorLabelImage;
+	TFloatAnimation *FloatAnimation34;
+	TLabel *errorLabel;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton4Click(TObject *Sender);
@@ -129,6 +158,16 @@ __published:	// IDE-managed Components
 	void __fastcall monthRadioClick(TObject *Sender);
 	void __fastcall yearRadioClick(TObject *Sender);
 	void __fastcall updateImageButtonClick(TObject *Sender);
+	void __fastcall backImageButton2MouseEnter(TObject *Sender);
+	void __fastcall backImageButton2MouseLeave(TObject *Sender);
+	void __fastcall nextImageButton2MouseEnter(TObject *Sender);
+	void __fastcall nextImageButton2MouseLeave(TObject *Sender);
+	void __fastcall homeImageButton4MouseEnter(TObject *Sender);
+	void __fastcall homeImageButton4MouseLeave(TObject *Sender);
+	void __fastcall printButtonImageMouseEnter(TObject *Sender);
+	void __fastcall printButtonImageMouseLeave(TObject *Sender);
+	void __fastcall viewButtonImageMouseEnter(TObject *Sender);
+	void __fastcall viewButtonImageMouseLeave(TObject *Sender);
 	//was private
 	public:	// User declarations
 	String inputTable;
@@ -139,6 +178,9 @@ __published:	// IDE-managed Components
 	String viewType;
 	String privateDayChosenStart;
 	String privateDayChosenEnd;
+	String privateDayChosenStartFull;
+	String privateDayChosenEndFull;
+	String privateDBDayChosen;
 	bool secondTimeArbitrary;
 	int selectAllButtonX;
 	int selectAllButtonY;

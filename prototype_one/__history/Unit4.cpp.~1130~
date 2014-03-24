@@ -246,9 +246,6 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		readGrid->Cells[0][columnIndex] = rVector[i];
 	}
 
-	//increase column index because added Rooms_Not_Cleaned
-    ++columnIndex;
-
 	//add more static items to column zero headings
 	String nonRoleHeadings[3] = {"Overtime Premium Cost", "Total Labor Hours", "Total Labor Cost"};
 	for (int i = 0; i < 3; ++i)
@@ -452,20 +449,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		while (!Form3->SQLQuery2->Eof)
 		{
 			//set indexOn so that week days appear in correct order (may need to do something in case a specific week day is not returned)
-			if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
-				indexOn = 2;
-			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
-				indexOn = 3;
-			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
-				indexOn = 4;
-			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
-				indexOn = 5;
-			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
-				indexOn = 6;
-			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
-				indexOn = 7;
-			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Friday"))
-				indexOn = 8;
+			indexOn = setIndexOn(Form1->getWeekStartDay());
 
 			//populate the header for this column with the day of the week
 			readGrid->ColumnByIndex(indexOn)->Header = Form3->SQLQuery2->Fields->Fields[1]->AsString;
@@ -1559,9 +1543,15 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		String dbDayChosenEnd = "";
 
 		//get the week selected by the day selected from the calendar
-		while (DayOfWeek(dayChosenStart) != 7)
+		int startDay = Form1->getWeekStartDay();
+		int endDay;
+		if (startDay - 1 == 0)
+			endDay = 7;
+		else
+			endDay = startDay - 1;
+		while (DayOfWeek(dayChosenStart) != startDay)
 			dayChosenStart--;
-		while (DayOfWeek(dayChosenEnd) != 6)
+		while (DayOfWeek(dayChosenEnd) != endDay)
 			dayChosenEnd++;
 
 		//convert to strings to pass into populateGrid function
@@ -1663,7 +1653,7 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	filterStartCalendar->Date = Now();
 	filterEndCalendar->Date = Now();
 
-	//clear readGrid and set rowCount back to bare minimum (19)
+	//clear readGrid and set rowCount back to bare minimum (20)
 	for (int i = 0; i < 10; ++i)
 	{
 		if (i != 1)
@@ -1862,9 +1852,15 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				TDateTime dayChosenEnd = dayCalendar->Date;
 
 				//get the week selected by the day selected from the calendar
-				while (DayOfWeek(dayChosenStart) != 7)
+				int startDay = Form1->getWeekStartDay();
+				int endDay;
+				if (startDay - 1 == 0)
+					endDay = 7;
+				else
+					endDay = startDay - 1;
+				while (DayOfWeek(dayChosenStart) != startDay)
 					dayChosenStart--;
-				while (DayOfWeek(dayChosenEnd) != 6)
+				while (DayOfWeek(dayChosenEnd) != endDay)
 					dayChosenEnd++;
 
 				//convert to strings to pass into populateGrid function
@@ -2227,7 +2223,7 @@ void __fastcall TForm4::chooseButtonCode()
 	String dbDayChosenStart = "";
 	String dbDayChosenEnd = "";
 
-	//clear readGrid and set rowCount back to bare minimum (19) and make invisible
+	//clear readGrid and set rowCount back to bare minimum (20) and make invisible
 	readGrid->Visible = false;
 	for (int i = 0; i < 10; ++i)
 	{
@@ -2237,7 +2233,7 @@ void __fastcall TForm4::chooseButtonCode()
 		for (int j = 0; j < readGrid->RowCount; ++j)
 			readGrid->Cells[i][j] = "";
 	}
-	readGrid->RowCount = 19;
+	readGrid->RowCount = 20;
 
 	//check which radio was selected
 	if (dayRadio->IsChecked)
@@ -2256,9 +2252,15 @@ void __fastcall TForm4::chooseButtonCode()
 		TDateTime dayChosenEnd = dayCalendar->Date;
 
 		//get the week selected by the day selected from the calendar
-		while (DayOfWeek(dayChosenStart) != 7)
+		int startDay = Form1->getWeekStartDay();
+		int endDay;
+		if (startDay - 1 == 0)
+			endDay = 7;
+		else
+			endDay = startDay - 1;
+		while (DayOfWeek(dayChosenStart) != startDay)
 			dayChosenStart--;
-		while (DayOfWeek(dayChosenEnd) != 6)
+		while (DayOfWeek(dayChosenEnd) != endDay)
 			dayChosenEnd++;
 
 		//convert to strings to pass into populateGrid function
@@ -2451,3 +2453,20 @@ viewLabel->Visible=false;
 }
 //---------------------------------------------------------------------------
 
+int __fastcall TForm4::setIndexOn(int startDay)
+{
+	if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
+		return 2;
+	else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
+		return 3;
+	else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
+		return 4;
+	else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
+		return 5;
+	else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
+		return 6;
+	else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
+		return 7;
+	else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Friday"))
+		return 8;
+}

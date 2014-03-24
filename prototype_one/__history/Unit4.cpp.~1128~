@@ -190,9 +190,6 @@ double __fastcall TForm4::toDouble(String gridString)
 //populate grid for when viewing by month, week, year, or arbitrary date range
 void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, String rangeStart, String rangeEnd, String type)
 {
-	//see if budget has been entered for this month
-
-
 	//hide columns that will not be used
 	for (int i = readGrid->ColumnCount - 1; i > 2; --i)
 		readGrid->ColumnByIndex(i)->Visible = true;
@@ -452,6 +449,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		while (!Form3->SQLQuery2->Eof)
 		{
 			//set indexOn so that week days appear in correct order (may need to do something in case a specific week day is not returned)
+            indexOn = setIndexOn(Form1->getWeekStartDay());
 			if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
 				indexOn = 2;
 			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
@@ -1559,9 +1557,15 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 		String dbDayChosenEnd = "";
 
 		//get the week selected by the day selected from the calendar
-		while (DayOfWeek(dayChosenStart) != 7)
+		int startDay = Form1->getWeekStartDay();
+		int endDay;
+		if (startDay - 1 == 0)
+			endDay = 7;
+		else
+			endDay = startDay - 1;
+		while (DayOfWeek(dayChosenStart) != startDay)
 			dayChosenStart--;
-		while (DayOfWeek(dayChosenEnd) != 6)
+		while (DayOfWeek(dayChosenEnd) != endDay)
 			dayChosenEnd++;
 
 		//convert to strings to pass into populateGrid function
@@ -1862,9 +1866,15 @@ void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 				TDateTime dayChosenEnd = dayCalendar->Date;
 
 				//get the week selected by the day selected from the calendar
-				while (DayOfWeek(dayChosenStart) != 7)
+				int startDay = Form1->getWeekStartDay();
+				int endDay;
+				if (startDay - 1 == 0)
+					endDay = 7;
+				else
+					endDay = startDay - 1;
+				while (DayOfWeek(dayChosenStart) != startDay)
 					dayChosenStart--;
-				while (DayOfWeek(dayChosenEnd) != 6)
+				while (DayOfWeek(dayChosenEnd) != endDay)
 					dayChosenEnd++;
 
 				//convert to strings to pass into populateGrid function
@@ -2256,9 +2266,15 @@ void __fastcall TForm4::chooseButtonCode()
 		TDateTime dayChosenEnd = dayCalendar->Date;
 
 		//get the week selected by the day selected from the calendar
-		while (DayOfWeek(dayChosenStart) != 7)
+		int startDay = Form1->getWeekStartDay();
+		int endDay;
+		if (startDay - 1 == 0)
+			endDay = 7;
+		else
+			endDay = startDay - 1;
+		while (DayOfWeek(dayChosenStart) != startDay)
 			dayChosenStart--;
-		while (DayOfWeek(dayChosenEnd) != 6)
+		while (DayOfWeek(dayChosenEnd) != endDay)
 			dayChosenEnd++;
 
 		//convert to strings to pass into populateGrid function
@@ -2451,3 +2467,7 @@ viewLabel->Visible=false;
 }
 //---------------------------------------------------------------------------
 
+int __fastcall TForm4::setIndexOn(int startDay)
+{
+
+}

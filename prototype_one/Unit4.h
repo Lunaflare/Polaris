@@ -210,6 +210,7 @@ public:		// User declarations
 	void __fastcall TForm4::ThreadTerminated(TObject *Sender);
 	void __fastcall chooseButtonCode();
 	void __fastcall radioButtons(bool which);
+	int __fastcall setIndexOn(int startDay);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm4 *Form4;
