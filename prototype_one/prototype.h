@@ -56,6 +56,7 @@ private:	// User declarations
 	String accessLevel;
 	String userID;
 	String hotelID;
+	int weekStartDay;
 public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);
 	String getUsername() { return username; }
@@ -69,6 +70,8 @@ public:		// User declarations
     void setInputLevel(String i) { inputLevel = i; }
 	String getUserID() { return userID; }
 	String getHotelID() { return hotelID; }
+	void setWeekStartDay(int w) { weekStartDay = w; }
+	int getWeekStartDay() { return weekStartDay; }
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm1 *Form1;

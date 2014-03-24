@@ -64,6 +64,7 @@ void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 		accessLevel = SQLQuery1->Fields->Fields[4]->AsString;
 		userID = SQLQuery1->Fields->Fields[0]->AsString;
 		hotelID = SQLQuery1->Fields->Fields[7]->AsString;
+		weekStartDay = SQLQuery1->Fields->Fields[10]->AsInteger;
 
 		//if rememberMe is set, update registry entry
 		TRegistry* reg = new TRegistry(KEY_READ);

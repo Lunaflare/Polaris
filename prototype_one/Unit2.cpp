@@ -8,6 +8,7 @@
 #include "Unit3.h"
 #include "Unit4.h"
 #include "Unit5.h"
+#include "windows.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.fmx"

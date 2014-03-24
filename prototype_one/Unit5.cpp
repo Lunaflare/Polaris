@@ -25,13 +25,28 @@ void __fastcall TForm5::FormShow(TObject *Sender)
 	Form2->Hide();
 
 	//if admin, show the edit DLR button
-	if (Form1->getAccessLevel() == 2)
+	if (Form1->getAccessLevel() > 0)
+	{
+		//superuser privileges at least
+		if (Form1->getAccessLevel() >= 1)
+		{
+			//set popup box index to current choice in db
+			int weekStart = Form1->getWeekStartDay();
+			weekStartDayPopupBox->ItemIndex = weekStart - 1;
+			weekStartDayPopupBox->Text = weekStartDayPopupBox->Items->operator [](weekStartDayPopupBox->ItemIndex);
+			weekStartDayLabel->Visible = true;
+			weekStartDayPopupBox->Visible = true;
+		}
+
+		//admin privileges
+		if (Form1->getAccessLevel() == 2)
 		{
 			editRoleButton->Visible = true;
 			addRoleButton->Visible = true;
 			sep2Image->Visible=true;
 			adminLabel->Visible=true;
 		}
+	}
 
 	//change radio buttons (input and read) to represent current database values
 	if (Form1->getInputLevel() == 0)
@@ -119,6 +134,7 @@ void __fastcall TForm5::saveChangesButtonClick(TObject *Sender)
 				String currentInputLevel;
 				String currentReadLevel;
 				String newPassword = passwordChangeEdit->Text;
+				int newWeekStart = weekStartDayPopupBox->ItemIndex + 1;
 				if (inputDefaultRadio->IsChecked)
 					currentInputLevel = "0";
 				else
@@ -129,7 +145,7 @@ void __fastcall TForm5::saveChangesButtonClick(TObject *Sender)
 					currentReadLevel = "1";
 
 				//query database and change input and read levels appropriately
-				Form1->SQLQuery1->SQL->Text="UPDATE baldwins_beta.user_info SET preference_read='"+currentReadLevel+"', password=md5('"+newPassword+"'), preference_write='"+currentInputLevel+"' WHERE user_info.userID='"+Form1->getUserID()+"';";
+				Form1->SQLQuery1->SQL->Text="UPDATE baldwins_beta.user_info SET preference_read='"+currentReadLevel+"', Week_Start_Day='"+newWeekStart+"', password=md5('"+newPassword+"'), preference_write='"+currentInputLevel+"' WHERE user_info.userID='"+Form1->getUserID()+"';";
 				Form1->SQLQuery1->ExecSQL();
 				Form1->SQLQuery1->SQL->Text="UPDATE baldwins_mant541.mantis_user_table SET password=md5('"+newPassword+"') WHERE mantis_user_table.username='"+Form1->getUsername()+"'";
 				Form1->SQLQuery1->ExecSQL();
@@ -138,6 +154,7 @@ void __fastcall TForm5::saveChangesButtonClick(TObject *Sender)
 				Form1->setReadLevel(currentReadLevel);
 				Form1->setInputLevel(currentInputLevel);
 				Form1->setPassword(newPassword);
+				Form1->setWeekStartDay(newWeekStart);
 
                 //erase data from password edit boxes
 				passwordChangeEdit->Text = "";
@@ -158,6 +175,7 @@ void __fastcall TForm5::saveChangesButtonClick(TObject *Sender)
 		//set input and read levels appropriately based on status upon home button click
 		String currentInputLevel;
 		String currentReadLevel;
+		int newWeekStart = weekStartDayPopupBox->ItemIndex + 1;
 		if (inputDefaultRadio->IsChecked)
 			currentInputLevel = "0";
 		else
@@ -168,12 +186,13 @@ void __fastcall TForm5::saveChangesButtonClick(TObject *Sender)
 			currentReadLevel = "1";
 
 		//query database and change input and read levels appropriately
-		Form1->SQLQuery1->SQL->Text="UPDATE baldwins_beta.user_info SET preference_read='"+currentReadLevel+"', preference_write='"+currentInputLevel+"' WHERE user_info.userID='"+Form1->getUserID()+"';";
+		Form1->SQLQuery1->SQL->Text="UPDATE baldwins_beta.user_info SET preference_read='"+currentReadLevel+"', Week_Start_Day='"+newWeekStart+"', preference_write='"+currentInputLevel+"' WHERE user_info.userID='"+Form1->getUserID()+"';";
 		Form1->SQLQuery1->ExecSQL();
 
 		//set read and input levels appropriately given the desired changes (so populated upon return to this form)
 		Form1->setReadLevel(currentReadLevel);
 		Form1->setInputLevel(currentInputLevel);
+		Form1->setWeekStartDay(newWeekStart);
 
         //erase data from password edit boxes
 		passwordChangeEdit->Text = "";

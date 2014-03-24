@@ -1,4 +1,4 @@
-(For day only)
+(For day only, may or may not be the same for others besides day)
 .grid row count
 .add one to column index in construct select query near top
 .add item to firstColumnNoDayWeek string array

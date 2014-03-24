@@ -9,6 +9,7 @@
 #include <FMX.Objects.hpp>
 #include <FMX.Types.hpp>
 #include <System.Classes.hpp>
+#include <FMX.Menus.hpp>
 //---------------------------------------------------------------------------
 #include <string>
 #include <System.Classes.hpp>
@@ -58,6 +59,8 @@ __published:	// IDE-managed Components
 	TImage *homeLabelImage;
 	TLabel *copyrightLabel;
 	TButton *addRoleButton;
+	TPopupBox *weekStartDayPopupBox;
+	TLabel *weekStartDayLabel;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton5Click(TObject *Sender);
