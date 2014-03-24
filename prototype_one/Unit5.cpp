@@ -36,6 +36,7 @@ void __fastcall TForm5::FormShow(TObject *Sender)
 			weekStartDayPopupBox->Text = weekStartDayPopupBox->Items->operator [](weekStartDayPopupBox->ItemIndex);
 			weekStartDayLabel->Visible = true;
 			weekStartDayPopupBox->Visible = true;
+			sep2Image->Visible=true;
 		}
 
 		//admin privileges
@@ -43,7 +44,6 @@ void __fastcall TForm5::FormShow(TObject *Sender)
 		{
 			editRoleButton->Visible = true;
 			addRoleButton->Visible = true;
-			sep2Image->Visible=true;
 			adminLabel->Visible=true;
 		}
 	}
