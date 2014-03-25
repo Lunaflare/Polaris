@@ -449,21 +449,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		while (!Form3->SQLQuery2->Eof)
 		{
 			//set indexOn so that week days appear in correct order (may need to do something in case a specific week day is not returned)
-            indexOn = setIndexOn(Form1->getWeekStartDay());
-			if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
-				indexOn = 2;
-			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
-				indexOn = 3;
-			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
-				indexOn = 4;
-			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
-				indexOn = 5;
-			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
-				indexOn = 6;
-			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
-				indexOn = 7;
-			else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Friday"))
-				indexOn = 8;
+			indexOn = setIndexOn(Form1->getWeekStartDay());
 
 			//populate the header for this column with the day of the week
 			readGrid->ColumnByIndex(indexOn)->Header = Form3->SQLQuery2->Fields->Fields[1]->AsString;
@@ -1522,7 +1508,7 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 			bareRole = Form3->SQLQuery2->Fields->Fields[0]->AsString;
 			bareRoleFormatted = StringReplace(bareRole, "_", " ", TReplaceFlags() << rfReplaceAll);
 			roleListBox->Items->Add(bareRoleFormatted);
-			roleVector.push_back(Form3->SQLQuery2->Fields->Fields[0]->AsString);
+			roleVector.push_back(bareRoleFormatted);
 			Form3->SQLQuery2->Next();
 		}
 
@@ -2469,5 +2455,123 @@ viewLabel->Visible=false;
 
 int __fastcall TForm4::setIndexOn(int startDay)
 {
-
+	if (startDay == 7)
+	{
+		if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
+			return 2;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
+			return 3;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
+			return 4;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
+			return 5;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
+			return 6;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
+			return 7;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Friday"))
+			return 8;
+	}
+	else if (startDay == 1)
+	{
+		if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
+			return 2;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
+			return 3;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
+			return 4;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
+			return 5;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
+			return 6;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Friday"))
+			return 7;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
+			return 8;
+	}
+	else if (startDay == 2)
+	{
+		if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
+			return 2;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
+			return 3;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
+			return 4;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
+			return 5;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Friday"))
+			return 6;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
+			return 7;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
+			return 8;
+	}
+	else if (startDay == 3)
+	{
+		if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
+			return 2;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
+			return 3;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
+			return 4;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Friday"))
+			return 5;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
+			return 6;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
+			return 7;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
+			return 8;
+	}
+	else if (startDay == 4)
+	{
+		if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
+			return 2;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
+			return 3;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Friday"))
+			return 4;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
+			return 5;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
+			return 6;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
+			return 7;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
+			return 8;
+	}
+	else if (startDay == 5)
+	{
+		if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
+			return 2;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Friday"))
+			return 3;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
+			return 4;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
+			return 5;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
+			return 6;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
+			return 7;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
+			return 8;
+	}
+	else if (startDay == 6)
+	{
+		if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Friday"))
+			return 2;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
+			return 3;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
+			return 4;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
+			return 5;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
+			return 6;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
+			return 7;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
+			return 8;
+	}
 }

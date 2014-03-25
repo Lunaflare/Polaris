@@ -568,7 +568,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 							//readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
 						}
 						else
-							readGrid->Cells[indexOn][columnIndex++] = nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+							readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
 					}
 					else
 					{
@@ -606,7 +606,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 
 			//fill in all productivity things for each iteration of cursor
 			readGrid->Cells[indexOn][columnIndex++] = nearestDollar(hoursVarianceOne - hoursVarianceTwo);
-			readGrid->Cells[indexOn][columnIndex++] = nearestDollar(costVarianceOne - costVarianceTwo);
+			readGrid->Cells[indexOn][columnIndex++] = blank + "$" + commas(IntToStr(nearestDollar(costVarianceOne - costVarianceTwo)));
 			if (totalRoomsCleanedSingleInstance == 0)
 				readGrid->Cells[indexOn][columnIndex++] = 0;
 			else
