@@ -160,6 +160,8 @@ String __fastcall TForm4::commas(string num)
 {
 	string temp;
 	int endstring = num.length(), i;
+	if(endstring <= 4)
+		return String(num.c_str());
 	for( i = endstring - 3; i >= 0; i -= 3)
 	{
 		if (i > 0)
@@ -176,7 +178,7 @@ String __fastcall TForm4::commas(string num)
 		temp = num.substr(0, 3+i) + temp;
 	}
 
-    return String(temp.c_str());
+	return String(temp.c_str());
 }
 
 double __fastcall TForm4::toDouble(String gridString)
@@ -838,7 +840,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		if (readGrid->Cells[indexOn][columnIndex - 8] == 0)
 			readGrid->Cells[indexOn][columnIndex++] = 0;
 		else
-			readGrid->Cells[indexOn][columnIndex++] = readGrid->Cells[indexOn][columnIndex-8] - readGrid->Cells[indexOn][columnIndex-7];
+			readGrid->Cells[indexOn][columnIndex++] = roundTwo(readGrid->Cells[indexOn][columnIndex-8] - readGrid->Cells[indexOn][columnIndex-7]);
 
 		//fill productivity for cost variance
 		if (readGrid->Cells[indexOn][columnIndex - 8] == 0)
