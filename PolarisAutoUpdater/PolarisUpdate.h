@@ -27,7 +27,7 @@ __published:	// IDE-managed Components
 	TTimer *exitTimer;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall exitTimerTimer(TObject *Sender);
-	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
+	void __fastcall FormCloseQuery(TObject *Sender, bool &CanClose);
 private:	// User declarations
 public:		// User declarations
 	void __fastcall checkFiles();

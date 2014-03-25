@@ -125,6 +125,7 @@ Form5->statusLabel->Text="Checking Files ...";
 			else
 			   {
 				Form5->statusLabel->Text="Encountered an error ";
+				ShowMessage(GetLastError());
 				//outfile<<" ERROR! \n";
 				//Form5->exitTimer->Enabled=true;
 				return;
@@ -139,7 +140,9 @@ Form5->statusLabel->Text="Checking Files ...";
 if(needsRegistering)
 {
 	statusLabel->Text="registering midas.dll ...";
-	ShellExecute(NULL, NULL, L"regsvr32",L"midas.dll",NULL,SW_HIDE);
+   // OLD WAY	ShellExecute(NULL, NULL, L"regsvr32",L"midas.dll",NULL,SW_HIDE);
+	ShellExecute(NULL,L"open",L"rundll32.exe", L"midas.dll, DllRegisterServer",NULL,SW_HIDE);
+	// DEBUGGING ShowMessage(GetLastError());
 }
   statusLabel->Text="Update complete!";
  progressBar->Value=100;
@@ -170,7 +173,7 @@ progressBar->Value+=20;
 		filePath,
 		0,      // Reserved. Must be set to 0.
 		NULL ); // status callback interface (not needed for basic use)
-	if(SUCCEEDED(hr))
+	if(hr==0)
 	{
 	 int Continue=0;
 	}
@@ -191,15 +194,16 @@ void __fastcall TForm5::exitTimerTimer(TObject *Sender)
 Form5->Close();
 }
 //---------------------------------------------------------------------------
-void __fastcall TForm5::FormClose(TObject *Sender, TCloseAction &Action)
-{
-ShellExecute(NULL, NULL, L"Polaris.exe", NULL, NULL, SW_SHOW);
-}
-
 bool fexists(const char *filename)
 {
   ifstream ifile(filename);
   return ifile;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm5::FormCloseQuery(TObject *Sender, bool &CanClose)
+{
+ShellExecute(NULL, NULL, L"Polaris.exe", NULL, NULL, SW_SHOW);
 }
 //---------------------------------------------------------------------------
 
