@@ -45,9 +45,9 @@ void __fastcall TForm5::checkFiles()
 Form5->statusLabel->Text="Checking Files ...";
 
  ifstream myfile;
- ofstream outfile;
+ //ofstream outfile;
   myfile.open ("update.list");
-	outfile.open("results.txt");
+  //outfile.open("results.txt");
 
   string temp="";
   string completeURL="";
@@ -63,7 +63,7 @@ Form5->statusLabel->Text="Checking Files ...";
 	myfile>>temp;
 	myfile>>lastChange;
 
-	outfile<<temp<<" "<<lastChange;
+	//outfile<<temp<<" "<<lastChange;
 
 	//This method checks file size differences!
 	FILE * pFile;
@@ -117,7 +117,7 @@ Form5->statusLabel->Text="Checking Files ...";
 			filePath2,
 			0,      // Reserved. Must be set to 0.
 			NULL ); // status callback interface (not needed for basic use)
-			if(SUCCEEDED(hr))
+			if(hr==0)
 			{
 				Form5->progressBar->Value+=10;
 				//outfile<<tmModifiedTime->tm_sec<<" Success! \n";
@@ -134,7 +134,7 @@ Form5->statusLabel->Text="Checking Files ...";
 	   }
   }
   myfile.close();
-  outfile.close();
+  //outfile.close();
   //register
 if(needsRegistering)
 {
