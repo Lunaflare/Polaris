@@ -160,6 +160,8 @@ String __fastcall TForm4::commas(string num)
 {
 	string temp;
 	int endstring = num.length(), i;
+	if(endstring <= 4)
+		return String(num.c_str());
 	for( i = endstring - 3; i >= 0; i -= 3)
 	{
 		if (i > 0)
@@ -176,7 +178,7 @@ String __fastcall TForm4::commas(string num)
 		temp = num.substr(0, 3+i) + temp;
 	}
 
-    return String(temp.c_str());
+	return String(temp.c_str());
 }
 
 double __fastcall TForm4::toDouble(String gridString)
@@ -568,7 +570,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 							//readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
 						}
 						else
-							readGrid->Cells[indexOn][columnIndex++] = nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
+							readGrid->Cells[indexOn][columnIndex++] = roundTwo(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
 					}
 					else
 					{
@@ -606,7 +608,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 
 			//fill in all productivity things for each iteration of cursor
 			readGrid->Cells[indexOn][columnIndex++] = nearestDollar(hoursVarianceOne - hoursVarianceTwo);
-			readGrid->Cells[indexOn][columnIndex++] = nearestDollar(costVarianceOne - costVarianceTwo);
+			readGrid->Cells[indexOn][columnIndex++] = blank + "$" + commas(IntToStr(nearestDollar(costVarianceOne - costVarianceTwo)));
 			if (totalRoomsCleanedSingleInstance == 0)
 				readGrid->Cells[indexOn][columnIndex++] = 0;
 			else
@@ -838,7 +840,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 		if (readGrid->Cells[indexOn][columnIndex - 8] == 0)
 			readGrid->Cells[indexOn][columnIndex++] = 0;
 		else
-			readGrid->Cells[indexOn][columnIndex++] = readGrid->Cells[indexOn][columnIndex-8] - readGrid->Cells[indexOn][columnIndex-7];
+			readGrid->Cells[indexOn][columnIndex++] = roundTwo(readGrid->Cells[indexOn][columnIndex-8] - readGrid->Cells[indexOn][columnIndex-7]);
 
 		//fill productivity for cost variance
 		if (readGrid->Cells[indexOn][columnIndex - 8] == 0)
@@ -1508,7 +1510,7 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 			bareRole = Form3->SQLQuery2->Fields->Fields[0]->AsString;
 			bareRoleFormatted = StringReplace(bareRole, "_", " ", TReplaceFlags() << rfReplaceAll);
 			roleListBox->Items->Add(bareRoleFormatted);
-			roleVector.push_back(Form3->SQLQuery2->Fields->Fields[0]->AsString);
+			roleVector.push_back(bareRoleFormatted);
 			Form3->SQLQuery2->Next();
 		}
 
@@ -2508,70 +2510,70 @@ int __fastcall TForm4::setIndexOn(int startDay)
 	}
 	else if (startDay == 3)
 	{
-		if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
+		if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
 			return 2;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
-			return 3;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
-			return 4;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
-			return 5;
 		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
-			return 6;
+			return 3;
 		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
-			return 7;
+			return 4;
 		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Friday"))
+			return 5;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
+			return 6;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
+			return 7;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
 			return 8;
 	}
 	else if (startDay == 4)
 	{
-		if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
+		if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
 			return 2;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
-			return 3;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
-			return 4;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
-			return 5;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
-			return 6;
 		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
-			return 7;
+			return 3;
 		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Friday"))
+			return 4;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
+			return 5;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
+			return 6;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
+			return 7;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
 			return 8;
 	}
 	else if (startDay == 5)
 	{
-		if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
+		if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
 			return 2;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
-			return 3;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
-			return 4;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
-			return 5;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
-			return 6;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
-			return 7;
 		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Friday"))
+			return 3;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
+			return 4;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
+			return 5;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
+			return 6;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
+			return 7;
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
 			return 8;
 	}
 	else if (startDay == 6)
 	{
-		if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
+		if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Friday"))
 			return 2;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Saturday"))
 			return 3;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Sunday"))
 			return 4;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Monday"))
 			return 5;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Tuesday"))
 			return 6;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Wednesday"))
 			return 7;
-		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Friday"))
+		else if (SameText(Form3->SQLQuery2->Fields->Fields[1]->AsString, "Thursday"))
 			return 8;
 	}
 }
