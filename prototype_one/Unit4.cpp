@@ -1508,7 +1508,7 @@ void __fastcall TForm4::FormShow(TObject *Sender)
 			bareRole = Form3->SQLQuery2->Fields->Fields[0]->AsString;
 			bareRoleFormatted = StringReplace(bareRole, "_", " ", TReplaceFlags() << rfReplaceAll);
 			roleListBox->Items->Add(bareRoleFormatted);
-			roleVector.push_back(Form3->SQLQuery2->Fields->Fields[0]->AsString);
+			roleVector.push_back(bareRoleFormatted);
 			Form3->SQLQuery2->Next();
 		}
 
