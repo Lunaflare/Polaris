@@ -1,0 +1,51 @@
+login to baldwinserver.com/cpanel
+
+go to "file manager"
+
+navigate into the "Lunaflare" folder then into the "polaris" folder
+
+now make sure you have the latest commit and you're all synced
+
+go into embarcadero and open the project
+
+change the the build configuration to "release"
+
+then click the play button to make it compile and run
+
+navigate to the Documents/Github/polaris/prototype_one 
+
+then navigate to Win32/release
+
+in that folder
+
+you'll then see prototype_one.exe
+
+copy that prototype_one.exe and paste it onto your desktop or something
+
+and rename it Polaris
+
+then go into the file manager on the baldwinserver cpanel and rename the Polaris.exe to Polaris_OLD8.exe
+
+upload the new Polaris
+
+then go back to your desktop and right click the new Polaris.exe and go to properties
+
+copy the "size"
+
+then go into cpanel file manager
+
+and right click update.list
+
+and "edit"
+
+then replace the number next to Polaris with the number you copied
+
+be sure to remove the commas
+
+then save
+
+then go to
+
+http://lunaflare.com/polaris/pump
+
+and it will increase the file size by 1
