@@ -16,3 +16,4 @@
 
 .in read when press home and go back in, some of the animations for errors and labels do not seem to work the second time through
 .decide on a new format for to do lists cuz txt file rlly com on
+.log out button
