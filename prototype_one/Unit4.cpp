@@ -127,12 +127,26 @@ void __fastcall TForm4::displayFilters(String filterType, int arbitraryIdentifie
 }
 
 //calculate what a value is as a percent to one decimal point
-float __fastcall TForm4::makePercent(float value)
+float __fastcall TForm4::makePercent(float top, float bottom)
 {
-	/*if (value < 1)
-		return value;
-	else*/
-		return floor(value * 100.0 * 10.0 + 0.5)/10.0;
+	double value = top/bottom;
+	double temp = value * 100.0;
+	double val = temp * 100.0;
+	val = RoundTo(val, 0);
+	temp = val / 100.0;
+	val = value * 10000.0;
+	val = RoundTo(val, 0);
+	value = val / 100.0;
+
+	if(top <= bottom)
+		return temp;
+	else
+	{
+		if(value >= 1)
+			return temp;
+		else
+			return value;
+	}
 }
 
 //round a decimal value to 2 places
@@ -141,7 +155,7 @@ float __fastcall TForm4::roundTwo(float value)
 	/*if (value < 1)
 		return value;
 	else*/
-		return floor(value * 100.0 + 0.5)/100.0;
+		return RoundTo((double)value, -2);
 }
 
 int __fastcall TForm4::nearestDollar(float value)
@@ -463,11 +477,11 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 			//compute occupancy percent (involves querying db)
 			if (SameText(type, "month"))
 			{
-				readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 1240.0) + " %";
+				readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat, 1240.0) + " %";
 			}
 			else if (SameText(type, "year"))
 			{
-				readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 14880.0) + " %";
+				readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat, 14880.0) + " %";
 			}
 			else if (SameText(type, "week") && monthChosen == -1)
 			{
@@ -476,7 +490,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 			}
 			else if (SameText(type, "week"))
 			{
-				readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 310.0) + " %";
+				readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat, 310.0) + " %";
 			}
 
 			//fill with rest of non role type stuff
@@ -503,7 +517,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 					if (j == 2)
 					{
 						if (Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat != 0)
-							readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat / Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
+							readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat, Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
 						else
 							readGrid->Cells[indexOn][columnIndex++] = "0 %";
 						++queryIndex;
@@ -563,7 +577,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 						if (j == 2)
 						{
 							if (Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat != 0)
-								readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat / Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
+								readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat, Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
 							else
 								readGrid->Cells[indexOn][columnIndex++] = "0%";
 							++queryIndex;
@@ -583,7 +597,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 						if (j == 2)
 						{
 							if (Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat != 0)
-								readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat / Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
+								readGrid->Cells[indexOn][columnIndex++] = blank + (double)makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex-1]->AsFloat, Form3->SQLQuery2->Fields->Fields[queryIndex-2]->AsFloat) + " %";
 							else
 								readGrid->Cells[indexOn][columnIndex++] = "0 %";
 							//readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
@@ -750,11 +764,11 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 			{
 				if (SameText(type, "month"))
 				{
-					occupancyPercent = totalCounter / 8680.0;
+					occupancyPercent = makePercent(totalCounter, 8680.0);
 				}
 				else if (SameText(type, "year"))
 				{
-					occupancyPercent = totalCounter / 104160.0;
+					occupancyPercent = makePercent(totalCounter, 104160.0);
 	            }
 				else if (SameText(type, "week") && monthChosen == -1)
 				{
@@ -763,13 +777,13 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 				}
 				else if (SameText(type, "week"))
 				{
-					occupancyPercent = totalCounter / 2170.0;
+					occupancyPercent = makePercent(totalCounter, 2170.0);
 				}
 			}
 
 			if (columnIndex == 1)
 				if (occupancyPercent != -1)
-					readGrid->Cells[indexOn][columnIndex] = blank + makePercent(occupancyPercent) + " %";
+					readGrid->Cells[indexOn][columnIndex] = blank + occupancyPercent + " %";
 				else
 					readGrid->Cells[indexOn][columnIndex] = "N/A";
 			else
@@ -811,7 +825,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, int monthChosen, St
 					readGrid->Cells[indexOn][columnIndex] = blank + "$" + commas(IntToStr(nearestDollar(totalCounter)));
 				else if (modThree % 3 == 0)
 					if (readGrid->Cells[indexOn][columnIndex-2] != 0)
-						readGrid->Cells[indexOn][columnIndex] = blank + makePercent(readGrid->Cells[indexOn][columnIndex-1] / readGrid->Cells[indexOn][columnIndex-2]) + " %";
+						readGrid->Cells[indexOn][columnIndex] = blank + makePercent(toDouble(readGrid->Cells[indexOn][columnIndex-1]), toDouble(readGrid->Cells[indexOn][columnIndex-2])) + " %";
 					else
 	                   	readGrid->Cells[indexOn][columnIndex] = "0%";
 				else
@@ -1152,7 +1166,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[0]->AsString;
 			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[2]->AsString;
 			offsetRoomsOccupiedTotal = Form3->SQLQuery2->Fields->Fields[2]->AsFloat;
-			readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat / 310.0) + " %";
+			readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[2]->AsFloat, 310.0) + " %";
 
 			//fill with rest of non role type stuff
 			readGrid->Cells[indexOn][columnIndex++] = Form3->SQLQuery2->Fields->Fields[3]->AsString;
@@ -1176,7 +1190,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 				{
 					//if j == 2, these should be percents
 					if (j == 2)
-						readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+						readGrid->Cells[indexOn][columnIndex++] = blank + (double)RoundTo((double)(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat), -2) + " %";
 					else if (j == 1)
 					{
 						//compute productivity man hours
@@ -1230,7 +1244,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 	                        hoursVarianceTwo = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
 
 						if (j == 2)
-							readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+							readGrid->Cells[indexOn][columnIndex++] = blank + (double)(RoundTo((double)(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat), -2)) + " %";
 						else
 							readGrid->Cells[indexOn][columnIndex++] = nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat);
 					}
@@ -1243,7 +1257,7 @@ void __fastcall TForm4::populateGrid(vector<String> rVector, String currentDate)
 							costVarianceTwo = Form3->SQLQuery2->Fields->Fields[queryIndex]->AsFloat;
 
 						if (j == 2)
-							readGrid->Cells[indexOn][columnIndex++] = blank + makePercent(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat) + " %";
+							readGrid->Cells[indexOn][columnIndex++] = blank + (double)(RoundTo((double)(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat), -2)) + " %";
 						else
 							readGrid->Cells[indexOn][columnIndex++] = blank + "$" + commas(IntToStr(nearestDollar(Form3->SQLQuery2->Fields->Fields[queryIndex++]->AsFloat)));
 					}
@@ -1584,6 +1598,13 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	Form2->Show();
 
 	//make items not visible again so in good shape upon reentry
+	ResetThings4();
+}
+
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::ResetThings4()
+{
 	roleListBox->Enabled=true;
 	arrowDay->Visible=false;
 	pickerArrow->Visible=false;
@@ -1667,7 +1688,6 @@ void __fastcall TForm4::homeImageButton4Click(TObject *Sender)
 	readGrid->RowCount = 20;
 }
 
-//---------------------------------------------------------------------------
 
 void __fastcall TForm4::nextImageButton2Click(TObject *Sender)
 {
@@ -2577,3 +2597,12 @@ int __fastcall TForm4::setIndexOn(int startDay)
 			return 8;
 	}
 }
+void __fastcall TForm4::signOutButtonOnClick(TObject *Sender)
+{
+	Form4->Hide();
+	Form1->Show();
+
+	ResetThings4();
+}
+//---------------------------------------------------------------------------
+

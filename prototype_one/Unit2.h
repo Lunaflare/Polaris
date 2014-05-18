@@ -53,6 +53,7 @@ __published:	// IDE-managed Components
 	TCalloutPanel *inputCallout;
 	TLabel *inputCalloutImage;
 	TFloatAnimation *FloatAnimation4;
+	TImage *signOutButton;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall inputSelectButtonClick(TObject *Sender);
@@ -71,6 +72,7 @@ __published:	// IDE-managed Components
 	void __fastcall readIndicatorImageMouseLeave(TObject *Sender);
 	void __fastcall inputIndicatorImageMouseEnter(TObject *Sender);
 	void __fastcall inputIndicatorImageMouseLeave(TObject *Sender);
+	void __fastcall signOutButtonOnClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TForm2(TComponent* Owner);

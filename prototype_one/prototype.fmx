@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'Login'
-  ClientHeight = 443
+  ClientHeight = 450
   ClientWidth = 539
   Fill.Kind = bkGradient
   Fill.Gradient.Points = <

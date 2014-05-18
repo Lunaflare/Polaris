@@ -54,15 +54,18 @@ __published:	// IDE-managed Components
 	TImage *backLabel;
 	TFloatAnimation *FloatAnimation7;
 	TFloatAnimation *FloatAnimation8;
+	TImage *signOutButton;
 	void __fastcall backImageButtonClick(TObject *Sender);
 	void __fastcall saveChangesButtonClick(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton6Click(TObject *Sender);
+	void __fastcall ResetThings6();
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall homeImageButton6MouseEnter(TObject *Sender);
 	void __fastcall backImageButtonMouseEnter(TObject *Sender);
 	void __fastcall backImageButtonMouseLeave(TObject *Sender);
 	void __fastcall homeImageButton6MouseLeave(TObject *Sender);
+	void __fastcall signOutButtonOnClick(TObject *Sender);
 private:	// User declarations
 	String inputTable;
 	String readTable;

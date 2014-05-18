@@ -144,6 +144,7 @@ __published:	// IDE-managed Components
 	TImage *errorImage;
 	TFloatAnimation *opacityFadeIn;
 	TAniIndicator *loadingIndicator;
+	TImage *signOutButton;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton3Click(TObject *Sender);
@@ -155,6 +156,7 @@ __published:	// IDE-managed Components
 	void __fastcall calendarChange(TObject *Sender);
 	void __fastcall homeImageButton5MouseEnter(TObject *Sender);
 	void __fastcall homeImageButton5MouseLeave(TObject *Sender);
+	void __fastcall ResetThings3();
 	void __fastcall homeImageButton5Click(TObject *Sender);
 	void __fastcall nextImageButtonMouseEnter(TObject *Sender);
 	void __fastcall nextImageButtonMouseLeave(TObject *Sender);
@@ -169,6 +171,7 @@ __published:	// IDE-managed Components
 		  TShiftState Shift);
 	void __fastcall submitButtonClick(TObject *Sender);
 	void __fastcall FormCloseQuery(TObject *Sender, bool &CanClose);
+	void __fastcall signOutButtonOnClick(TObject *Sender);
 
 //was private
 public:	// User declarations

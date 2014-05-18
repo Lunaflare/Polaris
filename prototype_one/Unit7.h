@@ -60,6 +60,7 @@ __published:	// IDE-managed Components
 	TFloatAnimation *FloatAnimation12;
 	TCalloutPanel *selectCallout;
 	TLabel *selectLabel;
+	TImage *signOutButton;
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall homeImageButton7Click(TObject *Sender);
@@ -72,6 +73,7 @@ __published:	// IDE-managed Components
 	void __fastcall backImageButtonMouseLeave(TObject *Sender);
 	void __fastcall nextImageButtonMouseEnter(TObject *Sender);
 	void __fastcall nextImageButtonMouseLeave(TObject *Sender);
+	void __fastcall signOutButtonOnClick(TObject *Sender);
 private:	// User declarations
 	int state;
 	String inputTable;

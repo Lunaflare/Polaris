@@ -145,6 +145,7 @@ __published:	// IDE-managed Components
 	TImage *errorLabelImage;
 	TFloatAnimation *FloatAnimation34;
 	TLabel *errorLabel;
+	TImage *signOutButton;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton4Click(TObject *Sender);
@@ -158,6 +159,7 @@ __published:	// IDE-managed Components
 	void __fastcall monthRadioClick(TObject *Sender);
 	void __fastcall yearRadioClick(TObject *Sender);
 	void __fastcall updateImageButtonClick(TObject *Sender);
+	void __fastcall ResetThings4();
 	void __fastcall backImageButton2MouseEnter(TObject *Sender);
 	void __fastcall backImageButton2MouseLeave(TObject *Sender);
 	void __fastcall nextImageButton2MouseEnter(TObject *Sender);
@@ -168,6 +170,7 @@ __published:	// IDE-managed Components
 	void __fastcall printButtonImageMouseLeave(TObject *Sender);
 	void __fastcall viewButtonImageMouseEnter(TObject *Sender);
 	void __fastcall viewButtonImageMouseLeave(TObject *Sender);
+	void __fastcall signOutButtonOnClick(TObject *Sender);
 	//was private
 	public:	// User declarations
 	String inputTable;
@@ -200,7 +203,7 @@ public:		// User declarations
 	__fastcall TForm4(TComponent* Owner);
 	void __fastcall populateGrid(vector<String>, String);
 	void __fastcall populateGrid(vector<String>, int, String, String, String);
-	float __fastcall makePercent(float);
+	float __fastcall makePercent(float, float);
 	float __fastcall roundTwo(float value);
 	int __fastcall nearestDollar(float value);
 	string __fastcall IntToStr(long int n);

@@ -195,3 +195,10 @@ inputCallout->Visible=false;
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TForm2::signOutButtonOnClick(TObject *Sender)
+{
+	Form2->Hide();
+	Form1->Show();
+}
+//---------------------------------------------------------------------------
+

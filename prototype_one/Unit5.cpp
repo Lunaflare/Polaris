@@ -235,3 +235,13 @@ void __fastcall TForm5::editRoleButtonClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TForm5::signOutButtonOnClick(TObject *Sender)
+{
+	//erase data from password edit boxes
+	passwordChangeEdit->Text = "";
+	confirmPasswordEdit->Text = "";
+	Form5->Hide();
+	Form1->Show();
+}
+//---------------------------------------------------------------------------
+

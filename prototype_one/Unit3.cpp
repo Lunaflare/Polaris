@@ -440,8 +440,7 @@ void __fastcall TForm3::FormClose(TObject *Sender, TCloseAction &Action)
 }
 //---------------------------------------------------------------------------
 
-//take user back to main menu when clicked
-void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
+void __fastcall TForm3::ResetThings3()
 {
 	//hide certain items
 	backImageButton->Visible = false;
@@ -458,13 +457,18 @@ void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
 	inputObject.valueMap.clear();
 	inputObject.size = 0;
 	inputObject.currentIndex = 0;
+}
+//---------------------------------------------------------------------------
 
+//take user back to main menu when clicked
+void __fastcall TForm3::homeImageButton3Click(TObject *Sender)
+{
+	ResetThings3();
 	//hide current form and show welcome screen
 	Form3->Hide();
 	Form2->Show();
 }
 //---------------------------------------------------------------------------
-
 //go through column headings as desired by the user
 void __fastcall TForm3::nextImageButtonClick(TObject *Sender)
 {
@@ -1137,5 +1141,13 @@ else CanClose=true;
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+
+void __fastcall TForm3::signOutButtonOnClick(TObject *Sender)
+{
+	ResetThings3();
+	Form3->Hide();
+	Form1->Show();
+}
 //---------------------------------------------------------------------------
 

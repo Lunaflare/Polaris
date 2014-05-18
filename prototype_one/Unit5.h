@@ -61,6 +61,7 @@ __published:	// IDE-managed Components
 	TButton *addRoleButton;
 	TPopupBox *weekStartDayPopupBox;
 	TLabel *weekStartDayLabel;
+	TImage *signOutButton;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall homeImageButton5Click(TObject *Sender);
@@ -69,6 +70,7 @@ __published:	// IDE-managed Components
 	void __fastcall homeImageButton5MouseLeave(TObject *Sender);
 	void __fastcall addRoleButtonClick(TObject *Sender);
 	void __fastcall editRoleButtonClick(TObject *Sender);
+	void __fastcall signOutButtonOnClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TForm5(TComponent* Owner);

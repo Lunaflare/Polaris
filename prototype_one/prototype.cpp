@@ -81,7 +81,19 @@ void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 		reg->Free();
 
 		//spawn the next form
+		usernameEdit->Text = "";
+		passwordEdit->Text = "";
+		loadIndicator->Enabled=false;
+		loadIndicator->Visible=false;
+
+		usernameEdit->Enabled = false;
+		usernameEdit->Enabled = true;
+
+		passwordEdit->Enabled = false;
+		passwordEdit->Enabled = true;
+
 		Form2->Show();
+
 	}
 	else
 	{

@@ -251,7 +251,13 @@ void __fastcall TForm6::homeImageButton6Click(TObject *Sender)
 	Form6->Hide();
 	Form2->Show();
 
-	//set things back to empty
+	ResetThings6();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm6::ResetThings6()
+{
+    //set things back to empty
 	roleNameEdit->Text = "";
 	roleWagesEdit->Text = "";
 	referencePopupBox->Items->Clear();
@@ -260,11 +266,11 @@ void __fastcall TForm6::homeImageButton6Click(TObject *Sender)
 	errorLabel->Visible = false;
 	checkInputImage->Visible=false;
 	inputCallout->Visible=false;
-	 wagesCallout->Visible=false;
-	 selectCallout->Visible=false;
+	wagesCallout->Visible=false;
+	selectCallout->Visible=false;
 }
-//---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
 void __fastcall TForm6::FormShow(TObject *Sender)
 {
 	//fill the rolePopupBox with possible labor standards references
@@ -332,4 +338,12 @@ homeLabel->Visible=false;
 }
 //---------------------------------------------------------------------------
 
+
+void __fastcall TForm6::signOutButtonOnClick(TObject *Sender)
+{
+	ResetThings6();
+	Form6->Hide();
+	Form1->Show();
+}
+//---------------------------------------------------------------------------
 
