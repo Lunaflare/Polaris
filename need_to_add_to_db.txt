@@ -1,8 +1,0 @@
-.maybe a role table per hotel (would add column for role table also to hotel ref)
-.in db store number of things in read that are not roles (i.e. everything that comes before the roles)
-	-right now I am using a static number for this
-.might want table saying which hotelID corresponds to which hotel (mostly for our records)
-.store "accounting" for particular months/weeks/years in order to calculate extra stuff in top left of grid?
-	-right now these calculations will not be correct because there is a hardcoded number for "accounting"
-.should store the names of roles that are necessary for special calculations in read
-	-then can actually edit the names of these roles
