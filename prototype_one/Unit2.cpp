@@ -23,9 +23,6 @@ __fastcall TForm2::TForm2(TComponent* Owner)
 //hides the main form once this form is shown
 void __fastcall TForm2::FormShow(TObject *Sender)
 {
-    //hide the main login form
-	Form1->Hide();
-
 	//if lowest accessLevel, disable read button and possibly input button
 	if (Form1->getAccessLevel() == 0)
 	{
@@ -65,6 +62,13 @@ void __fastcall TForm2::FormShow(TObject *Sender)
 				inputButtonImage->Enabled = true;
 		}
 	}
+
+	else if(Form1->getAccessLevel() == 1 || Form1->getAccessLevel() == 2)
+	{
+		// enable read button (do we want to show balloon here too?)
+		readButtonImage->Enabled = true;
+		readIndicatorImage->Visible=false;
+    }
 
 	//display username hello message, get username from form1
 	Form2->welcomeUserLabel->Text =  Form1->getUsername() + "!";
@@ -171,27 +175,27 @@ void __fastcall TForm2::readButtonImageClick(TObject *Sender)
 
 void __fastcall TForm2::readIndicatorImageMouseEnter(TObject *Sender)
 {
-readCallout->Visible=true;
-arrowImage->Visible=false;
+	readCallout->Visible=true;
+	arrowImage->Visible=false;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm2::readIndicatorImageMouseLeave(TObject *Sender)
 {
-readCallout->Visible=false;
+	readCallout->Visible=false;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm2::inputIndicatorImageMouseEnter(TObject *Sender)
 {
-inputCallout->Visible=true;
-arrowImage->Visible=false;
+	inputCallout->Visible=true;
+	arrowImage->Visible=false;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm2::inputIndicatorImageMouseLeave(TObject *Sender)
 {
-inputCallout->Visible=false;
+	inputCallout->Visible=false;
 }
 //---------------------------------------------------------------------------
 

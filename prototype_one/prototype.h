@@ -46,6 +46,7 @@ __published:	// IDE-managed Components
 	void __fastcall recoverPasswordButtonClick(TObject *Sender);
 	void __fastcall passwordEditKeyDown(TObject *Sender, WORD &Key, System::WideChar &KeyChar,
           TShiftState Shift);
+	void __fastcall Show();
 	void __fastcall FormCreate(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 private:	// User declarations
@@ -59,17 +60,28 @@ private:	// User declarations
 	int weekStartDay;
 public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);
-	String getUsername() { return username; }
-	String getPassword() { return password; }
 
+	String getUsername() { return username; }
+	void setUsername(String un) { username = un; }
+
+	String getPassword() { return password; }
 	void setPassword(String p) { password = p; }
+
 	String getInputLevel() { return inputLevel; }
+	void setInputLevel(String i) { inputLevel = i; }
+
 	String getReadLevel() { return readLevel; }
 	void setReadLevel(String r) { readLevel = r; }
+
 	String getAccessLevel() { return accessLevel; }
-    void setInputLevel(String i) { inputLevel = i; }
+	void setAccessLevel(String a) { accessLevel = a; }
+
 	String getUserID() { return userID; }
+	void setUserID(String u) { userID = u; }
+
 	String getHotelID() { return hotelID; }
+	void setHotelID(String h) { hotelID = h; }
+
 	void setWeekStartDay(int w) { weekStartDay = w; }
 	int getWeekStartDay() { return weekStartDay; }
 };

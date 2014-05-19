@@ -57,14 +57,14 @@ void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 		//success (not empty), spawn next form, get rid of error message
 		//first save some variables about the user
 		errorLabel->Visible = false;
-		username = usernameEdit->Text;
-		password = passwordEdit->Text;
-		inputLevel = SQLQuery1->Fields->Fields[9]->AsString;
-		readLevel = SQLQuery1->Fields->Fields[8]->AsString;
-		accessLevel = SQLQuery1->Fields->Fields[4]->AsString;
-		userID = SQLQuery1->Fields->Fields[0]->AsString;
-		hotelID = SQLQuery1->Fields->Fields[7]->AsString;
-		weekStartDay = SQLQuery1->Fields->Fields[10]->AsInteger;
+		setUsername(usernameEdit->Text);
+		setPassword(passwordEdit->Text);
+		setInputLevel(SQLQuery1->Fields->Fields[9]->AsString);
+		setReadLevel(SQLQuery1->Fields->Fields[8]->AsString);
+		setAccessLevel(SQLQuery1->Fields->Fields[4]->AsString);
+		setUserID(SQLQuery1->Fields->Fields[0]->AsString);
+		setHotelID(SQLQuery1->Fields->Fields[7]->AsString);
+		setWeekStartDay(SQLQuery1->Fields->Fields[10]->AsInteger);
 
 		//if rememberMe is set, update registry entry
 		TRegistry* reg = new TRegistry(KEY_READ);
@@ -91,7 +91,7 @@ void __fastcall TForm1::loginSubmitButtonClick(TObject *Sender)
 
 		passwordEdit->Enabled = false;
 		passwordEdit->Enabled = true;
-
+		Form1->Hide();
 		Form2->Show();
 
 	}
@@ -181,6 +181,36 @@ TRegistry* reg = new TRegistry(KEY_READ);
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TForm1::Show()
+{
+	//initialize registry settings
+	TRegistry* reg = new TRegistry(KEY_READ);
+	reg->RootKey = HKEY_CURRENT_USER;
+	reg->Access = KEY_READ;
+	if(reg->OpenKey("Software\\Lunaflare\\Polaris\\", true))
+	{
+		if(reg->ValueExists("remember"))
+		{
+		  if(reg->ReadInteger("remember")==1)
+		  {
+			Switch1->IsChecked=true;
+			usernameEdit->Text=reg->ReadString("user");
+			passwordEdit->SetFocus();
+		  }
+		}
+		else
+		{
+		reg->Access = KEY_WRITE;
+		reg->OpenKey("Software\\Lunaflare\\Polaris\\", true);
+		reg->WriteInteger("remember", 0);
+		usernameEdit->SetFocus();
+		}
+	}
+	reg->CloseKey();
+	reg->Free();
+	this->Visible = true;
+}
+//---------------------------------------------------------------------------
 
 void __fastcall TForm1::FormClose(TObject *Sender, TCloseAction &Action)
 {

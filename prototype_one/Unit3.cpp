@@ -314,6 +314,9 @@ void __fastcall TForm3::FormShow(TObject *Sender)
 	if (Form1->getAccessLevel() == 0)
 	{
 		//get the hotelID and query hotel_ref to find out which table to input to and which table to read from
+		chooseDateImageButton->Visible = false;
+		datePopupBoxLabel->Visible = false;
+		calendar->Visible = false;
 		String currentHotelID = Form1->getHotelID();
 		inputTable = "";
 		readTable = "";
